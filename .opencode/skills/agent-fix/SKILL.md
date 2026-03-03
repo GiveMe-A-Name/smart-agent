@@ -1,16 +1,23 @@
 ---
 name: agent-fix
-description: Applies fixes to OpenCode agent definitions based on improvement plans. Use when: (1) Observer detects issues in agent behavior, (2) Agent definitions need updating, (3) Fix plans are ready to be applied. NOT for: skill fixes, user code changes.
+description: Applies fixes to AI agent definition files based on improvement plans. Use when: (1) Observer detects issues in agent behavior, (2) Agent definitions need updating, (3) Fix plans are ready to be applied. NOT for: skill fixes, user code changes.
 ---
 
 # Agent Fix
 
-Apply fixes to agent definition files in `.opencode/agents/`.
+Apply fixes to agent definition files in the tool's agents directory.
+
+## Configuration
+
+Before starting, identify:
+- **Tool name**: The vibe coding tool (e.g., opencode, cursor, windsurf)
+- **Agents dir**: Where agent definitions are stored (e.g., `.opencode/agents/`, `.cursor/rules/`, `.windsurf/`)
+- **Snapshots dir**: Where backups are stored (e.g., `.opencode/snapshots/`)
 
 ## Workflow
 
 1. **Read target**: Load the agent .md file needing fixes
-2. **Create snapshot**: Copy to `.opencode/snapshots/snapshot_{name}_{timestamp}.bak`
+2. **Create snapshot**: Copy to `{snapshots_dir}/snapshot_{name}_{timestamp}.bak`
 3. **Apply changes**: Use edit/write to apply the fix
 4. **Verify**: Check syntax is valid markdown
 5. **Report**: Summarize changes made
@@ -18,12 +25,12 @@ Apply fixes to agent definition files in `.opencode/agents/`.
 ## Rules
 
 **Allowed to modify:**
-- `.opencode/agents/*.md`
+- `{agents_dir}*.md`
 
 **NEVER modify:**
 - User project code
 - External dependencies (node_modules, etc)
-- Files outside `.opencode/`
+- Files outside the tool's config directory
 
 ## Rollback
 
@@ -34,4 +41,4 @@ If verification fails:
 
 ## Output
 
-Report: target file, changes applied, snapshot ID, status (SUCCESS/FAILED)
+Report: target file, tool name, changes applied, snapshot ID, status (SUCCESS/FAILED)
