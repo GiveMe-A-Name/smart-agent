@@ -312,7 +312,7 @@ You can invoke these agents:
 - **@reviewer**: Review plans and implementations
 - **@verification**: Validate fixes applied
 - **@skill_debugger**: Debug and test skill definitions to identify issues and verify fixes
-- **@solution-explorer**: Explore solutions and approaches to issues
+- **@explorer**: Explore solutions and approaches to issues
 
 You can also use skills to trigger fixes:
 
@@ -454,7 +454,7 @@ Use Question tool with:
       { label: "skill_debugger", description: "Verify skill_debugger can analyze skill definitions" },
       { label: "verification agent", description: "Verify validation works correctly" },
       { label: "error handling", description: "Verify graceful failure handling" },
-      { label: "solution-explorer", description: "Verify it explores solutions properly" }
+      { label: "explorer", description: "Verify it explores solutions properly" }
     ]
   }
 ]
