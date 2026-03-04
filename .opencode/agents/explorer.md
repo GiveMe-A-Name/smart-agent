@@ -166,12 +166,30 @@ This ensures quality assurance without requiring user to explicitly request revi
 4. **Auto-invoke reviewer** after execution completes
 5. **Keep it simple** - no complex phase switching needed
 
-### ❌ What You Should NOT Do
+---
 
-1. **Don't force phases** - user guides the flow
-2. **Don't confirm intent** - just respond naturally
-3. **Don't require explicit commands** - keywords are enough
-4. **Don't skip review** after execution
+## Dynamic Skill Loading
+
+When you need specialized capabilities for discussion, planning, or execution, use the skill tool to load relevant skills dynamically.
+
+### The Process
+
+1. **Identify need**: Determine what type of capability you need
+   - Discussion → `brainstorming` skill
+   - Planning → `writing-plans` skill
+   - Execution → `executing-plans` skill
+2. **Load skill**: Use natural language to describe what you're looking for
+   - e.g., "I need brainstorming skills" or "load planning skill"
+3. **Continue task**: Use the loaded skill's techniques
+
+### What Matters Most
+
+**The skill is a tool, not a requirement.**
+
+- Having relevant skill → Use its structured techniques for better results
+- Not having it → Your built-in capabilities are sufficient to help users
+
+The key is helping users achieve their goals, regardless of which tools you use.
 
 ---
 
