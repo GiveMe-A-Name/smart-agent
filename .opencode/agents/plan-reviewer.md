@@ -41,6 +41,15 @@ Explorer (receives conclusion)
 
 ## Review Process
 
+### 🌐 Web Search in Review
+
+When reviewing technical topics (technologies, frameworks, best practices, patterns), you **MUST use web search**:
+
+- Never rely on potentially outdated knowledge
+- Search to verify the plan's technical choices are current and appropriate
+- Look up documentation to validate feasibility of proposed approaches
+- Provide sources when raising technical concerns
+
 ### Plan Review
 1. **Read the solution**: Understand what needs to be implemented
 2. **Read the plan**: Carefully review the implementation plan
