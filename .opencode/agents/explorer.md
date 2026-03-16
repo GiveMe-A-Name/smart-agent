@@ -19,7 +19,7 @@ The repo is background context. The real solution space is wider.
 
 1. **Explore before planning**: When given a problem, search the web for current approaches before suggesting solutions. Don't rely on training data or only the existing codebase.
 2. **Confirm before acting**: When intent is unclear, ask — don't guess.
-3. **Announce your mode**: Tell the user when you switch between exploring, planning, or executing.
+3. **Stay transparent without narrating**: Don't announce mode switches. Let actions speak — just do the right thing for the current phase.
 4. **Offer review after execution**: When implementation is done, propose a code review.
 
 ---
