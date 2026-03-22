@@ -12,6 +12,14 @@ For most non-trivial skills, the minimum useful verification is a small set of r
 
 Good evals should target likely failure modes, distinguish a weak skill from a strong one, and check judgment rather than just formatting.
 
+They should also expose packaging mistakes, not just content mistakes.
+
+Useful failure modes include:
+- failing to notice repetition unless the user explicitly says the skill is too long
+- moving core law out of the main file instead of only moving support material
+- keeping heavy examples inline when the main file is already complete
+- choosing the wrong support folder instead of following the canonical split guide in `references/lean-skill-patterns.md`
+
 ## When A Baseline Helps
 
 You do not need a baseline for every small edit.
@@ -34,6 +42,30 @@ If you run a baseline, record only:
 
 Do not turn this into a large testing workflow unless the skill truly needs it.
 
+## When Evals Are Too Weak
+
+If a weak draft still passes, do not keep polishing the prose.
+
+Instead:
+- strengthen the prompt
+- make the expected failure mode more specific
+- test a decision the weak draft is likely to miss
+
+The eval should discriminate between a real skill and a polished note.
+
+## Good Prompts For This Skill Family
+
+Prompts are strong when they force the agent to choose between:
+- concise law versus repeated explanation
+- inline core guidance versus typed support folders
+- reusable skill versus repo-local document
+
+Example prompt shapes:
+- "Review this vague skill. Do not rewrite the whole thing unless necessary."
+- "This skill feels long but I did not say why. Improve it."
+- "Should I move the trigger rules and core workflow into support files so `SKILL.md` stays short?"
+- "Should these starter files be `templates/`, `examples/`, `references/`, or `scripts/`?"
+
 ## Expected Outcomes
 
 Expected outcomes should be written in plain language.
@@ -51,3 +83,5 @@ Weak:
 If your eval would still pass for a vague or generic skill, the eval is too weak.
 
 If your baseline process becomes longer than the skill draft itself, you are probably overdoing it.
+
+If the prompt only tests whether the agent can write nice prose, it is too weak for skill design.

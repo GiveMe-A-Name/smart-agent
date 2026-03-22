@@ -128,28 +128,49 @@
         "Evaluates the `description` as trigger logic rather than as a summary of the workflow",
         "Checks whether the artifact should remain a skill versus a repo-local document",
         "Calls out missing verification or eval coverage if absent",
+        "Checks packaging and redundancy rather than only wording quality",
         "Returns prioritized fixes instead of reflexively rewriting the entire skill",
         "Respects the request to avoid a full rewrite unless clearly necessary"
       ]
     },
     {
       "id": 7,
-      "name": "protect-core-from-reference-split",
+      "name": "protect-core-from-bad-support-split",
       "phase": "eval",
-      "prompt": "My skill draft is getting long. I think I should move the trigger rules, constraints, and core workflow into `references/` so the main `SKILL.md` stays short. Is that the right move?",
-      "why_this_exists": "A packaging mistake can make the main skill file short but hollow, which hurts usability at the moment of decision.",
+      "prompt": "My skill draft is getting long. I think I should move the trigger rules, constraints, and core workflow into support files so the main `SKILL.md` stays short. Is that the right move? Also, I have starter scaffolds, good/bad sample outputs, naming rules, and a helper validator script. How should these be packaged?",
+      "why_this_exists": "A packaging mistake can make the main skill file short but hollow, and a weak package often dumps every supporting file into `references/` instead of choosing folders by function.",
       "baseline_failure_signals": [
-        "Moves core trigger logic, constitution, or main workflow into `references/`",
+        "Moves core trigger logic, constitution, or main workflow out of the main file",
         "Optimizes for file size instead of decision quality",
-        "Fails to distinguish core rules from lookup-heavy support material"
+        "Fails to distinguish references, templates, examples, and scripts"
       ],
-      "expected_output": "Pushes back on moving essential trigger logic, constitution, or primary workflow into `references/`, while still allowing heavy lookup material or templates to be split out.",
+      "expected_output": "Pushes back on moving essential trigger logic, constitution, or primary workflow out of the main file, while packaging starter scaffolds as templates, sample outputs as examples, naming rules as references, and validators as scripts.",
       "files": [],
       "expectations": [
         "Keeps core trigger logic, constitution, and main workflow inline",
-        "Allows `references/` only for heavy lookup material, templates, or repeated detail",
+        "Maps scaffolds to `templates/`, exemplars to `examples/`, lookup rules to `references/`, and deterministic helpers to `scripts/`",
         "Explains the tradeoff in terms of usability and decision quality, not just file size",
-        "Makes a clear distinction between core law and supporting detail"
+        "Makes a clear distinction between core law and supporting assets"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "proactive-redundancy-audit",
+      "phase": "eval",
+      "prompt": "Please improve this skill draft. I did not say it is too long, but it feels hard to use. The draft repeats the same packaging advice in the overview, the workflow, the checklist, and the common mistakes section.",
+      "why_this_exists": "The skill should teach agents to notice structural redundancy on their own instead of waiting for the user to explicitly complain that the skill is too long.",
+      "baseline_failure_signals": [
+        "Makes only local wording tweaks while leaving repeated arguments intact",
+        "Focuses on style polish instead of collapsing duplicate sections",
+        "Does not mention redundancy unless directly asked about length"
+      ],
+      "expected_output": "Identifies the repeated argument, proposes or performs a compression pass, and explains what should stay inline versus what could move to `references/` if the draft remains complex.",
+      "files": [],
+      "expectations": [
+        "Detects redundancy even though the user did not explicitly say the draft is too long",
+        "Identifies at least one repeated idea that should be merged or compressed",
+        "Explains whether the fix is deletion, merging, or moving support detail to `references/`",
+        "Keeps the focus on decision quality rather than file length alone"
       ]
     },
     {

@@ -2,16 +2,15 @@
 
 ## Review Order
 
-When assessing an existing skill, review it in this order:
-
+Review in this order:
 1. `description`
 2. scope boundary
 3. constitution
 4. execution guidance
 5. verification
-6. packaging
+6. packaging and redundancy
 
-This order matters. A skill that is well-written but poorly triggered is still weak.
+This order matters. A polished file that triggers badly or repeats itself is still weak.
 
 ## Section Checks
 
@@ -19,12 +18,12 @@ This order matters. A skill that is well-written but poorly triggered is still w
 
 Check:
 - is it trigger-focused?
-- does it describe when to use the skill rather than what steps it performs?
+- does it describe when to use the skill rather than the workflow?
 - would it help discovery?
 
 Common failures:
 - workflow summary
-- vague description like "helps with skills"
+- vague wording like "helps with skills"
 - no concrete contexts or symptoms
 
 ### 2. Scope Boundary
@@ -35,7 +34,7 @@ Check:
 
 Common failures:
 - repo-local instructions forced into a skill
-- project setup material presented as reusable agent capability
+- project setup material presented as reusable capability
 
 ### 3. Constitution
 
@@ -73,17 +72,33 @@ Common failures:
 - generic evals with no failure pressure
 - verification treated as optional polish
 
-### 6. Packaging
+### 6. Packaging And Redundancy
 
 Check:
 - is the main `SKILL.md` lean but complete?
-- does `references/` hold only supporting material?
+- do support folders match file roles? Use `references/lean-skill-patterns.md` as the canonical split guide.
 - were essential rules mistakenly moved out?
+- does more than one section make the same argument?
 
 Common failures:
 - main skill too long and repetitive
-- main skill hollow because key logic moved to references
-- `references/` used as a dump
+- main skill hollow because key logic moved out of the main file
+- support files dumped into the wrong folder instead of following the canonical split guide
+- repeated packaging advice scattered across multiple sections
+
+## Mandatory Redundancy Audit
+
+Run this even if the user never said the skill is too long.
+
+Check for:
+- the same rule explained in overview, workflow, and checklist
+- examples that merely restate bullets
+- sections that exist only to justify an already-clear rule
+
+When found:
+- keep the clearest version inline
+- compress or delete the repeats
+- move only the expanded support material to the correct support folder
 
 ## Recommended Review Output
 
@@ -91,7 +106,7 @@ Use this shape by default:
 - overall assessment
 - what already works
 - highest-impact gaps
-- section review for description, scope, constitution, execution, verification, packaging
+- section review for description, scope, constitution, execution, verification, packaging and redundancy
 - prioritized fixes
 - rewritten text only for the weakest parts
 

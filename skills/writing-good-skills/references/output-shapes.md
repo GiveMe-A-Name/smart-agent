@@ -6,9 +6,13 @@ Default output shape:
 - skill boundary decision
 - trigger logic explanation
 - lean `SKILL.md`
-- supporting `references/` only if justified
+- supporting folders only if justified
 - realistic eval prompts
 - short explanation of what behavior the skill should change
+
+If the skill is complex, also include:
+- a split map explaining what stays inline versus what moves to `references/`, `templates/`, `examples/`, or `scripts/`
+- a short note on what repetition was removed or compressed
 
 ## When Reviewing A Skill
 
@@ -16,7 +20,7 @@ Default output shape:
 - overall assessment
 - what already works
 - highest-impact gaps
-- section review for description, scope, constitution, execution, verification, packaging
+- section review for description, scope, constitution, execution, verification, packaging, and redundancy
 - prioritized fixes
 - rewritten text only for the weakest sections
 
@@ -32,17 +36,11 @@ Prefer:
 
 ## Packaging Rule
 
-Use `references/` only when it improves decision quality in the main file.
+Use support folders only when they improve decision quality in the main file.
 
-Move out:
-- expanded examples
-- templates
-- repeated review prompts
-- long explanations
+Use `references/lean-skill-patterns.md` as the canonical split guide.
 
-Keep inline:
-- trigger logic
-- boundary decisions
-- constitution
-- main workflow
-- self-correction signals
+For this output file, do not re-list the full folder taxonomy or the full keep-inline law unless the current rewrite depends on a specific distinction.
+
+Output-specific rule:
+- when a split map is needed, point to the canonical guide and explain only the skill-specific exceptions, tradeoffs, or file-role decisions for the current package
