@@ -1,0 +1,176 @@
+{
+  "skill_name": "writing-good-skills",
+  "meta": {
+    "purpose": "Measure whether the skill changes behavior on likely failure modes rather than merely producing polished prose.",
+    "evaluation_model": "Use each prompt in two passes when possible: baseline without the skill to capture likely failure behavior, then with the skill to verify the behavior changes in the intended direction.",
+    "notes": [
+      "If the baseline already passes comfortably, the prompt is weak and should be revised.",
+      "Expected outcomes should check trigger logic, scope boundary, constitution, verification, and packaging when relevant.",
+      "A tidy artifact is not enough; the response should show the judgment this skill is meant to teach."
+    ]
+  },
+  "evals": [
+    {
+      "id": 1,
+      "name": "notes-to-skill-package",
+      "phase": "baseline_and_eval",
+      "prompt": "Turn these incident-response notes into a real skill that future agents can discover and use. Do not just summarize them. Notes: - Use severity names `SEV-1` through `SEV-4`. - Every serious update must separate facts, hypotheses, and unknowns. - During payment incidents, preserve replay and idempotency evidence before broad cleanup or rollback. - The first response should name an incident lead, current impact, immediate containment step, and next update time. - Do not declare root cause just because the most recent deploy looks suspicious. - Prefer a reusable skill package over a loose markdown note.",
+      "why_this_exists": "Weak agents often collapse rough notes into a generic markdown summary or produce a polished but shallow skill that loses the distinctive operational constraints.",
+      "baseline_failure_signals": [
+        "Returns only a summary or advice note instead of a real skill package shape",
+        "Loses distinctive source-note constraints such as replay/idempotency evidence or facts-hypotheses-unknowns separation",
+        "Omits realistic verification prompts or treats them as optional"
+      ],
+      "expected_output": "Creates a real skill package shape that preserves distinctive source-note constraints inside a trigger-focused skill and includes realistic verification prompts tied to likely failure modes.",
+      "files": [],
+      "expectations": [
+        "Produces a real skill package shape instead of only a markdown summary",
+        "Preserves multiple distinctive details from the source notes rather than inventing a generic skill",
+        "Includes explicit constraints and at least one clear 'must not happen' rule",
+        "Includes realistic eval prompts or an equivalent verification section",
+        "Makes the trigger logic discoverable rather than burying it inside process explanation"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "rewrite-trigger-description",
+      "phase": "eval",
+      "prompt": "This `description` is wrong because it summarizes the workflow instead of the trigger conditions. Rewrite it so it triggers correctly. Bad description: `Use when creating a skill by gathering notes, writing a first draft, comparing outputs, revising the draft, and packaging the final result.`",
+      "why_this_exists": "A common failure mode is treating the description as a workflow summary, which weakens discovery and encourages skipping the main skill body.",
+      "baseline_failure_signals": [
+        "Rewrites the sentence but still keeps process steps in the description",
+        "Comments on style without explaining the trigger problem",
+        "Produces a vague replacement with no concrete use conditions"
+      ],
+      "expected_output": "Rewrites the description around use conditions and symptoms, replacing the workflow summary with a concise trigger-focused description and a short explanation of why the new wording triggers better.",
+      "files": [],
+      "expectations": [
+        "Provides a replacement description that is explicitly about when to use the skill",
+        "Removes the step-by-step workflow summary from the replacement description",
+        "Explains why the new description should trigger better than the original",
+        "Keeps the explanation focused on discovery rather than only prose polish"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "push-back-on-skipped-evals",
+      "phase": "eval",
+      "prompt": "I have a rough `SKILL.md`, but I skipped evals because the topic is obvious. Can you finish it?",
+      "why_this_exists": "The skill should resist the common rationalization that verification is optional when the topic feels obvious or the author feels confident.",
+      "baseline_failure_signals": [
+        "Accepts the omission and just polishes the draft",
+        "Treats verification as nice-to-have rather than part of done",
+        "Adds generic test ideas with no realistic prompts"
+      ],
+      "expected_output": "Pushes back on the skipped verification step and adds a small set of realistic eval prompts before calling the skill complete.",
+      "files": [],
+      "expectations": [
+        "Pushes back on skipping evals or verification for a non-trivial skill",
+        "Adds a small realistic eval set or equivalent concrete verification prompts",
+        "Frames verification as part of completion rather than optional polish",
+        "Explains the likely failure mode the new prompts are meant to expose"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "route-repo-local-material-correctly",
+      "phase": "baseline_and_eval",
+      "prompt": "Please turn our repository onboarding notes into something agents can use. The notes are specific to this repo's folder structure, setup commands, review checklist, and team conventions. I want the result to help future agents work in this repository correctly.",
+      "why_this_exists": "Weak skill guidance often forces repository-local material into a reusable skill package instead of routing it to the right artifact.",
+      "baseline_failure_signals": [
+        "Forces repo-local onboarding content into a reusable skill package",
+        "Fails to explain why the material is local operating context rather than reusable capability",
+        "Gives no alternative structure for the proper repo-local document"
+      ],
+      "expected_output": "Decides this likely belongs in `README.md` or `AGENTS.md` rather than forcing it into a reusable skill package, and gives a usable structure for the local document.",
+      "files": [],
+      "expectations": [
+        "Routes the request toward `AGENTS.md` or `README.md` instead of forcing a reusable skill",
+        "Explains that the material is repository-specific operating context rather than a reusable capability skill",
+        "Provides an agent-usable structure for the repo-local document",
+        "Makes the boundary decision explicit rather than implied"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "fast-path-without-dropping-verification",
+      "phase": "eval",
+      "prompt": "I already know this topic well, so just write the skill and skip the eval prompts. We need to move fast, and testing the skill feels unnecessary.",
+      "why_this_exists": "The skill should offer a minimal fast path without surrendering the evidence loop.",
+      "baseline_failure_signals": [
+        "Drops verification completely in the name of speed",
+        "Agrees that confidence can replace evidence",
+        "Refuses to help rather than offering a smaller but still valid path"
+      ],
+      "expected_output": "Refuses to treat verification as optional for a non-trivial skill, writes the smallest viable draft path, and still adds realistic eval prompts or explains the narrow reason not to.",
+      "files": [],
+      "expectations": [
+        "Refuses to skip verification outright for a non-trivial skill",
+        "Offers a minimal fast path rather than removing verification entirely",
+        "States that evals or realistic prompts are required unless the case is narrowly trivial",
+        "Keeps the answer practical instead of only scolding the user"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "review-in-stable-order",
+      "phase": "eval",
+      "prompt": "I have an existing `SKILL.md` that feels vague and hard to discover. Please review it and tell me what to improve. Do not rewrite the whole thing unless necessary.",
+      "why_this_exists": "A common weak response is to comment on prose quality or jump straight to a rewrite instead of reviewing trigger quality, scope, constitution, execution, verification, and packaging in a stable order.",
+      "baseline_failure_signals": [
+        "Only comments on wording or readability",
+        "Skips trigger quality, scope boundary, or verification",
+        "Reflexively rewrites the whole file despite the user's constraint"
+      ],
+      "expected_output": "Reviews the skill in a stable order that checks trigger quality, boundary choice, constitution, execution guidance, verification, and packaging rather than only commenting on prose quality.",
+      "files": [],
+      "expectations": [
+        "Evaluates the `description` as trigger logic rather than as a summary of the workflow",
+        "Checks whether the artifact should remain a skill versus a repo-local document",
+        "Calls out missing verification or eval coverage if absent",
+        "Returns prioritized fixes instead of reflexively rewriting the entire skill",
+        "Respects the request to avoid a full rewrite unless clearly necessary"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "protect-core-from-reference-split",
+      "phase": "eval",
+      "prompt": "My skill draft is getting long. I think I should move the trigger rules, constraints, and core workflow into `references/` so the main `SKILL.md` stays short. Is that the right move?",
+      "why_this_exists": "A packaging mistake can make the main skill file short but hollow, which hurts usability at the moment of decision.",
+      "baseline_failure_signals": [
+        "Moves core trigger logic, constitution, or main workflow into `references/`",
+        "Optimizes for file size instead of decision quality",
+        "Fails to distinguish core rules from lookup-heavy support material"
+      ],
+      "expected_output": "Pushes back on moving essential trigger logic, constitution, or primary workflow into `references/`, while still allowing heavy lookup material or templates to be split out.",
+      "files": [],
+      "expectations": [
+        "Keeps core trigger logic, constitution, and main workflow inline",
+        "Allows `references/` only for heavy lookup material, templates, or repeated detail",
+        "Explains the tradeoff in terms of usability and decision quality, not just file size",
+        "Makes a clear distinction between core law and supporting detail"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "baseline-plan-before-major-rewrite",
+      "phase": "eval",
+      "prompt": "I want to heavily rewrite this non-trivial skill. Before drafting, tell me how you would set up a small baseline to prove the rewrite is worth it.",
+      "why_this_exists": "The package now teaches baseline-vs-eval discipline, so the eval suite should test whether the agent can articulate that evidence loop before drafting.",
+      "baseline_failure_signals": [
+        "Jumps into rewriting advice without a baseline plan",
+        "Mentions testing vaguely but does not separate baseline prompts from eval prompts",
+        "Provides prompts without saying what failures they are meant to reveal"
+      ],
+      "expected_output": "Proposes a small baseline plan with 2-3 realistic prompts, states what likely failures each prompt should reveal, and distinguishes the baseline from the later eval pass.",
+      "files": [],
+      "expectations": [
+        "Proposes 2-3 realistic baseline prompts before the rewrite",
+        "Explains what failure behavior each prompt is meant to expose",
+        "Distinguishes baseline prompts from later eval prompts",
+        "Keeps the baseline small and failure-oriented rather than broad and generic"
+      ]
+    }
+  ]
+}
