@@ -171,6 +171,31 @@
         "Distinguishes baseline prompts from later eval prompts",
         "Keeps the baseline small and failure-oriented rather than broad and generic"
       ]
+    },
+    {
+      "id": 9,
+      "name": "guide-ai-during-skill-creation",
+      "phase": "baseline_and_eval",
+      "prompt": "I want a new skill that helps future agents turn rough incident notes into a reusable operating skill. I do not have a draft yet. Help another AI write the skill so the result is a real skill package that is discoverable and testable, not just a polished markdown note.",
+      "why_this_exists": "The trigger should fire not only for reviewing an existing `SKILL.md`, but also when the task is to guide the AI during initial skill creation.",
+      "baseline_failure_signals": [
+        "Treats the request as generic writing advice rather than skill-authoring guidance",
+        "Assumes there must already be a draft `SKILL.md` to review",
+        "Returns a generic section template without making boundary, trigger, and constraint decisions",
+        "Suggests evals that only check formatting quality instead of exposing shallow skill-authoring behavior",
+        "Fails to explain how the skill should stay discoverable and reusable rather than becoming an incident-specific note"
+      ],
+      "expected_output": "Guides the creation of a new skill package from scratch, including trigger-focused description advice, boundary decisions, main-file versus reference split, explicit failure-prevention guidance, and a small eval set that can distinguish real skill judgment from generic markdown polish.",
+      "files": [],
+      "expectations": [
+        "Recognizes that the skill applies even when no draft exists yet",
+        "Explains what a good skill should contain, not only how to polish wording or fill a template",
+        "Makes at least one explicit boundary decision about reusable skill versus incident-specific note",
+        "Covers trigger wording, core `SKILL.md` content, and what should remain out of `references/`",
+        "Names at least one likely failure mode the skill should explicitly guard against",
+        "Provides 2-3 realistic eval prompts and explains what weak behavior each prompt should expose",
+        "Frames the result as a reusable skill package rather than a generic markdown note"
+      ]
     }
   ]
 }

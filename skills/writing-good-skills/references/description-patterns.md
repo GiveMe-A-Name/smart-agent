@@ -16,7 +16,7 @@ Write in third person. Describe:
 Example:
 
 ```yaml
-description: Use when creating, reviewing, or improving a `SKILL.md`-based skill, especially when turning notes into a reusable skill, fixing vague trigger logic, or adding verification prompts.
+description: Use when creating or revising a reusable skill package, especially from rough notes, from-scratch skill ideas, vague trigger wording, boundary confusion with `AGENTS.md` or `README.md`, or missing realistic evals.
 ```
 
 Why it works:

@@ -1,6 +1,6 @@
 ---
 name: writing-good-skills
-description: Use when creating, reviewing, or improving a `SKILL.md`-based skill, especially when turning notes into a reusable skill, fixing vague trigger logic, deciding whether content belongs in a skill versus `AGENTS.md` or `README.md`, or adding verification prompts.
+description: Use when creating or revising a reusable skill package, especially from rough notes, from-scratch skill ideas, vague trigger wording, boundary confusion with `AGENTS.md` or `README.md`, or missing realistic evals.
 ---
 
 # Writing Good Skills
@@ -18,7 +18,7 @@ The goal is to encode the judgment agents usually skip:
 ## When To Use
 
 Use this skill when the user asks to:
-- create a skill from notes, habits, or a proven workflow
+- create a skill from notes, habits, a proven workflow, or a from-scratch idea, and needs help deciding what the skill should contain
 - improve or review an existing `SKILL.md`
 - fix a skill that feels vague, broad, or hard to discover
 - decide whether content belongs in a skill versus `AGENTS.md`, `README.md`, or a note
@@ -61,6 +61,7 @@ A good skill must:
 - produce a reusable skill, not a broad note dump
 - choose skill versus `AGENTS.md` / `README.md` / note before drafting
 - use `description` for triggering, not workflow summary
+- help the agent author the skill, not only critique or polish an existing draft
 - keep `SKILL.md` lean and move only heavy supporting detail to `references/`
 - teach judgment, not just formatting
 - include realistic verification for non-trivial skills
@@ -100,6 +101,17 @@ When creating or reviewing a skill package:
 
 If supporting files add execution risk without clear capability value, remove them or keep the skill documentation-only.
 
+## Draft New Skills
+
+When the task is to author a new skill rather than review an existing draft, work in this order:
+1. decide whether the material belongs in a reusable skill at all
+2. write the trigger first so the skill is discoverable before it is polished
+3. make the core constraints and failure-prevention rules explicit
+4. add the smallest useful workflow that helps the next agent act
+5. design a small eval set that can distinguish a real skill from a polished note
+
+If the "new skill" guidance skips boundary choice, trigger quality, or verification, it is incomplete.
+
 ## Review Existing Skills
 
 When reviewing an existing `SKILL.md`, check it in this order:
@@ -118,6 +130,7 @@ Detailed review prompts and report shapes live in `references/review-checklist.m
 
 Stop and revise if:
 - the description starts summarizing workflow instead of trigger conditions
+- the guidance only critiques an existing draft but does not help the agent write a new skill when that is the actual task
 - the draft reads like a note or meeting summary
 - the skill explains what to do but not what must not happen
 - the examples are generic and not tied to real failure modes
