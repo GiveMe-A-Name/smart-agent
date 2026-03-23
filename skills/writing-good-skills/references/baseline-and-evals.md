@@ -6,6 +6,8 @@ This file is a supporting appendix for verification.
 
 The main job of this skill is still to help agents write better skills. Verification exists to check whether the guidance actually changed behavior.
 
+For this package, verification should reinforce capability-first judgment. It should reward clear boundary recognition, correct artifact choice, and strong skill law rather than polished prose or skill-to-skill routing.
+
 ## Evals First
 
 For most non-trivial skills, the minimum useful verification is a small set of realistic eval prompts.
@@ -14,11 +16,14 @@ Good evals should target likely failure modes, distinguish a weak skill from a s
 
 They should also expose packaging mistakes, not just content mistakes.
 
+Good evals for this skill family should prefer boundary language over handoff language and should not reward skill-to-skill routing unless a named skill reference is truly necessary to prevent a severe category error.
+
 Useful failure modes include:
 - failing to notice repetition unless the user explicitly says the skill is too long
 - moving core law out of the main file instead of only moving support material
 - keeping heavy examples inline when the main file is already complete
 - choosing the wrong support folder instead of following the canonical split guide in `references/lean-skill-patterns.md`
+- replacing a weak boundary with skill-to-skill routing or other handoff language
 
 ## When A Baseline Helps
 
@@ -40,6 +45,8 @@ If you run a baseline, record only:
 - what failure mode it revealed
 - what the revised skill should improve
 
+Prefer behavior notes such as "used routing language instead of naming the capability boundary" over vague quality notes such as "felt weak".
+
 Do not turn this into a large testing workflow unless the skill truly needs it.
 
 ## When Evals Are Too Weak
@@ -53,12 +60,15 @@ Instead:
 
 The eval should discriminate between a real skill and a polished note.
 
+If the eval would still pass when the response replaces one named-skill handoff with another, the eval is too weak.
+
 ## Good Prompts For This Skill Family
 
 Prompts are strong when they force the agent to choose between:
 - concise law versus repeated explanation
 - inline core guidance versus typed support folders
 - reusable skill versus repo-local document
+- boundary language versus skill-to-skill routing
 
 Example prompt shapes:
 - "Review this vague skill. Do not rewrite the whole thing unless necessary."
@@ -73,10 +83,12 @@ Expected outcomes should be written in plain language.
 Good:
 - "Routes repo-local onboarding material to `AGENTS.md` or `README.md` instead of forcing a skill."
 - "Rewrites the description around trigger conditions and explains why."
+- "Replaces handoff language with capability-first boundary language."
 
 Weak:
 - "Writes a good skill."
 - "Improves the document."
+- "Names the next skill to invoke."
 
 ## Minimal Heuristic
 
@@ -85,3 +97,5 @@ If your eval would still pass for a vague or generic skill, the eval is too weak
 If your baseline process becomes longer than the skill draft itself, you are probably overdoing it.
 
 If the prompt only tests whether the agent can write nice prose, it is too weak for skill design.
+
+If the prompt rewards routing, handoff chains, or named skill references by default, it is not aligned with the capability-first law.

@@ -6,11 +6,13 @@ Use this file when a skill draft is becoming long or repetitive.
 
 The goal is not the shortest possible `SKILL.md`. The goal is a main file that stays complete at decision time and support folders that hold only the right kind of support material.
 
+Keep the package capability-first: the main file should teach boundary judgment, not hide skill-to-skill routing in support docs.
+
 ## Split Rule
 
 Keep inline:
 - trigger logic
-- boundary choice
+- boundary decision
 - constitution
 - main workflow
 - self-correction signals
@@ -23,6 +25,8 @@ Move out of the main file by role:
 - `scripts/` for deterministic helpers worth reusing
 
 If moving a section would leave the main file unable to guide a first-pass decision, keep it inline.
+
+If moving a section would push boundary language, core law, or capability-first judgment into support files, keep it inline.
 
 ## Folder Taxonomy
 
@@ -84,16 +88,22 @@ Do not split when:
 
 "Put trigger rules, constitution, and the main workflow into support files so the main file stays short."
 
+"Use support docs to explain which named skill should run next."
+
 Why this fails:
 - the main file becomes hollow
 - the agent has to go hunting for the actual law
 - shortness replaces usability
+- support docs quietly become skill-to-skill routing
 
 ## Good Move
 
 "Keep the law inline. Move the expanded examples, templates, review prompts, and deterministic helpers into the right support folders, then point to them clearly."
 
+"Keep capability-first boundary judgment in the main file. Use support docs to deepen the current skill, not to pre-write the next skill choice."
+
 Why this works:
 - the first-pass decision stays local
 - support detail remains available
 - the main file becomes shorter without becoming weaker
+- support docs reinforce the same law instead of smuggling in skill-to-skill routing

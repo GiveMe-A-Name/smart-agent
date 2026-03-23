@@ -11,11 +11,12 @@ Write skills as reusable constitutions for future agents.
 
 Good skill guidance teaches:
 - when the skill should trigger
+- what capability the skill owns and where its boundary is
 - what must be true and what must not happen
 - the smallest useful workflow
 - what evidence proves the skill changes behavior
 
-Do not write a diary, a note dump, or a rigid SOP.
+Do not write a diary, a note dump, a rigid SOP, or a hidden skill-to-skill routing graph.
 
 ## When To Use
 
@@ -30,20 +31,34 @@ Do not use it for plain project documentation or repo-local operating rules.
 
 ## Core Law
 
-Every good skill needs four things:
+Every good skill needs six things:
 1. trigger logic
-2. constitution
-3. minimal workflow
-4. verification
+2. boundary
+3. constitution
+4. minimal workflow
+5. self-correction signals
+6. verification
 
 If one is missing, the skill is weak.
 
 Keep the main `SKILL.md` lean, but do not hollow it out.
 
+A good skill is capability-first: it teaches judgment, not orchestration.
+
+Use the skill to clarify:
+- when the capability applies
+- what the capability owns and does not own
+- what must be true before acting
+- what must not happen inside the skill boundary
+
+Do not use the skill to pre-write the agent's next move with skill-to-skill routing such as handoff chains, named-skill routing graphs, or mandatory "use X next" instructions.
+
+When a skill reaches the edge of its scope, state what is missing, what the skill does not own, and why continuing inside the skill would mislead. Let the agent choose the next action from the capability map.
+
 When revising an existing skill, default to integration over accretion.
 Do not append local prose until you have checked whether the same idea already has a better home in the current `SKILL.md`.
 
-## Boundary First
+## Boundary First, Not Routing
 
 Before drafting, decide whether the material belongs in:
 - `SKILL.md` for reusable capability
@@ -52,6 +67,23 @@ Before drafting, decide whether the material belongs in:
 - a note or runbook for local reference
 
 If the material is mostly local context, do not force it into a skill.
+
+Prefer boundary language such as:
+- `Do not use this skill when ...`
+- `This skill does not own ...`
+- `If this grounding is still missing, state it explicitly`
+- `This request is outside this skill's scope`
+
+Avoid routing language such as:
+- `Route to ...`
+- `Route back to ...`
+- `Hand off to ...`
+- `Use X skill next`
+- `Relationship to ...`
+
+The difference matters: boundary language teaches scope judgment, while routing language teaches skill-to-skill routing.
+
+If all named skill references were removed, the file should still teach a clear, useful capability. Use named skill references only when they prevent a severe category error.
 
 ## What Must Stay Inline
 
@@ -97,6 +129,7 @@ When writing or revising a skill, make these decisions explicit:
 - trigger wording
 - core constraints and failure-prevention rules
 - the smallest workflow that helps the next agent act
+- whether any wording is teaching boundary judgment or secretly encoding skill-to-skill routing
 - verification and eval shape
 - redundancy and support-folder split
 
@@ -151,6 +184,10 @@ Use a baseline when the rewrite is substantial, the topic feels obvious, or the 
 
 If a weak draft still passes the eval, strengthen the prompt before adding more prose.
 
+Good evals reward boundary recognition, explicit missing grounding, correct output shape, and refusal to fabricate what the skill cannot supply.
+
+Do not reward naming the next skill, explicit handoff language, or acting as though good performance depends on skill-to-skill routing.
+
 See:
 - `references/description-patterns.md`
 - `references/baseline-and-evals.md`
@@ -164,6 +201,8 @@ Stop and revise if:
 - the draft reads like a note or meeting summary
 - the file keeps repeating the same claim in several sections
 - a local fix made the file longer without improving the skill's structure
+- the draft relies on named skill references to explain its boundary
+- the skill stops making sense once named skill references are removed
 - the main `SKILL.md` is growing because support detail stayed inline
 - core rules were moved out of the main file and it became hollow
 - support material was dumped into `references/` even though it should have been a template, example, or script

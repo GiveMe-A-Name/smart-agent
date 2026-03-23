@@ -3,7 +3,7 @@
 ## When Creating A Skill
 
 Default output shape:
-- skill boundary decision
+- capability-first boundary decision
 - trigger logic explanation
 - lean `SKILL.md`
 - supporting folders only if justified
@@ -21,6 +21,7 @@ Default output shape:
 - what already works
 - highest-impact gaps
 - section review for description, scope, constitution, execution, verification, packaging, and redundancy
+- boundary language versus skill-to-skill routing issues if present
 - prioritized fixes
 - rewritten text only for the weakest sections
 
@@ -34,6 +35,8 @@ Prefer:
 - provide replacement text for that section
 - state what effect the rewrite should have
 
+If the weakness is about scope, prefer boundary language over handoff language or other skill-to-skill routing wording.
+
 ## Packaging Rule
 
 Use support folders only when they improve decision quality in the main file.
@@ -44,3 +47,4 @@ For this output file, do not re-list the full folder taxonomy or the full keep-i
 
 Output-specific rule:
 - when a split map is needed, point to the canonical guide and explain only the skill-specific exceptions, tradeoffs, or file-role decisions for the current package
+- when a routing smell is present, name it as skill-to-skill routing and rewrite it in capability-first boundary terms
