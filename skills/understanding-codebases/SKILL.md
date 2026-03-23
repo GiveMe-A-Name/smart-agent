@@ -1,6 +1,6 @@
 ---
 name: understanding-codebases
-description: Use when one or two targeted repository lookups are not enough and the agent must understand an unfamiliar repository slice, trace call flow, compare patterns, or prove ownership and likely change points across multiple files or layers before proposing changes.
+description: Use when one or two targeted lookups are not enough and the agent must understand a repository slice across multiple files or layers to trace behavior, compare patterns, or identify ownership and likely change points safely.
 ---
 
 # Codebase Understanding
@@ -30,30 +30,23 @@ Do not use this skill when:
 ## Boundary
 
 This skill owns:
-- building a task-specific repository slice instead of summarizing the whole repo or doing generic preflight exploration
-- locating entry points, key implementation files, and nearby tests when they materially support the question
-- tracing one main call path from entry toward implementation
-- finding nearby comparable implementations and extracting local patterns when available
-- identifying likely change points and explaining why they are stronger candidates than nearby files when change placement is part of the question
-- surfacing what is still unknown or only hypothesized
+- building a task-specific repository slice for the current question
+- tracing enough call flow to ground ownership, behavior, or likely change placement
+- comparing nearby implementations when local patterns matter
+- stating what is proven, hypothesized, and still unknown
 
 This skill does not own:
 - clarifying product intent, scope, or acceptance criteria
-- sequencing implementation work or writing a change plan
-- recommending a verification strategy
-- deciding whether implementation is complete
+- writing a change plan or sequencing implementation work
+- recommending verification strategy or completion judgment
 
 ## Constitution
 
 - Understand before suggesting.
 - Prefer code evidence over intuition.
-- Do not use this skill as a mandatory preflight before editing, answering, or clarifying.
-- Learn from nearby patterns before inferring ownership, local conventions, or change points.
-- Trace beyond export, registration, config, and facade layers when possible.
-- Distinguish entry, orchestration, implementation, and shared utility layers.
-- Do not infer ownership or the main change point from filenames, package names, or top-level exports alone.
-- Explain why a candidate change point belongs here and not in nearby modules.
-- Stop once the current ownership or change-point question is grounded; do not keep mapping the repo just because more context exists.
+- Do not use this skill as a default warm-up before every action.
+- Learn from nearby patterns before inferring ownership or conventions.
+- Trace past export, registration, config, and facade layers when possible.
 - Mark unproven claims as hypotheses or unknowns.
 - Produce analysis, not implementation commitments.
 
@@ -61,39 +54,29 @@ This skill does not own:
 
 These are understanding moves, not a fixed sequence. Use the ones that help answer the current code-understanding question.
 
-- Anchor on the current question: ownership, main call flow, candidate change point, local convention, or behavior source.
-- Build a local repository slice around the files, layers, and tests that matter to that question.
-- Find the strongest entry points and trace toward behavior-changing code instead of stopping at exports, config, or facades.
-- Compare nearby implementations to learn local conventions before inferring how this slice works.
-- Distinguish proven relationships from hypotheses, and keep track of what is still unknown.
-- Stop once the current question is grounded well enough to answer safely.
+- Anchor on the current question.
+- Build the smallest repository slice that can answer it safely.
+- Trace toward behavior-changing code instead of stopping at facades.
+- Compare nearby patterns when they materially inform the answer.
+- Stop once the answer is grounded well enough to avoid intuition.
 
 ## Grounded Understanding
 
-You have enough understanding for the current question when, from code evidence, you can do most of the following that actually matter here:
+You have enough understanding for the current question when, from code evidence, you can do the relevant subset of the following:
 
-- explain the relevant repository slice and how its parts relate
-- trace enough of the call flow to answer the current question safely
+- explain the repository slice that matters to this question
+- trace enough call flow to answer safely
 - point to concrete evidence for ownership, behavior, conventions, or likely change placement when relevant
-- name the strongest nearby patterns or explicitly note that comparable examples are sparse
-- use nearby tests as evidence when they materially support the question, or say they were not useful or not present
 - state the major unknowns that remain
 
-If you still cannot answer the current question without leaning on intuition, keep investigating instead of sounding certain.
+If you still need intuition to bridge the answer, keep investigating.
 
 ## Self-Correction Signals
 
 Stop and revise when:
 
-| Signal | What it means | What to do |
-|---|---|---|
-| You are suggesting code changes before building a repository slice | You are acting on intuition too early | Go back and map the local slice first |
-| You only found export, registration, config, or facade layers | You have not reached real implementation yet | Keep tracing toward behavior-changing code |
-| You listed files without explaining relationships | You searched, but did not model the code | Add call flow and responsibility boundaries |
-| You did not inspect similar implementations when they exist | You are inventing patterns from scratch | Inspect nearby comparable examples first |
-| You are treating a dependent or consumer module as the main change point without proof | Ownership is likely misidentified | Re-check which layer owns the behavior |
-| You are stating guesses as facts | Evidence and inference are mixed together | Relabel claims as proven, hypothesis, or unknown |
-| Your analysis is turning into implementation design | You are crossing into planning | Restate the boundary and return to analysis |
-| You have no open unknowns in a genuinely unfamiliar area | You are likely overconfident | Re-examine what is still unproven |
-| One or two targeted lookups would have answered the question | You escalated into deep analysis too early | Stop deep analysis and answer from the narrower evidence already available |
-| You are still exploring after the ownership or change-point question is already grounded | Repository mapping became habitual instead of necessary | Stop and report the current analysis |
+- you are suggesting changes before building a local repository slice
+- you stopped at export, registration, config, or facade layers
+- you listed files without explaining relationships or call flow
+- you are treating guesses about ownership or change placement as facts
+- you are drifting into planning or still exploring after the question is already grounded
