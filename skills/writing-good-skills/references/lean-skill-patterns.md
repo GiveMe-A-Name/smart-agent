@@ -16,10 +16,9 @@ Keep inline:
 - constitution
 - main workflow
 - self-correction signals
-- verification expectation
 
 Move out of the main file by role:
-- `references/` for detailed review prompts, long checklists, lookup tables, and extended eval notes
+- `references/` for detailed review prompts, long checklists, and lookup tables
 - `templates/` for reusable scaffolds or starter structures
 - `examples/` for good, bad, or contrasting examples
 - `scripts/` for deterministic helpers worth reusing

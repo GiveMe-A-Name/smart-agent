@@ -9,8 +9,7 @@ Review in this order:
 2. scope boundary
 3. constitution
 4. execution guidance
-5. verification
-6. packaging and redundancy
+5. packaging and redundancy
 
 This order matters. A polished file that triggers badly or repeats itself is still weak.
 
@@ -69,21 +68,7 @@ Common failures:
 - long theory that does not change action
 - skill-to-skill routing disguised as workflow guidance
 
-### 5. Verification
-
-Check:
-- are there realistic eval prompts or equivalent checks?
-- do they target likely failure modes?
-- if the skill is non-trivial, is there evidence it changes behavior?
-- do the evals reward boundary recognition and explicit missing grounding rather than skill-to-skill routing?
-
-Common failures:
-- no evals
-- generic evals with no failure pressure
-- verification treated as optional polish
-- evals reward explicit handoff language or named-skill routing
-
-### 6. Packaging And Redundancy
+### 5. Packaging And Redundancy
 
 Check:
 - is the main `SKILL.md` lean but complete?
@@ -136,7 +121,7 @@ Use this shape by default:
 - overall assessment
 - what already works
 - highest-impact gaps
-- section review for description, scope, constitution, execution, verification, packaging and redundancy
+- section review for description, scope, constitution, execution, packaging and redundancy
 - boundary-vs-routing issues if present
 - prioritized fixes
 - rewritten text only for the weakest parts

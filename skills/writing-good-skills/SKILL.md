@@ -1,6 +1,6 @@
 ---
 name: writing-good-skills
-description: Use when creating or revising a reusable skill package, especially from rough notes, overlong or repetitive `SKILL.md` drafts, weak trigger wording, unclear main-file versus support-folder splits (`references/`, `templates/`, `examples/`, `scripts/`), boundary confusion with `AGENTS.md` or `README.md`, or missing realistic evals.
+description: Use when creating or revising a reusable skill package, especially from rough notes, overlong or repetitive `SKILL.md` drafts, weak trigger wording, unclear main-file versus support-folder splits (`references/`, `templates/`, `examples/`, `scripts/`), or boundary confusion with `AGENTS.md` or `README.md`.
 ---
 
 # Writing Good Skills
@@ -14,7 +14,6 @@ Good skill guidance teaches:
 - what capability the skill owns and where its boundary is
 - what must be true and what must not happen
 - the smallest useful workflow
-- what evidence proves the skill changes behavior
 
 Do not write a diary, a note dump, a rigid SOP, or a hidden skill-to-skill routing graph.
 
@@ -25,19 +24,17 @@ Use this skill when the task is to:
 - review or improve an existing `SKILL.md`
 - fix a skill that feels vague, repetitive, bloated, or hard to discover
 - decide whether material belongs in a skill, `AGENTS.md`, `README.md`, or a note
-- add realistic baseline prompts or eval prompts
 
 Do not use it for plain project documentation or repo-local operating rules.
 
 ## Core Law
 
-Every good skill needs six things:
+Every good skill needs five things:
 1. trigger logic
 2. boundary
 3. constitution
 4. minimal workflow
 5. self-correction signals
-6. verification
 
 If one is missing, the skill is weak.
 
@@ -94,7 +91,6 @@ Keep these in the main `SKILL.md`:
 - constitution
 - main workflow
 - self-correction signals
-- verification expectation
 
 These are the skill's law. Do not move them into `references/` just to make the file shorter.
 
@@ -131,14 +127,13 @@ When writing or revising a skill, make these decisions explicit:
 - core constraints and failure-prevention rules
 - the smallest workflow that helps the next agent act
 - whether any wording is teaching boundary judgment or secretly encoding skill-to-skill routing
-- verification and eval shape
 - redundancy and support-folder split
 
 The order is flexible. The goal is not to follow a ritual, but to ensure these decisions do not stay implicit.
 
 The redundancy pass is mandatory even if the user did not complain that the skill is too long.
 
-If the task is to help create a brand-new skill, do not wait for a draft. Make the boundary, trigger, constitution, support-folder split, and verification decisions explicitly.
+If the task is to help create a brand-new skill, do not wait for a draft. Make the boundary, trigger, constitution, support-folder split, and redundancy decisions explicitly.
 
 ## Integration Before Accretion
 
@@ -170,28 +165,14 @@ Review in this order:
 2. scope boundary
 3. constitution
 4. execution guidance
-5. verification
-6. packaging and redundancy
+5. packaging and redundancy
 
 If the review comments only on wording, it is incomplete.
 
 See `references/review-checklist.md` for expanded review heuristics.
 
-## Verification
-
-For any non-trivial skill, create a small set of realistic prompts that expose likely failure modes.
-
-Use a baseline when the rewrite is substantial, the topic feels obvious, or the missing behavior is still unclear.
-
-If a weak draft still passes the eval, strengthen the prompt before adding more prose.
-
-Good evals reward boundary recognition, explicit missing grounding, correct output shape, and refusal to fabricate what the skill cannot supply.
-
-Do not reward naming the next skill, explicit handoff language, or acting as though good performance depends on skill-to-skill routing.
-
 See:
 - `references/description-patterns.md`
-- `references/baseline-and-evals.md`
 - `references/output-shapes.md`
 
 ## Self-Correction Signals
@@ -206,12 +187,10 @@ Stop and revise if:
 - the main `SKILL.md` is growing because support detail stayed inline
 - core rules were moved out of the main file and it became hollow
 - support material was dumped into `references/` even though it should have been a template, example, or script
-- verification is treated as optional polish
 
 ## Output Expectations
 
 By default, produce:
 - a lean `SKILL.md`
 - support folders only where they reduce noise without hiding the law
-- realistic eval prompts
 - a short explanation of the behavior the skill should change

@@ -18,7 +18,7 @@ Keep the description capability-first. It should help the agent recognize the sk
 Example:
 
 ```yaml
-description: Use when creating or revising a reusable skill package, especially from rough notes, overlong or repetitive `SKILL.md` drafts, weak trigger wording, unclear main-file versus support-folder splits (`references/`, `templates/`, `examples/`, `scripts/`), boundary confusion with `AGENTS.md` or `README.md`, or missing realistic evals.
+description: Use when creating or revising a reusable skill package, especially from rough notes, overlong or repetitive `SKILL.md` drafts, weak trigger wording, unclear main-file versus support-folder splits (`references/`, `templates/`, `examples/`, `scripts/`), or boundary confusion with `AGENTS.md` or `README.md`.
 ```
 
 Why it works:

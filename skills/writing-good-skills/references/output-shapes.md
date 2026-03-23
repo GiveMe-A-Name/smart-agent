@@ -7,7 +7,6 @@ Default output shape:
 - trigger logic explanation
 - lean `SKILL.md`
 - supporting folders only if justified
-- realistic eval prompts
 - short explanation of what behavior the skill should change
 
 If the skill is complex, also include:
@@ -20,7 +19,7 @@ Default output shape:
 - overall assessment
 - what already works
 - highest-impact gaps
-- section review for description, scope, constitution, execution, verification, packaging, and redundancy
+- section review for description, scope, constitution, execution, packaging, and redundancy
 - boundary language versus skill-to-skill routing issues if present
 - prioritized fixes
 - rewritten text only for the weakest sections
