@@ -27,7 +27,8 @@
       "expectations": [
         "Produces a real skill package shape instead of only a markdown summary",
         "Preserves multiple distinctive details from the source notes",
-        "Includes explicit constraints, trigger logic, and realistic verification"
+        "Includes explicit constraints, trigger logic, and realistic verification",
+        "Includes at least one clear `must not happen` rule or equivalent failure-prevention constraint"
       ]
     },
     {
@@ -117,11 +118,12 @@
         "Skips trigger quality, scope boundary, or verification",
         "Reflexively rewrites the whole file despite the user's constraint"
       ],
-      "expected_output": "Reviews the skill in a stable order instead of only commenting on prose quality.",
+      "expected_output": "Reviews the skill in a stable order that checks description, scope boundary, constitution, execution guidance, verification, and packaging rather than only commenting on prose quality.",
       "files": [],
       "expectations": [
         "Evaluates the `description` as trigger logic rather than as a summary of the workflow",
         "Checks whether the artifact should remain a skill versus a repo-local document",
+        "Uses or clearly follows the stable review order named in the eval",
         "Calls out missing verification or eval coverage and checks packaging or redundancy",
         "Returns prioritized fixes and respects the request to avoid a full rewrite unless necessary"
       ]
@@ -299,6 +301,26 @@
         "Pushes back on rewarding skill-to-skill routing by default",
         "Names at least three better eval targets grounded in boundary judgment",
         "Connects the eval advice to the capability-first law and keeps named skill references exceptional"
+      ]
+    },
+    {
+      "id": 17,
+      "name": "allow-named-reference-for-severe-category-error",
+      "phase": "eval",
+      "prompt": "I want this skill to stay capability-first, but there is one edge case where the current skill cannot safely continue without specialized grounding. Is it ever acceptable to mention a named neighboring skill? If yes, show the narrow kind of wording that is allowed and explain what would make it drift back into routing.",
+      "why_this_exists": "The package should preserve the explicit exception for named skill references that prevent a severe category error.",
+      "baseline_failure_signals": [
+        "Treats all named skill references as categorically forbidden",
+        "Approves a neighboring-skill handoff chain instead of a narrow exception",
+        "Allows the exception without requiring a severe category error or explicit missing grounding"
+      ],
+      "expected_output": "Allows a narrow named-skill reference only when it prevents a severe category error, and keeps the wording in boundary terms rather than routing terms.",
+      "files": [],
+      "expectations": [
+        "States that named skill references are exceptional rather than forbidden or routine",
+        "Requires an explicit severe category error or equivalent unsafe-misleading condition before allowing the reference",
+        "Shows wording that explains missing grounding or boundary without prescribing sequence or mandatory next steps",
+        "Explains what would turn the exception back into skill-to-skill routing"
       ]
     }
   ]

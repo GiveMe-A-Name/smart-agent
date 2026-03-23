@@ -79,11 +79,12 @@ Avoid routing language such as:
 - `Route back to ...`
 - `Hand off to ...`
 - `Use X skill next`
-- `Relationship to ...`
 
 The difference matters: boundary language teaches scope judgment, while routing language teaches skill-to-skill routing.
 
 If all named skill references were removed, the file should still teach a clear, useful capability. Use named skill references only when they prevent a severe category error.
+
+A short relationship note can be acceptable when it clarifies capability boundaries without prescribing sequence. If a `Relationship to ...` section turns into handoff steps, neighboring-skill routing, or mandatory next actions, rewrite it as boundary language or remove it.
 
 ## What Must Stay Inline
 
