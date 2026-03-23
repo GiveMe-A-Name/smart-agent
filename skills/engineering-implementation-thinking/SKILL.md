@@ -59,9 +59,11 @@ Use this skill when the remaining question is:
 
 - Do not treat the task description as the full implementation truth.
 - Do not assume the smallest edit is the best edit.
+- Do not treat passing current tests as proof that the current edit point is the right implementation boundary.
 - Do not assume existing code shape is arbitrary before considering what it may be protecting.
 - Do not preserve a weak pattern blindly just because it already exists.
 - Do not infer unconfirmed product intent from code shape alone.
+- Do not let deadline or delivery pressure justify moving responsibility into the wrong layer.
 - Do not use maintainability as an excuse for unnecessary redesign.
 - Prefer the least invasive change that keeps responsibilities clear and future changes easier.
 
@@ -80,6 +82,7 @@ A strong result can answer:
 Stop and revise when:
 - you are implementing directly from the request without understanding the surrounding code
 - you are treating the first editable location as the right implementation location
+- you are using green tests or delivery pressure to justify a patch at a boundary you already suspect is wrong
 - you are making the narrowest patch even though it adds duplication, coupling, or confusion
 - you are preserving an existing pattern without judging whether it is still the right one
 - you are expanding the work into redesign beyond what the change needs
