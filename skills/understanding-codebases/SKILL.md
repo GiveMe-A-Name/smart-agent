@@ -38,6 +38,7 @@ This skill owns:
 This skill does not own:
 - clarifying product intent, scope, or acceptance criteria
 - writing a change plan or sequencing implementation work
+- final engineering judgment about how a change should be implemented once repository evidence is understood
 - recommending verification strategy or completion judgment
 
 ## Constitution
