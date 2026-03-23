@@ -40,6 +40,9 @@ If one is missing, the skill is weak.
 
 Keep the main `SKILL.md` lean, but do not hollow it out.
 
+When revising an existing skill, default to integration over accretion.
+Do not append local prose until you have checked whether the same idea already has a better home in the current `SKILL.md`.
+
 ## Boundary First
 
 Before drafting, decide whether the material belongs in:
@@ -87,16 +90,17 @@ Treat packaging as part of the design.
 
 Only add `templates/`, `examples/`, or `scripts/` when they remove real repeated work or improve decision quality. Do not create folder sprawl just because the pattern exists.
 
-## Writing Workflow
+## Core Drafting Decisions
 
-Work in this order:
-1. choose the right artifact boundary
-2. if revising an existing skill, inspect the current structure before editing
-3. write a trigger-focused `description`
-4. state the core constraints and failure-prevention rules
-5. add the smallest workflow that helps the next agent act
-6. add realistic verification
-7. run a redundancy pass before finishing
+When writing or revising a skill, make these decisions explicit:
+- artifact boundary
+- trigger wording
+- core constraints and failure-prevention rules
+- the smallest workflow that helps the next agent act
+- verification and eval shape
+- redundancy and support-folder split
+
+The order is flexible. The goal is not to follow a ritual, but to ensure these decisions do not stay implicit.
 
 The redundancy pass is mandatory even if the user did not complain that the skill is too long.
 
@@ -104,7 +108,7 @@ If the task is to help create a brand-new skill, do not wait for a draft. Make t
 
 ## Integration Before Accretion
 
-When revising an existing skill, default to integration, not accretion.
+Treat this as a law, not a drafting preference.
 
 Before adding new prose:
 1. read the whole main `SKILL.md`
