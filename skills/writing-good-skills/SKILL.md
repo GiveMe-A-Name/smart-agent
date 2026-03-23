@@ -193,7 +193,6 @@ See:
 - `references/description-patterns.md`
 - `references/baseline-and-evals.md`
 - `references/output-shapes.md`
-- `evals/evals.json`
 
 ## Self-Correction Signals
 
