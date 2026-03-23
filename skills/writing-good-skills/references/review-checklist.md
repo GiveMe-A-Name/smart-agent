@@ -6,9 +6,9 @@ Before reviewing a specific section, read the whole main `SKILL.md` once and mar
 
 Review in this order:
 1. `description`
-2. scope boundary
-3. constitution
-4. execution guidance
+2. capability boundary
+3. invariants
+4. decision signals and applied guidance
 5. packaging and redundancy
 
 This order matters. A polished file that triggers badly or repeats itself is still weak.
@@ -29,7 +29,7 @@ Common failures:
 - vague wording like "helps with skills"
 - no concrete contexts or symptoms
 
-### 2. Scope Boundary
+### 2. Capability Boundary
 
 Check:
 - is this really a reusable capability?
@@ -41,7 +41,7 @@ Common failures:
 - project setup material presented as reusable capability
 - skill-to-skill routing used to compensate for a weak or missing boundary
 
-### 3. Constitution
+### 3. Invariants
 
 Check:
 - are the main constraints explicit?
@@ -54,18 +54,19 @@ Common failures:
 - no red lines
 - no boundary rules
 
-### 4. Execution Guidance
+### 4. Decision Signals And Applied Guidance
 
 Check:
-- does it tell the agent what to do in practice?
-- is the workflow minimal and usable?
+- does it teach the agent what to notice in practice?
+- does any action guidance sharpen judgment instead of enforcing a rigid SOP?
 - are examples teaching judgment rather than just format?
 - does it avoid telling the agent which skill must run next?
 
 Common failures:
-- only philosophy, no applied guidance
+- only philosophy, no practical decision cues
 - too many repeated examples
 - long theory that does not change action
+- action guidance that is really a fixed template or mandatory output shape
 - skill-to-skill routing disguised as workflow guidance
 
 ### 5. Packaging And Redundancy
@@ -85,18 +86,20 @@ Common failures:
 - repeated packaging advice scattered across multiple sections
 - a local fix appends fresh prose without first integrating overlapping material
 - the skill only works as part of skill-to-skill routing
+- the skill only works when followed as a fixed sequence
 
 ## Mandatory Boundary-Vs-Routing Audit
 
 Run this even if the user never mentioned skill relationships.
 
 Check for:
-- boundary statements expressed as `hand off to`, `route to`, `use X next`, or similar routing language
-- named skill references doing skill-to-skill routing work instead of preventing a severe category error
+- routing language being used in place of a clear boundary
+- named skill references doing skill-to-skill routing work instead of adding real workflow clarity or preventing a severe category error
 - scope edges that fail to state what grounding is missing
 
 When found:
-- replace routing language with boundary language
+- make the boundary explicit first
+- keep routing language only when it teaches real workflow knowledge without replacing the boundary
 - state what the skill owns and does not own
 - keep the next action for the agent to decide unless a named reference is truly necessary to prevent a severe category error
 
@@ -105,7 +108,7 @@ When found:
 Run this even if the user never said the skill is too long.
 
 Check for:
-- the same rule explained in overview, workflow, and checklist
+- the same rule explained in overview, guidance, and checklist
 - examples that merely restate bullets
 - sections that exist only to justify an already-clear rule
 
@@ -115,17 +118,15 @@ When found:
 - compress or delete the repeats
 - move only the expanded support material to the correct support folder
 
-## Recommended Review Output
+## Possible Review Deliverables
 
-Use this shape by default:
-- overall assessment
-- what already works
-- highest-impact gaps
-- section review for description, scope, constitution, execution, packaging and redundancy
-- boundary-vs-routing issues if present
-- prioritized fixes
+Choose the smallest deliverable that improves the review outcome:
+- overall assessment with highest-impact gaps
+- section-by-section review when structure is the problem
 - rewritten text only for the weakest parts
+- a capability-model rewrite recommendation when the whole file teaches the wrong thing
+- a packaging recommendation when structure is the real issue
 
 ## Minimal Rule
 
-If a review comments only on wording and style, or ignores workflow-routing smells, it is incomplete.
+If a review comments only on wording and style, ignores workflow-routing smells, or treats rigid output templates as harmless, it is incomplete.

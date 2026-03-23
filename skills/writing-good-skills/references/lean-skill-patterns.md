@@ -12,10 +12,10 @@ Keep the package capability-first: the main file should teach boundary judgment,
 
 Keep inline:
 - trigger logic
-- boundary decision
-- constitution
-- main workflow
-- self-correction signals
+- capability boundary
+- invariants
+- decision signals
+- failure signals
 
 Move out of the main file by role:
 - `references/` for detailed review prompts, long checklists, and lookup tables
@@ -56,7 +56,7 @@ Use this decision order:
 1. merge into the strongest existing section
 2. tighten existing wording
 3. replace duplication with a cross-reference
-4. add a new section only if the idea adds a new decision signal or workflow
+4. add a new section only if the idea adds a new decision signal, invariant, or failure signal
 
 The default move is integration. Appending is the last resort.
 
@@ -80,29 +80,35 @@ Split when:
 
 Do not split when:
 - the content is still core law
-- the main workflow would become unclear without it
+- the main decision cues would become unclear without it
 - the split only optimizes file length instead of decision quality
 
 ## Bad Move
 
-"Put trigger rules, constitution, and the main workflow into support files so the main file stays short."
+"Put trigger rules, invariants, and decision cues into support files so the main file stays short."
 
-"Use support docs to explain which named skill should run next."
+"Use support docs mainly to explain which named skill should run next instead of clarifying the current skill's boundary."
+
+"Make every response follow the same output shape so the skill feels consistent."
 
 Why this fails:
 - the main file becomes hollow
 - the agent has to go hunting for the actual law
 - shortness replaces usability
-- support docs quietly become skill-to-skill routing
+- support docs quietly substitute routing for boundary clarity
+- fixed presentation replaces capability teaching
 
 ## Good Move
 
 "Keep the law inline. Move the expanded examples, templates, review prompts, and deterministic helpers into the right support folders, then point to them clearly."
 
-"Keep capability-first boundary judgment in the main file. Use support docs to deepen the current skill, not to pre-write the next skill choice."
+"Keep capability-first boundary judgment in the main file. Use support docs to deepen the current skill, not to replace boundary clarity with a hidden routing graph."
+
+"Use action hints only when they improve judgment. Do not turn them into mandatory SOP or output-template law."
 
 Why this works:
 - the first-pass decision stays local
 - support detail remains available
 - the main file becomes shorter without becoming weaker
 - support docs reinforce the same law instead of smuggling in skill-to-skill routing
+- the package teaches flexible judgment instead of format compliance
