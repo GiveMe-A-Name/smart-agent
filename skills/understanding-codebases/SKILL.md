@@ -1,6 +1,6 @@
 ---
 name: understanding-codebases
-description: Use when one or two targeted lookups are not enough and the agent must understand a repository slice across multiple files or layers to trace behavior, compare patterns, or identify ownership and likely change points safely.
+description: Use when one or two targeted lookups are not enough and the agent must understand a repository slice across multiple files or layers to trace behavior, compare patterns, or identify ownership and candidate change points safely.
 ---
 
 # Codebase Understanding
@@ -31,7 +31,7 @@ Do not use this skill when:
 
 This skill owns:
 - building a task-specific repository slice for the current question
-- tracing enough call flow to ground ownership, behavior, or likely change placement
+- tracing enough call flow to ground ownership, behavior, or candidate change points
 - comparing nearby implementations when local patterns matter
 - stating what is proven, hypothesized, and still unknown
 
@@ -67,7 +67,7 @@ You have enough understanding for the current question when, from code evidence,
 
 - explain the repository slice that matters to this question
 - trace enough call flow to answer safely
-- point to concrete evidence for ownership, behavior, conventions, or likely change placement when relevant
+- point to concrete evidence for ownership, behavior, conventions, or candidate change points when relevant
 - state the major unknowns that remain
 
 If you still need intuition to bridge the answer, keep investigating.

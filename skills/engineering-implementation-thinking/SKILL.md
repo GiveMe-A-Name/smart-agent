@@ -1,17 +1,19 @@
 ---
 name: engineering-implementation-thinking
-description: Use when implementing or modifying code requires engineering judgment about intent, existing architecture, historical code shape, hidden constraints, and long-term maintainability.
+description: Use when implementing or modifying code requires engineering judgment about clarified intent, architecture, historical code shape, hidden constraints, and long-term maintainability, and the needed code evidence is already available or can be gathered with focused investigation.
 ---
 
 # Engineering Implementation Thinking
 
 Implement changes with engineering judgment, not just task completion.
 
-This skill helps the agent decide how to land code responsibly in an existing system: understand the real intent, read current code as evidence of prior decisions, respect meaningful constraints, and avoid both shallow patching and unnecessary redesign.
+This skill helps the agent decide how to land code responsibly in an existing system: work from clarified intent, read current code as evidence of prior decisions, respect meaningful constraints, and choose among a narrow patch, a focused structural improvement, or an explicit pause when understanding is still too weak.
 
 ## Trigger Logic
 
 Use this skill when:
+- the requested intent is already clarified enough, or can be clarified enough, to support responsible implementation judgment
+- the relevant code evidence is already grounded enough, or can be gathered with focused investigation, to support implementation judgment
 - a non-trivial change is being implemented in an existing codebase
 - understanding why current code is shaped this way may change how the work should be done
 - a narrow patch could complete the task, but might weaken structure or maintainability
@@ -22,13 +24,14 @@ Do not use this skill when:
 - the main missing step is still requirement clarification or repository exploration
 - the work is purely mechanical, clerical, or stylistic
 - the main question is whether work is complete rather than how it should be implemented
+- the agent is using engineering judgment as a default warm-up for every non-trivial implementation task
 
 ## Boundary
 
 This skill owns:
-- reasoning from requested intent to responsible implementation
+- reasoning from clarified intent and grounded code evidence to responsible implementation
 - understanding why relevant code is shaped the way it is
-- judging where the change should land so responsibilities stay coherent
+- judging whether candidate change points and existing patterns should be preserved, extended, tightened, or improved so responsibilities stay coherent
 - deciding whether a local patch is sufficient or a focused structural improvement is warranted
 - balancing delivery speed, simplicity, system coherence, and future maintainability
 
@@ -43,12 +46,14 @@ This skill does not own:
 
 This skill assumes the agent can obtain enough code evidence to reason responsibly, but it does not own repository analysis as an end in itself.
 
+If implementation judgment is blocked by missing code evidence, gather the missing evidence first. If that requires deeper repository-slice analysis across multiple files or layers, use `understanding-codebases`.
+
 This skill is not the right tool yet when the main missing piece is still:
 - understanding what this part of the codebase does, how behavior flows, or who owns the touched area
 - clarifying what the user really wants or which decisions still require human intent
 
 Use this skill when the remaining question is:
-- given the real intent and the code evidence, what is the right way to implement this here?
+- given the clarified intent and grounded code evidence, should this be a local patch, a focused structural improvement, or an explicit pause?
 
 ## Invariants
 
@@ -56,18 +61,19 @@ Use this skill when the remaining question is:
 - Do not assume the smallest edit is the best edit.
 - Do not assume existing code shape is arbitrary before considering what it may be protecting.
 - Do not preserve a weak pattern blindly just because it already exists.
+- Do not infer unconfirmed product intent from code shape alone.
 - Do not use maintainability as an excuse for unnecessary redesign.
 - Prefer the least invasive change that keeps responsibilities clear and future changes easier.
 
 ## Core Questions
 
 A strong result can answer:
-- What is the real intent of this change?
+- What clarified implementation-relevant intent must this change serve?
 - Why is the current code shaped this way?
 - Which current patterns are essential, accidental, or ready for focused improvement?
-- Where should this change live so ownership stays clear?
+- Which candidate change points actually support coherent ownership?
 - Would the smallest patch make future work harder?
-- Should this change preserve, extend, or tighten the existing structure?
+- Should this change be a local patch, a focused structural improvement, or an explicit pause pending better understanding?
 
 ## Self-Correction Signals
 
