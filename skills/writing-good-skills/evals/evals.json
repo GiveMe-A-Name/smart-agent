@@ -95,20 +95,20 @@
       "id": 5,
       "name": "fast-path-without-dropping-verification",
       "phase": "eval",
-      "prompt": "I already know this topic well, so just write the skill and skip the eval prompts. We need to move fast, and testing the skill feels unnecessary.",
-      "why_this_exists": "The skill should offer a minimal fast path without surrendering the evidence loop.",
+      "prompt": "I already know this topic well, so give me the fastest acceptable path to finish this skill today. Keep verification as small as possible, but make it valid.",
+      "why_this_exists": "This checks whether the skill can compress the verification path without dropping it, instead of only pushing back on skipped evals in principle.",
       "baseline_failure_signals": [
         "Drops verification completely in the name of speed",
-        "Agrees that confidence can replace evidence",
-        "Refuses to help rather than offering a smaller but still valid path"
+        "Only scolds the user about skipping evals without proposing a workable fast path",
+        "Provides a broad eval plan instead of the smallest valid verification loop"
       ],
-      "expected_output": "Refuses to treat verification as optional for a non-trivial skill, writes the smallest viable draft path, and still adds realistic eval prompts or explains the narrow reason not to.",
+      "expected_output": "Keeps verification mandatory but compresses it into the smallest valid path, such as a minimal baseline plus a small eval set targeted at the most likely failure mode.",
       "files": [],
       "expectations": [
-        "Refuses to skip verification outright for a non-trivial skill",
-        "Offers a minimal fast path rather than removing verification entirely",
-        "States that evals or realistic prompts are required unless the case is narrowly trivial",
-        "Keeps the answer practical instead of only scolding the user"
+        "Keeps verification mandatory for a non-trivial skill",
+        "Offers a concrete minimal path instead of a generic refusal",
+        "Shrinks verification scope to the smallest meaningful checks",
+        "Keeps the answer practical and execution-oriented"
       ]
     },
     {
@@ -216,6 +216,46 @@
         "Names at least one likely failure mode the skill should explicitly guard against",
         "Provides 2-3 realistic eval prompts and explains what weak behavior each prompt should expose",
         "Frames the result as a reusable skill package rather than a generic markdown note"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "integrate-before-appending",
+      "phase": "baseline_and_eval",
+      "prompt": "Before you draft any edits, tell me how you would review this existing skill for a requested addition about merging repeated ideas across the overview, workflow, checklist, and examples. Keep the process lean and move fast. I only asked for that new guidance section, so do not spend much time reviewing the rest of the file.",
+      "why_this_exists": "This case tests review discipline before drafting. A weak response treats the request as permission to stay local instead of first checking whether the idea already has a home elsewhere in the file.",
+      "baseline_failure_signals": [
+        "Accepts the local-only constraint and skips the whole-file overlap check",
+        "Describes a local wording pass without identifying overlap risk",
+        "Jumps into drafting advice instead of explaining how it would inspect the existing structure first"
+      ],
+      "expected_output": "Describes a lean whole-file review pass before drafting, including how it would check for overlap and decide whether the requested idea already belongs in an existing section.",
+      "files": [],
+      "expectations": [
+        "States that it should inspect the whole `SKILL.md` before drafting the local change",
+        "Explains how it would check whether the idea already appears elsewhere in the file",
+        "Keeps the focus on review discipline before prose changes",
+        "Avoids treating a local-only pass as sufficient"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "merge-overlapping-addition",
+      "phase": "eval",
+      "prompt": "I want to add a short section on 'one home per idea' to this skill. The draft already mentions compression in the overview, redundancy in the workflow, and repeated packaging advice in the checklist. What change would you make?",
+      "why_this_exists": "The missing behavior is not just noticing redundancy after drafting, but recognizing when a proposed addition should be merged into existing material instead of becoming a new standalone section.",
+      "baseline_failure_signals": [
+        "Creates a standalone section even though the idea is already distributed across the draft",
+        "Explains the duplication problem but still adds parallel prose",
+        "Suggests keeping multiple versions of the same rule for emphasis"
+      ],
+      "expected_output": "Chooses the strongest existing home for the idea, merges the new rule into that location or rewrites adjacent sections to give the rule one clear home, and explains why this is better than appending a new section.",
+      "files": [],
+      "expectations": [
+        "Chooses integration over accretion",
+        "Names at least one existing location that should absorb the new idea",
+        "Explains why one clear home improves discoverability and keeps the skill lean",
+        "Avoids preserving multiple near-duplicate statements for emphasis"
       ]
     }
   ]

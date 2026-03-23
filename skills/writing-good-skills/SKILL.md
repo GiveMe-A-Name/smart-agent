@@ -91,15 +91,27 @@ Only add `templates/`, `examples/`, or `scripts/` when they remove real repeated
 
 Work in this order:
 1. choose the right artifact boundary
-2. write a trigger-focused `description`
-3. state the core constraints and failure-prevention rules
-4. add the smallest workflow that helps the next agent act
-5. add realistic verification
-6. run a redundancy pass before finishing
+2. if revising an existing skill, inspect the current structure before editing
+3. write a trigger-focused `description`
+4. state the core constraints and failure-prevention rules
+5. add the smallest workflow that helps the next agent act
+6. add realistic verification
+7. run a redundancy pass before finishing
 
 The redundancy pass is mandatory even if the user did not complain that the skill is too long.
 
 If the task is to help create a brand-new skill, do not wait for a draft. Make the boundary, trigger, constitution, support-folder split, and verification decisions explicitly.
+
+## Integration Before Accretion
+
+When revising an existing skill, default to integration, not accretion.
+
+Before adding new prose:
+1. read the whole main `SKILL.md`
+2. identify sections that already carry part of the same idea
+3. strengthen the best existing home for the idea before creating a new one
+
+A skill should have one clear home for each important idea. If the same judgment appears in overview, workflow, checklist, and examples, keep the strongest version and merge or delete the rest. See `references/lean-skill-patterns.md` for the decision order.
 
 ## Redundancy Pass
 
@@ -111,7 +123,7 @@ Stop and compress if:
 - a section exists only to defend a rule that is already clear
 - packaging advice is repeated across overview, workflow, and checklist
 
-Shorter is not the goal by itself. The goal is one clear place for each important idea.
+Shorter is not the goal by itself. The goal is clearer guidance with less repetition.
 
 ## Review Existing Skills
 
@@ -147,6 +159,7 @@ Stop and revise if:
 - the description summarizes workflow instead of trigger conditions
 - the draft reads like a note or meeting summary
 - the file keeps repeating the same claim in several sections
+- a local fix made the file longer without improving the skill's structure
 - the main `SKILL.md` is growing because support detail stayed inline
 - core rules were moved out of the main file and it became hollow
 - support material was dumped into `references/` even though it should have been a template, example, or script

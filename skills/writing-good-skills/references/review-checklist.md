@@ -2,6 +2,8 @@
 
 ## Review Order
 
+Before reviewing a specific section, read the whole main `SKILL.md` once and mark where the same idea already appears.
+
 Review in this order:
 1. `description`
 2. scope boundary
@@ -11,6 +13,8 @@ Review in this order:
 6. packaging and redundancy
 
 This order matters. A polished file that triggers badly or repeats itself is still weak.
+
+If the user points at one weak section, do not stay local by default. First check whether the draft already has a better home for the same idea.
 
 ## Section Checks
 
@@ -79,12 +83,14 @@ Check:
 - do support folders match file roles? Use `references/lean-skill-patterns.md` as the canonical split guide.
 - were essential rules mistakenly moved out?
 - does more than one section make the same argument?
+- was a new section added where an existing section should have been strengthened instead?
 
 Common failures:
 - main skill too long and repetitive
 - main skill hollow because key logic moved out of the main file
 - support files dumped into the wrong folder instead of following the canonical split guide
 - repeated packaging advice scattered across multiple sections
+- a local fix appends fresh prose without first integrating overlapping material
 
 ## Mandatory Redundancy Audit
 
@@ -97,6 +103,7 @@ Check for:
 
 When found:
 - keep the clearest version inline
+- merge into the strongest existing section before creating a new one
 - compress or delete the repeats
 - move only the expanded support material to the correct support folder
 

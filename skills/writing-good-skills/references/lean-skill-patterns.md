@@ -45,6 +45,18 @@ Ask:
 3. Is this paragraph clarifying the law, or merely defending it?
 4. Would a shorter cross-reference preserve the same value?
 
+## Integration Before Accretion
+
+When revising an existing skill, do not default to adding a new section just because the request names one topic.
+
+Use this decision order:
+1. merge into the strongest existing section
+2. tighten existing wording
+3. replace duplication with a cross-reference
+4. add a new section only if the idea adds a new decision signal or workflow
+
+The default move is integration. Appending is the last resort.
+
 ## Common Compression Moves
 
 Use these moves in order:
@@ -52,6 +64,8 @@ Use these moves in order:
 2. replace repeated explanation with one rule plus one example
 3. move heavy support material to the correct support folder
 4. delete defensive prose that adds no new decision signal
+
+If a requested addition overlaps with existing overview, workflow, checklist, or examples, keep one home for the idea and strengthen that location instead of creating a parallel block.
 
 ## Signs The Draft Should Split
 
