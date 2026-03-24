@@ -87,3 +87,5 @@ Stop and revise when:
 | The diagnosis sounds like generic caution, broad repository notes, or early fix speculation | The skill did not change behavior enough | Restate which specific failure evidence grounds each claim |
 
 See `examples/symptom-vs-owning-layer.md` for a contrast pair showing how a stack-trace line can be the symptom site without being the owning layer.
+
+See `examples/fixture-bypass-detection.md` for a contrast pair showing how bypass information can appear to be acknowledged while still being set aside in favor of stack-trace evidence.

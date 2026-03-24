@@ -86,3 +86,5 @@ Do not proceed if key intent is still being guessed silently.
 If the result mainly asks broad questions the agent could have answered itself, or if it confuses evidence with intent, the clarification is weak.
 
 See `examples/resolve-vs-escalate.md` for a contrast pair showing when a question should be answered from evidence versus escalated to the user.
+
+See `examples/compress-to-root-question.md` for a contrast pair showing how to identify the single root question when multiple unknowns share the same underlying gap.
