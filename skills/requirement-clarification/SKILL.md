@@ -1,6 +1,6 @@
 ---
 name: requirement-clarification
-description: Use when a request is underspecified, ambiguous, or uses unclear terminology and the agent needs to clarify intent and unresolved human decisions before planning or implementation.
+description: Use when a request is ambiguous or underspecified and clarifying intent requires resolving unknowns before planning or implementation.
 ---
 
 # Requirement Clarification
@@ -50,20 +50,10 @@ This skill does not own:
 
 ## Clarification Heuristics
 
-Use the smallest move that reduces ambiguity.
-
 - First identify whether the unknown is about user intent, repository fact, or stable outside knowledge.
 - Resolve local repository unknowns directly when one or two targeted lookups are enough; if deeper repository analysis is needed, treat it as supporting input rather than the result.
 - Use external knowledge only when it changes how the request should be interpreted.
-- Keep turning evidence into requirement language, and ask the human only about decisions that evidence cannot settle.
 - Stop once the remaining uncertainty is small, explicit, and human-owned.
-
-## Enough To Proceed
-
-Clarification is sufficient when the request can be restated in concrete working terms, the main constraints are labeled by evidence strength, and the remaining uncertainty has been compressed into a small set of genuinely human decisions.
-
-Do not continue clarifying just to gather more context.
-Do not proceed if key intent is still being guessed silently.
 
 ## Self-Correction Signals
 
@@ -87,5 +77,8 @@ A good result:
 - labels what is confirmed, inferred, and still unknown
 - ends with a small set of real human decisions rather than a long list of exploratory questions
 - does not drift into planning, change design, or completion judgment
+
+Stop when these conditions are met; do not continue clarifying to gather more context.
+Do not proceed if key intent is still being guessed silently.
 
 If the result mainly asks broad questions the agent could have answered itself, or if it confuses evidence with intent, the clarification is weak.
