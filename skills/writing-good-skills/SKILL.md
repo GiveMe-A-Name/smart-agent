@@ -9,15 +9,9 @@ description: Use when creating or revising a reusable skill package, especially 
 
 Write skills as reusable capability guides for future agents.
 
-A good skill teaches:
-- when it should trigger
-- what capability it owns and where that boundary ends
-- what must be true and what must not happen
-- what signals should shape judgment while acting or reviewing
-
 Do not write a diary, a note dump, a rigid SOP, or a hidden routing graph.
 
-## When To Use
+## Trigger Logic
 
 Use this skill when the task is to:
 - create a skill from notes, habits, or a from-scratch idea
@@ -26,6 +20,7 @@ Use this skill when the task is to:
 - decide whether material belongs in a skill, `AGENTS.md`, `README.md`, or a note
 
 Do not use it for plain project documentation or repo-local operating rules.
+Do not use it for minor wording or formatting fixes where no structural or boundary judgment is needed.
 
 ## Core Law
 
@@ -42,16 +37,7 @@ Keep the main `SKILL.md` lean, but do not hollow it out.
 
 These five stay in the main `SKILL.md`, not in support files.
 
-A good skill is capability-first: it teaches judgment, not orchestration.
-
-Use the skill to clarify:
-- when the capability applies
-- what it owns and does not own
-- what must be true before acting
-- what must not happen inside the boundary
-- what signals should influence judgment
-
-Do not turn the skill into orchestration. When the skill reaches its edge, state what is missing, what it does not own, and why continuing inside the skill would mislead.
+Keep skills capability-first: they should teach judgment, not encode orchestration. See `Boundary Clarity And Routing Language` below for how to apply this.
 
 ## Boundary Clarity And Routing Language
 
@@ -145,11 +131,10 @@ Review in this order:
 
 If the review comments only on wording, it is incomplete.
 
-See `references/review-checklist.md` for expanded review heuristics.
+Choose the deliverable that best improves judgment rather than forcing a uniform presentation.
 
-See:
-- `references/description-patterns.md`
-- `references/response-modes.md`
+See `references/review-checklist.md` for expanded review heuristics.
+See `references/description-patterns.md` and `references/response-modes.md` for reference patterns and deliverable options.
 
 ## Self-Correction Signals
 
@@ -161,8 +146,3 @@ Stop and revise if:
 - core rules were moved out of the main file and it became hollow
 - support material was moved out, but the split made the package harder to use or judge
 
-## Possible Deliverables
-
-Choose the deliverable that best improves judgment rather than forcing a uniform presentation.
-
-See `references/response-modes.md` for the full menu of response modes and selection heuristics.
