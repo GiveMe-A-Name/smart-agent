@@ -99,6 +99,8 @@ The redundancy pass is mandatory even if the user did not complain that the skil
 
 If the task is to help create a brand-new skill, do not wait for a draft. Make the boundary, trigger, invariants, support-folder split, and redundancy decisions explicitly.
 
+When the input is raw notes or a workflow description, the most common failure is turning the notes into a renumbered step list rather than extracting the underlying judgment. See `examples/notes-to-skill.md` for a before/after showing what goes wrong and why.
+
 ## Integration And Compression
 
 Treat this as a law, not a drafting preference.
