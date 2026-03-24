@@ -63,16 +63,10 @@ A stronger intervention is less likely to be justified when the change is:
 
 ## Failure Patterns
 
-Watch for these failure modes:
-- using "minimal change" as an excuse to ignore structural damage
-- using "maintainability" as an excuse to redesign beyond the real need
-- assuming old code is bad without understanding what constraint it was solving
-- preserving old code blindly without checking whether the current change exposes a real design weakness
+Watch for this failure mode in particular:
 - making the patch pass now while quietly making future changes harder
 
 ## Rule Of Thumb
-
-Choose the least invasive implementation that is still honest about the structure the change really needs.
 
 If a tiny patch would distort responsibilities, it is too small.
 If a broad redesign goes beyond what this change needs, it is too large.

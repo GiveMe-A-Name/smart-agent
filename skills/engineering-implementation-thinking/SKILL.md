@@ -46,7 +46,7 @@ This skill does not own:
 
 This skill assumes the agent can obtain enough code evidence to reason responsibly, but it does not own repository analysis as an end in itself.
 
-If implementation judgment is blocked by missing code evidence, gather the missing evidence first. If that requires deeper repository-slice analysis across multiple files or layers, use `understanding-codebases`.
+If implementation judgment is blocked by missing code evidence, gather the missing evidence first. If that requires deeper repository-slice analysis across multiple files or layers, do that first before returning to this skill.
 
 This skill is not the right tool yet when the main missing piece is still:
 - understanding what this part of the codebase does, how behavior flows, or who owns the touched area
@@ -58,13 +58,9 @@ Use this skill when the remaining question is:
 ## Invariants
 
 - Do not treat the task description as the full implementation truth.
-- Do not assume the smallest edit is the best edit.
-- Do not treat passing current tests as proof that the current edit point is the right implementation boundary.
 - Do not assume existing code shape is arbitrary before considering what it may be protecting.
-- Do not preserve a weak pattern blindly just because it already exists.
 - Do not infer unconfirmed product intent from code shape alone.
 - Do not let deadline or delivery pressure justify moving responsibility into the wrong layer.
-- Do not use maintainability as an excuse for unnecessary redesign.
 - Prefer the least invasive change that keeps responsibilities clear and future changes easier.
 
 ## Core Questions
@@ -77,6 +73,8 @@ A strong result can answer:
 - Would the smallest patch make future work harder?
 - Should this change be a local patch, a focused structural improvement, or an explicit pause pending better understanding?
 
+Use `references/risk-triage.md` when these questions do not resolve the patch-vs-improvement-vs-pause choice. See `examples/patch-vs-structural-improvement.md` for a contrast pair showing how the same request can warrant either a narrow patch or a focused structural improvement depending on what the current code shape reveals.
+
 ## Self-Correction Signals
 
 Stop and revise when:
@@ -88,13 +86,3 @@ Stop and revise when:
 - you are expanding the work into redesign beyond what the change needs
 - you cannot explain how the implementation supports both current intent and future maintainability
 
-## What Good Looks Like
-
-A good result:
-- fits the real structure of the codebase
-- reflects understanding of why the touched code exists in its current form
-- preserves or intentionally improves boundaries
-- avoids both thoughtless minimal patching and unnecessary redesign
-- makes related future changes easier, clearer, or safer
-
-Use `references/risk-triage.md` when you need help deciding whether the change needs a narrow patch, a focused structural improvement, or an explicit pause due to weak understanding.
