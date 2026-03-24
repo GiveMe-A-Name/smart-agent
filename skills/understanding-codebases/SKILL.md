@@ -51,17 +51,6 @@ This skill does not own:
 - final engineering judgment about how a change should be implemented once repository evidence is understood
 - recommending verification strategy or completion judgment
 
-## Constitution
-
-- Understand before suggesting.
-- Prefer code evidence over intuition.
-- Do not use this skill as a default warm-up before every action.
-- Spend lookup budget on hypotheses, not on repeated reassurance.
-- Learn from nearby patterns before inferring ownership or conventions.
-- Trace past export, registration, config, and facade layers when possible.
-- Mark unproven claims as hypotheses or unknowns.
-- Produce analysis, not implementation commitments.
-
 ## Core Moves
 
 These are understanding moves, not a fixed sequence. Use the ones that help answer the current code-understanding question.
@@ -125,3 +114,5 @@ State the role of each file precisely. For example: `middleware/auth.ts` is the 
 - Spending more lookups just to reconfirm the same absence in neighboring files
 - Presenting an untraced downstream module as a proven change point
 - Drifting into planning after the repository slice is already grounded
+
+See `examples/fake-new-hypothesis.md` for a contrast pair showing how a lookup that looks like a new hypothesis can actually just be rechecking the same absence.
