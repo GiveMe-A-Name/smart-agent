@@ -53,9 +53,6 @@ Use the skill to clarify:
 
 Do not turn the skill into orchestration. When the skill reaches its edge, state what is missing, what it does not own, and why continuing inside the skill would mislead.
 
-When revising an existing skill, default to integration over accretion.
-Do not append local prose until you have checked whether the same idea already has a better home in the current `SKILL.md`.
-
 ## Boundary Clarity And Routing Language
 
 Before drafting, decide whether the material belongs in:
@@ -84,6 +81,8 @@ Use support folders by function:
 - `examples/` for good, bad, or contrasting exemplars
 - `scripts/` for deterministic executable helpers
 
+Add an `examples/` folder when the skill's key judgment calls are subtle enough that an agent could follow the rules and still produce the wrong output — typically when a bad pattern looks superficially similar to a good one. A good example pair: a realistic bad case alongside a corrected version, annotated to name what makes the bad case wrong. Keep it minimal — enough to reveal the relevant distinction, not a restatement of rules the prose already makes clear.
+
 If a section mainly re-explains an earlier rule, compress it first. If it still belongs outside the main file, move it to the folder that matches its role. Only add support files when they improve decision quality or remove real repeated work.
 
 See `references/lean-skill-patterns.md` for the split rules and support-folder taxonomy.
@@ -104,7 +103,7 @@ When writing or revising a skill, make these decisions explicit:
 - trigger wording
 - invariants and failure-prevention rules
 - decision signals that should shape judgment
-- whether action guidance would improve judgment or merely hard-code a SOP
+- whether key judgment calls are subtle enough that rules alone won't prevent the wrong output — if so, add contrast examples
 - whether any wording is teaching boundary judgment or secretly encoding routing
 - redundancy and support-folder split
 
@@ -162,24 +161,8 @@ Stop and revise if:
 - core rules were moved out of the main file and it became hollow
 - support material was moved out, but the split made the package harder to use or judge
 
-## Action Guidance
-
-Action guidance is optional, not a mandatory section.
-
-Include it only when it sharpens judgment by showing:
-- what to notice before acting
-- what tradeoff or distinction matters in practice
-- what a good versus bad move looks like
-
-If the guidance can only be expressed as a rigid sequence or mandatory output shape, it probably belongs in a template or should be removed.
-
 ## Possible Deliverables
 
-Choose the output that best teaches or improves the current skill. Useful deliverables include:
-- a lean rewritten `SKILL.md`
-- a targeted rewrite of the weakest section
-- a packaging recommendation for support folders
-- a short explanation of what agent behavior should change
-- a contrast example when judgment is the real problem
+Choose the deliverable that best improves judgment rather than forcing a uniform presentation.
 
-Choose the deliverable that best improves judgment, rather than forcing a uniform presentation.
+See `references/response-modes.md` for the full menu of response modes and selection heuristics.

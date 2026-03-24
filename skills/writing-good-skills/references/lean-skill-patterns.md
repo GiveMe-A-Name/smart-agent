@@ -33,7 +33,7 @@ Use the narrowest folder that matches the file's job.
 
 - `references/`: read for knowledge
 - `templates/`: copy or adapt as a starting point
-- `examples/`: compare against a standard
+- `examples/`: compare against a standard — add when a bad pattern looks superficially similar to a good one and rules alone won't prevent the wrong output; a good example pair is a realistic bad case alongside a corrected version, annotated to name what makes the bad case wrong
 - `scripts/`: execute for deterministic work
 
 Bad packaging often comes from collapsing all four jobs into `references/`.

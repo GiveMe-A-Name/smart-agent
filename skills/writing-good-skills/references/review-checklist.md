@@ -61,6 +61,8 @@ Check:
 - does any action guidance sharpen judgment instead of enforcing a rigid SOP?
 - are examples teaching judgment rather than just format?
 - does it avoid telling the agent which skill must run next?
+- were key judgment calls assessed for whether rules alone are sufficient, or whether contrast examples are needed?
+- if an `examples/` folder exists, do the examples show a realistic bad case alongside a corrected version, annotated to name what makes the bad case wrong?
 
 Common failures:
 - only philosophy, no practical decision cues
@@ -68,6 +70,8 @@ Common failures:
 - long theory that does not change action
 - action guidance that is really a fixed template or mandatory output shape
 - skill-to-skill routing disguised as workflow guidance
+- examples folder added without assessing whether the judgment gap actually requires it
+- examples that restate rules already clear in the prose, rather than revealing a subtle distinction
 
 ### 5. Packaging And Redundancy
 
