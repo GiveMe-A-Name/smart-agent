@@ -61,6 +61,8 @@ This skill does not own:
 - For each unknown, decide before asking: can a targeted lookup or stable external knowledge resolve this, or does it require a human decision? Only escalate what cannot be answered from evidence.
 - Resolve local repository unknowns directly when one or two targeted lookups are enough; if deeper repository analysis is needed, treat it as supporting input rather than the result.
 - Use external knowledge only when it changes how the request should be interpreted.
+- When you must ask after exploration yields nothing, ask for a pointer to the code or location — something that lets you find the answer yourself. Asking the user to describe the problem shifts diagnosis to them and is a weaker fallback.
+- When stated requirements explicitly conflict, the clarification question is about priority or tradeoff — not about what each requirement means individually. Name the conflict and ask the user to choose.
 - Stop once the remaining uncertainty is small, explicit, and human-owned.
 
 ## Self-Correction Signals
@@ -88,3 +90,5 @@ If the result mainly asks broad questions the agent could have answered itself, 
 See `examples/resolve-vs-escalate.md` for a contrast pair showing when a question should be answered from evidence versus escalated to the user.
 
 See `examples/compress-to-root-question.md` for a contrast pair showing how to identify the single root question when multiple unknowns share the same underlying gap.
+
+See `examples/conflicting-requirements.md` for a contrast pair showing how to handle requirements that explicitly contradict each other.
