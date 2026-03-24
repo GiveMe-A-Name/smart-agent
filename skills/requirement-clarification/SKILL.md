@@ -1,6 +1,6 @@
 ---
 name: requirement-clarification
-description: Use when a request is ambiguous or underspecified and clarifying intent requires resolving unknowns before planning or implementation.
+description: Use when a request is ambiguous or underspecified and the agent must classify unknowns as user intent, repository fact, or external knowledge before proceeding — not when the main missing step is code exploration or implementation.
 ---
 
 # Requirement Clarification
@@ -17,6 +17,25 @@ combining three inputs:
 This skill is about better clarification behavior, not about filling out a
 template. Its main job is to reduce ambiguity and compress the remaining
 questions down to the few decisions that actually require the human.
+
+## Trigger Logic
+
+Before using this skill, classify what kind of unknown is blocking progress:
+
+- `user intent`: what the user actually wants — only the user can resolve this
+- `repository fact`: what the current code does, how it is structured, what patterns exist — can often be resolved with a targeted lookup
+- `stable external knowledge`: well-established domain conventions or best practices — can often be resolved without asking the user
+
+Use this skill when:
+- the request is ambiguous or underspecified and proceeding risks working toward the wrong goal
+- the main missing step is understanding what the user actually wants, not how to implement it
+- key unknowns have not yet been classified as user intent, repository fact, or external knowledge
+
+Do not use this skill when:
+- intent is clear enough to support planning or implementation directly
+- the main missing step is repository exploration or code analysis, not intent clarification
+- the task is fully mechanical or already unambiguous
+- the agent is using clarification as a default first step before every task
 
 ## Boundary
 
@@ -37,20 +56,9 @@ This skill does not own:
 - verification strategy
 - completion judgment
 
-## Constitution
-
-- Clarify before planning.
-- Prefer the smallest evidence-gathering move that resolves the ambiguity.
-- Resolve repository and stable external unknowns before asking the human.
-- Distinguish user-stated goals, repository facts, external knowledge, and unresolved unknowns.
-- Do not treat repository facts or external best practice as confirmed product intent.
-- Escalate only irreducible product, business, or preference decisions to the human.
-- Surface conflicting interpretations instead of silently choosing one.
-- Produce clarified understanding, not generic exploration or a change plan.
-
 ## Clarification Heuristics
 
-- First identify whether the unknown is about user intent, repository fact, or stable outside knowledge.
+- For each unknown, decide before asking: can a targeted lookup or stable external knowledge resolve this, or does it require a human decision? Only escalate what cannot be answered from evidence.
 - Resolve local repository unknowns directly when one or two targeted lookups are enough; if deeper repository analysis is needed, treat it as supporting input rather than the result.
 - Use external knowledge only when it changes how the request should be interpreted.
 - Stop once the remaining uncertainty is small, explicit, and human-owned.
@@ -70,15 +78,11 @@ Stop and revise when:
 
 ## Verification Expectation
 
-A good result:
-- restates the request in clearer working terms
-- separates user intent, repository facts, external knowledge, and unresolved decisions
-- uses repository evidence and external knowledge only when they reduce genuine ambiguity
-- labels what is confirmed, inferred, and still unknown
-- ends with a small set of real human decisions rather than a long list of exploratory questions
-- does not drift into planning, change design, or completion judgment
+A good result restates the request in clearer working terms and ends with a small set of real human decisions, not a long list of exploratory questions.
 
 Stop when these conditions are met; do not continue clarifying to gather more context.
 Do not proceed if key intent is still being guessed silently.
 
 If the result mainly asks broad questions the agent could have answered itself, or if it confuses evidence with intent, the clarification is weak.
+
+See `examples/resolve-vs-escalate.md` for a contrast pair showing when a question should be answered from evidence versus escalated to the user.
