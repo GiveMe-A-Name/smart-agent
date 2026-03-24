@@ -24,7 +24,7 @@ Do not use it for minor wording or formatting fixes where no structural or bound
 
 ## Core Law
 
-Every good skill needs five things:
+Every capability-and-constraints skill needs five things:
 1. trigger logic
 2. capability boundary
 3. invariants
@@ -85,6 +85,7 @@ Treat packaging as part of the design.
 ## Core Drafting Decisions
 
 When writing or revising a skill, make these decisions explicit:
+- task format — procedural (SOP) or judgment-heavy (capability + constraints): procedural tasks have fixed steps and low variation; judgment tasks have high variation or context-dependent paths. Apply the five-element framework only to judgment tasks. Do not rewrite a clear SOP as capability + constraints.
 - artifact boundary
 - trigger wording
 - invariants and failure-prevention rules
