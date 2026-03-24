@@ -1,6 +1,6 @@
 ---
 name: understanding-codebases
-description: Use when one or two targeted lookups are not enough and the agent must understand a repository slice across multiple files or layers to trace behavior, compare patterns, or identify ownership and candidate change points safely.
+description: Use when one or two targeted lookups are not enough and the agent must understand a repository slice across multiple files or layers to trace behavior, compare patterns, or identify ownership and candidate change points safely. Do not use for requests that are mainly missing human decisions or otherwise only need clarification.
 ---
 
 # Codebase Understanding
@@ -16,16 +16,26 @@ work is complete.
 ## Trigger Logic
 
 Use this skill when:
+- the question is concrete enough to investigate, but the needed repository evidence is still missing
 - one or two targeted repository lookups are not enough to answer the current question safely
 - the task requires repository-slice analysis across multiple files or layers
 - the agent must trace a main call flow, compare local patterns, or prove ownership before suggesting where work belongs
 - unfamiliarity with the local slice makes confident action unsafe without deeper code evidence
 
 Do not use this skill when:
+- the main blocker is intent ambiguity, missing human decisions, or unclear improvement targets
 - a single file, obvious edit path, or one or two targeted lookups already answer the question
 - the task is a shallow lookup about terminology, existing flags, exposed configuration, exported options, or already-obvious behavior
 - the goal is only to decide whether the request is clear enough to continue clarification
 - the agent is using repository understanding as a default warm-up before every action
+
+"Two targeted lookups" means at most two tool calls tied to the current hypothesis set — not one lookup per likely location, not repeated checks that only reconfirm the same absence, and not curiosity-driven browsing. If the first lookup already suggests the repo lacks the evidence needed to answer the current premise safely, stop and self-correct rather than broadening the search.
+
+Before deepening repository exploration, distinguish among these cases:
+
+- `intent ambiguity`: the request mainly needs clarification or human decisions; do not use repository exploration to solve that
+- `repo-fact gap`: the question is concrete, but repository evidence is missing; use this skill only if limited targeted lookups still do not ground the answer
+- `already answerable`: one or two targeted lookups already answer the question; do not invoke this skill
 
 ## Boundary
 
@@ -46,6 +56,7 @@ This skill does not own:
 - Understand before suggesting.
 - Prefer code evidence over intuition.
 - Do not use this skill as a default warm-up before every action.
+- Spend lookup budget on hypotheses, not on repeated reassurance.
 - Learn from nearby patterns before inferring ownership or conventions.
 - Trace past export, registration, config, and facade layers when possible.
 - Mark unproven claims as hypotheses or unknowns.
@@ -56,9 +67,11 @@ This skill does not own:
 These are understanding moves, not a fixed sequence. Use the ones that help answer the current code-understanding question.
 
 - Anchor on the current question.
+- Identify the current hypothesis before spending lookup budget.
 - Build the smallest repository slice that can answer it safely.
 - Trace toward behavior-changing code instead of stopping at facades.
 - Compare nearby patterns when they materially inform the answer.
+- Use a second lookup only when it tests a materially different hypothesis, such as "the first entry-path guess was wrong," rather than repeating the same absence check in another likely place.
 - Stop once the answer is grounded well enough to avoid intuition.
 
 ## Grounded Understanding
@@ -80,4 +93,35 @@ Stop and revise when:
 - you stopped at export, registration, config, or facade layers
 - you listed files without explaining relationships or call flow
 - you are treating guesses about ownership or change placement as facts
+- a negative lookup already supports "missing repo evidence," but you keep searching without a materially different hypothesis
+- your follow-up lookup changes paths or tools but only reconfirms the same absence
 - you are drifting into planning or still exploring after the question is already grounded
+
+## Judgment in Practice
+
+**Task**: "Where does the auth token get validated?"
+
+**Decision 1 — Should I invoke this skill?**
+The question is concrete, but answering it safely requires more than naming a plausible file. I need to trace from request entry toward behavior-changing code and distinguish orchestrators from the real validation point. → Invoke this skill.
+
+**Decision 2 — What is my starting hypothesis?**
+My first hypothesis is that auth validation starts in request middleware. That is only a starting point, not the answer. I need repository evidence.
+
+**Decision 3 — First lookup: entry path found. Is that enough?**
+I found `middleware/auth.ts` with a `validateToken` call. This grounds the entry path, but the file appears to delegate the real work. That is useful evidence, not yet the behavior-changing code. → Continue.
+
+**Decision 4 — Second lookup: follow delegation, not curiosity.**
+My next hypothesis is that the delegated module contains the actual validation logic or leads directly to it. I spend the second lookup on the module called by `middleware/auth.ts`, such as `services/token.ts`, because it tests a new hypothesis rather than repeating the same absence check elsewhere.
+
+**Decision 5 — What counts as enough evidence?**
+If `services/token.ts` performs signature checks, expiry checks, or calls a concrete verifier that I actually inspected, I can now point to the real validation path and stop. If it only delegates again and I have not traced into the next layer, I should not present that downstream verifier as proven. I should say the validation path likely continues there, but that final step remains unverified.
+
+**Decision 6 — How do I report the result?**
+State the role of each file precisely. For example: `middleware/auth.ts` is the request entry and orchestration layer; `services/token.ts` contains or routes the validation flow; any downstream verifier is only a proven validation point if I actually traced into it. Anything not directly confirmed from code stays labeled as a hypothesis or unknown.
+
+**What this skill prevents here:**
+- Stopping at the first plausible file and calling it the answer
+- Treating a function name like `validateToken` as proof of where validation really happens
+- Spending more lookups just to reconfirm the same absence in neighboring files
+- Presenting an untraced downstream module as a proven change point
+- Drifting into planning after the repository slice is already grounded
