@@ -46,19 +46,6 @@ This skill does not own:
 - authoring integration test fixtures as the main output
 - judging whether work is complete
 
-## Constitution
-
-- Do not edit code before you can restate the concrete failing behavior.
-- Do not confuse the symptom site with the owning layer.
-- Do not assume the implementation is wrong until you have considered
-  expectation, fixture, and environment failure modes.
-- Prefer code evidence and nearby patterns over first-fix intuition. Treat
-  nearby patterns as support, not proof of ownership.
-- Do not weaken assertions or widen tolerances just to remove the symptom.
-- Do not spread edits across multiple layers while ownership is still unclear.
-- Report unknowns explicitly instead of hiding them inside confident diagnosis.
-- Produce a diagnosis and readiness-to-edit judgment, not a speculative fix.
-
 ## Diagnosis Heuristics
 
 - Start by restating the concrete failing behavior in specific terms.
@@ -80,6 +67,8 @@ Editing is grounded enough to begin when:
 Do not start editing when the likely owner is still just the nearest file, when
 the failure could still just as easily belong to expectation or fixture logic,
 or when the unknowns are large enough that any edit would mostly be guesswork.
+Use nearby patterns and code evidence to support the owning-layer judgment, but
+treat proximity as support, not proof.
 
 ## Self-Correction Signals
 
@@ -95,18 +84,6 @@ Stop and revise when:
 | You propose a fix before naming a diagnosis | You are patching symptoms | Finish diagnosis first |
 | You want to weaken assertions or increase timeouts to move on | You are hiding the symptom | Keep the assertion and find the cause |
 | You still cannot explain ownership after tracing the visible path | Local diagnosis is insufficient | State what kind of missing grounding remains instead of bluffing through it |
+| The diagnosis sounds like generic caution, broad repository notes, or early fix speculation | The skill did not change behavior enough | Restate which specific failure evidence grounds each claim |
 
-## What Good Looks Like
-
-A good result:
-- starts from a concrete visible failure instead of a vague report
-- distinguishes symptom site from owning layer
-- considers the main competing explanations
-- uses code evidence and nearby patterns to support the diagnosis without
-  treating proximity as ownership proof
-- names meaningful unknowns
-- stops premature code changes when diagnosis is weak
-- makes it clear whether fix work can begin responsibly
-
-If the result sounds like generic caution, broad repository notes, or early fix
-speculation, the skill did not change behavior enough.
+See `examples/symptom-vs-owning-layer.md` for a contrast pair showing how a stack-trace line can be the symptom site without being the owning layer.
