@@ -1,6 +1,6 @@
 ---
 name: engineering-implementation-thinking
-description: Use when implementing or modifying code requires engineering judgment about clarified intent, architecture, historical code shape, hidden constraints, and long-term maintainability, and the needed code evidence is already available or can be gathered with focused investigation.
+description: Use when implementing a non-trivial change in an existing codebase requires deciding how to land it responsibly, such as whether to make a local patch, preserve or tighten a boundary, or do a focused structural improvement instead of the quickest edit.
 ---
 
 # Engineering Implementation Thinking
@@ -12,16 +12,16 @@ This skill helps the agent decide how to land code responsibly in an existing sy
 ## Trigger Logic
 
 Use this skill when:
-- the requested intent is already clarified enough, or can be clarified enough, to support responsible implementation judgment
-- the relevant code evidence is already grounded enough, or can be gathered with focused investigation, to support implementation judgment
 - a non-trivial change is being implemented in an existing codebase
-- understanding why current code is shaped this way may change how the work should be done
-- a narrow patch could complete the task, but might weaken structure or maintainability
+- clarified intent and enough code evidence are already available to decide how to land the change responsibly
+- the main question is whether to make a local patch, preserve or tighten a boundary, or do a focused structural improvement instead
+- understanding why the current code is shaped this way may change how the work should be done
 - architecture boundaries, contracts, compatibility concerns, or historical decisions materially affect the implementation
+- the quickest edit could complete the task, but might weaken structure or maintainability
 
 Do not use this skill when:
 - the change is tiny, local, and has one obvious low-risk path
-- the main missing step is still requirement clarification or repository exploration
+- the main missing step is still requirement clarification, repository understanding, or ownership analysis
 - the work is purely mechanical, clerical, or stylistic
 - the main question is whether work is complete rather than how it should be implemented
 - the agent is using engineering judgment as a default warm-up for every non-trivial implementation task
@@ -85,4 +85,3 @@ Stop and revise when:
 - you are preserving an existing pattern without judging whether it is still the right one
 - you are expanding the work into redesign beyond what the change needs
 - you cannot explain how the implementation supports both current intent and future maintainability
-

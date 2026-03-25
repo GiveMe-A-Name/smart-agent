@@ -1,6 +1,6 @@
 ---
 name: writing-good-skills
-description: Use when creating or revising a reusable skill package, especially from rough notes, overlong or repetitive `SKILL.md` drafts, weak trigger wording, unclear main-file versus support-folder splits (`references/`, `templates/`, `examples/`, `scripts/`), or boundary confusion with `AGENTS.md` or `README.md`.
+description: Use when creating or substantially revising a reusable skill package whose trigger wording, boundary, invariants, examples, or support-file split need structural judgment. Do not use for isolated wording tweaks, obvious local edits, or plain project documentation.
 ---
 
 # Writing Good Skills
@@ -15,12 +15,12 @@ Do not write a diary, a note dump, a rigid SOP, or a hidden routing graph.
 
 Use this skill when the task is to:
 - create a skill from notes, habits, or a from-scratch idea
-- review or improve an existing `SKILL.md`
-- fix a skill that feels vague, repetitive, bloated, or hard to discover
+- structurally review or revise an existing `SKILL.md` whose trigger logic, boundary, or packaging may be weak
+- fix a skill that feels vague, repetitive, bloated, over-broad, hard to discover, or unclear in scope
 - decide whether material belongs in a skill, `AGENTS.md`, `README.md`, or a note
 
 Do not use it for plain project documentation or repo-local operating rules.
-Do not use it for minor wording or formatting fixes where no structural or boundary judgment is needed.
+Do not use it for isolated wording tweaks, obvious local edits, or formatting fixes where no structural or boundary judgment is needed.
 
 ## Core Law
 
@@ -148,4 +148,3 @@ Stop and revise if:
 - the main `SKILL.md` is bloating because support detail stayed inline
 - core rules were moved out of the main file and it became hollow
 - support material was moved out, but the split made the package harder to use or judge
-

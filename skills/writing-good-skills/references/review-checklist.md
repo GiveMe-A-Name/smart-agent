@@ -23,6 +23,7 @@ Check:
 - is it trigger-focused?
 - does it describe when to use the skill rather than the workflow?
 - would it help discovery?
+- is the problem substantial enough that this skill should apply at all, rather than a local wording or formatting fix?
 
 Common failures:
 - workflow summary

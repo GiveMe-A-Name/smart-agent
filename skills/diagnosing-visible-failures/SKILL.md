@@ -1,6 +1,6 @@
 ---
 name: diagnosing-visible-failures
-description: Use when a specific test failure, visible CI error, stack trace, or other currently visible regression is already present and the agent needs to diagnose the likely owning layer before editing code.
+description: Use when a specific test failure, CI error, stack trace, or other currently visible regression is already present and the agent needs to figure out what layer most likely owns the problem before editing code.
 ---
 
 # Diagnosing Visible Failures

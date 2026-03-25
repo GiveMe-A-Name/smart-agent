@@ -39,7 +39,7 @@ Think of it as label text on the drawer, not the tool inside the drawer.
 Example:
 
 ```yaml
-description: Use when creating or revising a reusable skill package, especially from rough notes, overlong or repetitive `SKILL.md` drafts, weak trigger wording, unclear main-file versus support-folder splits (`references/`, `templates/`, `examples/`, `scripts/`), or boundary confusion with `AGENTS.md` or `README.md`.
+description: Use when creating or substantially revising a reusable skill package whose trigger wording, boundary, invariants, examples, or support-file split need structural judgment. Do not use for isolated wording tweaks, obvious local edits, or plain project documentation.
 ```
 
 Why it works:

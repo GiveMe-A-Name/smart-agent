@@ -1,6 +1,6 @@
 ---
 name: requirement-clarification
-description: Use when a request is ambiguous or underspecified and the agent must classify unknowns as user intent, repository fact, or external knowledge before proceeding — not when the main missing step is code exploration or implementation.
+description: Use when the user's request is ambiguous, underspecified, or internally conflicting and the agent needs to clarify what the user actually wants before planning or implementation. Do not use when the main missing step is code exploration or implementation.
 ---
 
 # Requirement Clarification
@@ -20,20 +20,21 @@ questions down to the few decisions that actually require the human.
 
 ## Trigger Logic
 
-Before using this skill, classify what kind of unknown is blocking progress:
+When the request is still ambiguous, identify what kind of unknown is actually blocking safe progress:
 
 - `user intent`: what the user actually wants — only the user can resolve this
 - `repository fact`: what the current code does, how it is structured, what patterns exist — can often be resolved with a targeted lookup
 - `stable external knowledge`: well-established domain conventions or best practices — can often be resolved without asking the user
 
 Use this skill when:
-- the request is ambiguous or underspecified and proceeding risks working toward the wrong goal
-- the main missing step is understanding what the user actually wants, not how to implement it
-- key unknowns have not yet been classified as user intent, repository fact, or external knowledge
+- the request is ambiguous, underspecified, or internally conflicting and proceeding risks working toward the wrong goal
+- the main missing step is clarifying what the user actually wants, which constraints matter, or which tradeoff they intend
+- some unknowns may be answered from shallow repository evidence or stable external knowledge, but the remaining ambiguity is still mainly about intent
+- the agent needs to separate user-owned decisions from questions it can resolve directly from evidence
 
 Do not use this skill when:
 - intent is clear enough to support planning or implementation directly
-- the main missing step is repository exploration or code analysis, not intent clarification
+- the main missing step is deep repository exploration, code ownership analysis, or implementation choice, not intent clarification
 - the task is fully mechanical or already unambiguous
 - the agent is using clarification as a default first step before every task
 

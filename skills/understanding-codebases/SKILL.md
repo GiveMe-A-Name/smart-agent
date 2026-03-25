@@ -1,6 +1,6 @@
 ---
 name: understanding-codebases
-description: Use when one or two targeted lookups are not enough and the agent must understand a repository slice across multiple files or layers to trace behavior, compare patterns, or identify ownership and candidate change points safely. Do not use for requests that are mainly missing human decisions or otherwise only need clarification.
+description: Use when the user asks to analyze how part of the codebase works, trace behavior across multiple files or layers, find where a bug or feature is implemented, compare local patterns, or determine the safest place to change code. Do not use for simple single-file lookups or requests that mainly need human decisions.
 ---
 
 # Codebase Understanding
@@ -16,11 +16,11 @@ work is complete.
 ## Trigger Logic
 
 Use this skill when:
-- the question is concrete enough to investigate, but the needed repository evidence is still missing
-- one or two targeted repository lookups are not enough to answer the current question safely
-- the task requires repository-slice analysis across multiple files or layers
-- the agent must trace a main call flow, compare local patterns, or prove ownership before suggesting where work belongs
-- unfamiliarity with the local slice makes confident action unsafe without deeper code evidence
+- the user is asking how part of the codebase works, where behavior is implemented, or where a change should go
+- answering safely requires tracing behavior across multiple files or layers rather than naming one plausible file
+- the question is concrete, but current repository evidence is still too thin to answer confidently
+- a single obvious file or one or two targeted lookups do not ground the answer well enough
+- tracing call flow, comparing nearby patterns, or proving ownership matters before suggesting where work belongs
 
 Do not use this skill when:
 - the main blocker is intent ambiguity, missing human decisions, or unclear improvement targets
