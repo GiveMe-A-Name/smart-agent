@@ -31,6 +31,7 @@ Use this skill when:
 - the main missing step is clarifying what the user actually wants, which constraints matter, or which tradeoff they intend
 - some unknowns may be answered from shallow repository evidence or stable external knowledge, but the remaining ambiguity is still mainly about intent
 - the agent needs to separate user-owned decisions from questions it can resolve directly from evidence
+- the request may mention code locations or implementation ideas, but those details do not remove the need for human intent
 
 Do not use this skill when:
 - intent is clear enough to support planning or implementation directly

@@ -1,6 +1,6 @@
 ---
 name: understanding-codebases
-description: Use when the user asks to analyze how part of the codebase works, trace behavior across multiple files or layers, find where a bug or feature is implemented, compare local patterns, or determine the safest place to change code. Do not use for simple single-file lookups or requests that mainly need human decisions.
+description: Use when the user asks to analyze how part of the codebase works, trace behavior across multiple files or layers, compare local patterns, or determine where behavior is implemented and the safest place to change code. Do not use for simple single-file lookups, requests that mainly need human decisions, or cases where a currently visible failure mainly needs pre-edit diagnosis.
 ---
 
 # Codebase Understanding
@@ -24,9 +24,11 @@ Use this skill when:
 
 Do not use this skill when:
 - the main blocker is intent ambiguity, missing human decisions, or unclear improvement targets
+- a concrete current failure is already visible and the main task is diagnosing the likely owning layer before editing
 - a single file, obvious edit path, or one or two targeted lookups already answer the question
 - the task is a shallow lookup about terminology, existing flags, exposed configuration, exported options, or already-obvious behavior
 - the goal is only to decide whether the request is clear enough to continue clarification
+- the main question is still whether the request is clear enough or what the user actually wants
 - the agent is using repository understanding as a default warm-up before every action
 
 "Two targeted lookups" means at most two tool calls tied to the current hypothesis set — not one lookup per likely location, not repeated checks that only reconfirm the same absence, and not curiosity-driven browsing. If the first lookup already suggests the repo lacks the evidence needed to answer the current premise safely, stop and self-correct rather than broadening the search.

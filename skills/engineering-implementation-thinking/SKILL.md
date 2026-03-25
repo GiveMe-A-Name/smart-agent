@@ -1,6 +1,6 @@
 ---
 name: engineering-implementation-thinking
-description: Use when implementing a non-trivial change in an existing codebase requires deciding how to land it responsibly, such as whether to make a local patch, preserve or tighten a boundary, or do a focused structural improvement instead of the quickest edit.
+description: Use when implementing a non-trivial change in an existing codebase and the main question is already how to land it responsibly, such as whether to make a local patch, preserve or tighten a boundary, or do a focused structural improvement instead of the quickest edit. Do not use when the right change point or owning boundary is still ungrounded.
 ---
 
 # Engineering Implementation Thinking
@@ -22,6 +22,7 @@ Use this skill when:
 Do not use this skill when:
 - the change is tiny, local, and has one obvious low-risk path
 - the main missing step is still requirement clarification, repository understanding, or ownership analysis
+- the safest change point or owning boundary is still ungrounded from code evidence
 - the work is purely mechanical, clerical, or stylistic
 - the main question is whether work is complete rather than how it should be implemented
 - the agent is using engineering judgment as a default warm-up for every non-trivial implementation task
