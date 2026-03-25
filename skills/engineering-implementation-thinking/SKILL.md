@@ -68,13 +68,14 @@ Use this skill when the remaining question is:
 
 A strong result can answer:
 - What clarified implementation-relevant intent must this change serve?
+- Does the shape of the problem itself — multiple similar issues, repeated patterns, or scattered ownership — signal a missing abstraction rather than N independent fixes?
 - Why is the current code shaped this way?
 - Which current patterns are essential, accidental, or ready for focused improvement?
 - Which candidate change points actually support coherent ownership?
 - Would the smallest patch make future work harder?
 - Should this change be a local patch, a focused structural improvement, or an explicit pause pending better understanding?
 
-Use `references/risk-triage.md` when these questions do not resolve the patch-vs-improvement-vs-pause choice. See `examples/patch-vs-structural-improvement.md` for a contrast pair showing how the same request can warrant either a narrow patch or a focused structural improvement depending on what the current code shape reveals.
+Use `references/risk-triage.md` when these questions do not resolve the patch-vs-improvement-vs-pause choice. See `examples/patch-vs-structural-improvement.md` for a general contrast pair, and `examples/security-review-duplicate-helper.md` for a review-remediation case where fixing the issue responsibly requires re-centering a shared helper instead of scattering local copies.
 
 ## Self-Correction Signals
 
