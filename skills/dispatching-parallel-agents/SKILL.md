@@ -1,0 +1,82 @@
+---
+name: dispatching-parallel-agents
+description: Use when the user wants to split clearly independent work across multiple sub-agents or parallel agents. Do not use for a single bug or when diagnosis, files, state, or dependencies overlap.
+---
+
+# Dispatching Parallel Agents
+
+Delegate independent tasks to isolated agents running concurrently. Each agent receives precisely constructed context — never your session history — and returns a focused result for you to integrate.
+
+<HARD-GATE>
+Do NOT dispatch agents until you have confirmed that each task is genuinely independent. Parallel dispatch on related problems wastes work and produces conflicting changes.
+</HARD-GATE>
+
+## Capability Boundary
+
+This skill covers: identifying independent problem domains, scoping agent tasks, dispatching concurrently, and integrating results.
+
+This skill does NOT own:
+- Diagnosing what is broken (do that before dispatching)
+- Choosing which agent type to use for a given task
+- Merging conflicting changes if agents edited overlapping code
+
+If you do not yet understand what is broken, diagnose first. Parallel dispatch is for execution, not exploration.
+
+## Decision Signals
+
+**Independence test:** A task is independent if you can answer yes to all of the following:
+- Could fixing this task leave the others unaffected? (If fixing A might fix B, investigate together first)
+- Would each agent edit non-overlapping files and resources?
+- Can you write a complete, self-contained prompt for each agent without referencing the others?
+- Does no agent need another's output to begin?
+
+If any answer is no, tasks are not independent. Use sequential agents or investigate together first.
+
+**When parallel is the wrong choice:** Even when tasks pass the independence test, prefer a single agent if there are only 2 tasks and one is much faster — the coordination overhead may not be worth it. Prefer sequential if tasks are exploratory (you don't know the scope) or if a shared resource (same config file, same database) would serialize them anyway.
+
+**Agent scoping:** Each agent prompt must contain exactly what the agent needs and nothing more:
+- One problem domain — one test file, one subsystem, one bug
+- All necessary context inline — error messages, test names, relevant file paths — never "see session context"
+- Explicit constraints — what the agent must NOT change
+- Specified output format — what you need back to integrate results
+
+If you cannot write a self-contained prompt, the task is not scoped correctly.
+
+**Verification judgment:** After agents return, do not assume fixes are compatible. Check: did any agents edit the same files? If yes, review those changes for conflicts before running the full suite. Spot-check at least one agent's work — agents can make systematic errors that look correct in isolation.
+
+## Invariants
+
+- Each agent gets its own isolated context — never pass session history or "you know what we discussed"
+- One agent per independent problem domain — do not bundle unrelated problems into one agent
+- Dispatch only after the independence test passes — not speculatively
+
+## Failure Signals
+
+Stop and reassess if:
+- You are dispatching because the problem is confusing, not because tasks are independent — diagnose first
+- Agent scope is "fix all the tests" or "investigate the system" — too broad; split into one domain per agent
+- You have no plan for integrating results — know how you will verify compatibility before dispatching
+
+## Agent Prompt Structure
+
+A good agent prompt is focused, self-contained, and specific about output:
+
+```
+Fix the 3 failing tests in src/agents/agent-tool-abort.test.ts:
+
+1. "should abort tool with partial output capture" — expects 'interrupted at' in message
+2. "should handle mixed completed and aborted tools" — fast tool aborted instead of completed
+3. "should properly track pendingToolCount" — expects 3 results but gets 0
+
+These appear to be timing/race condition issues.
+
+Your task:
+1. Read the test file and understand what each test verifies
+2. Identify root cause — timing issues or actual bugs?
+3. Fix — replace arbitrary timeouts with event-based waiting if appropriate
+
+Do NOT change production code outside agent-tool-abort.ts.
+Do NOT just increase timeouts — find the real issue.
+
+Return: summary of root cause and what you changed.
+```
