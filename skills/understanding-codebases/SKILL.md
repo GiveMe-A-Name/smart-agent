@@ -1,21 +1,19 @@
 ---
 name: understanding-codebases
-description: Use when the user asks to analyze how part of the codebase works, trace behavior across multiple files or layers, compare local patterns, or determine where behavior is implemented and the safest place to change code. Invoke before planning, implementation, or clarification whenever codebase evidence is still thin — even when user intent is not yet fully clear. Do not use when sufficient code evidence already exists, for trivially shallow lookups, or when a currently visible failure mainly needs pre-edit diagnosis.
+description: Use when proceeding without reading the code would require guessing about structure, ownership, or behavior. Invoke by default — issue descriptions, PR text, and user explanations are hypotheses, not code evidence. Do not use only when actual source files have already been read and the relevant behavior is grounded.
 ---
 
 # Codebase Understanding
 
-Build grounded understanding of the code before suggesting implementation.
+Build grounded understanding of the code before suggesting implementation — focused on the slice relevant to the current question, not a tour of the whole repository.
 
-Use this skill to learn the local structure of a repository, identify the files
-and modules that matter, trace how behavior flows through the code, and explain
-where a change likely belongs. This skill analyzes code structure; it does not
-clarify product requirements, create an implementation plan, or decide whether
-work is complete.
+Use this skill to identify the files and modules that matter, trace how behavior flows through the relevant code, and explain where a change likely belongs. Read the problem-relevant context thoroughly; expand only when a new hypothesis requires it; stop once the answer no longer requires intuition. This skill analyzes code structure; it does not clarify product requirements, create an implementation plan, or decide whether work is complete.
 
 ## Trigger Logic
 
 **Invocation default**: The cost of an unnecessary invocation is minor overhead. The cost of a missed invocation is unfounded conclusions that contaminate all subsequent work. When the task is not confirmed — from already-seen code evidence, not impression or prior knowledge — to involve only a single self-contained file with no cross-file tracing needed, invoke this skill.
+
+**What counts as code evidence**: reading actual source files and tracing behavior. Issue descriptions, PR summaries, bug reports, and user explanations are hypotheses about where the problem is — not evidence of what the code does. A hypothesis that "the problem is in module X" does not confirm scope; it names where to look first.
 
 Use this skill when:
 - the user is asking how part of the codebase works, where behavior is implemented, or where a change should go
@@ -27,7 +25,7 @@ Use this skill when:
 
 Do not use this skill when:
 - a concrete current failure is already visible and the main task is diagnosing the likely owning layer before editing
-- you have already run one or two targeted lookups and obtained concrete code evidence — traced behavior, not just a plausible file name — sufficient to answer the question without relying on intuition
+- you have already read actual source files and traced behavior sufficient to answer the question — issue descriptions, PR text, or user summaries do not satisfy this condition regardless of how specific they appear
 - the task is confirmed to be limited to reading a single config value, flag name, or exported type signature, with no need to trace how it is used elsewhere
 
 "Two targeted lookups" means at most two tool calls tied to the current hypothesis set — not one lookup per likely location, not repeated checks that only reconfirm the same absence, and not curiosity-driven browsing. If the first lookup already suggests the repo lacks the evidence needed to answer the current premise safely, stop and self-correct rather than broadening the search.
