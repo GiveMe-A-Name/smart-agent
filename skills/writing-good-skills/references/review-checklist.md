@@ -17,9 +17,9 @@ If the user points at one weak section, do not stay local by default. First chec
 
 ## Section Checks
 
-### 1. Description
+### 1. Description And Trigger Condition Quality
 
-Check:
+Check the `description` field:
 - is it trigger-focused?
 - does it describe when to use the skill rather than the workflow?
 - would it help discovery?
@@ -29,6 +29,14 @@ Common failures:
 - workflow summary
 - vague wording like "helps with skills"
 - no concrete contexts or symptoms
+
+Check the Trigger Logic section (see `references/skill-trigger-design-principles.md` for the full checklist):
+- does the skill have an **invocation default** paragraph that states the cost asymmetry — what happens when the skill is missed vs. invoked unnecessarily?
+- can every **"Do not use"** condition be confirmed from already-seen evidence, not impression? (remove conditions with "obvious", "simple", "trivial", "tiny" assessed before investigation)
+- is there a **"default warm-up" or "every action" condition** that gives blanket permission to skip? (remove it)
+- do redirect conditions say **"do X first, then return here"** rather than just "do not use"?
+- are **specific skill names hardcoded** in redirect conditions? (replace with principle descriptions)
+- does the **description** reflect direction-3 — "invoke unless confirmed otherwise" rather than "use when substantial enough"?
 
 ### 2. Capability Boundary
 

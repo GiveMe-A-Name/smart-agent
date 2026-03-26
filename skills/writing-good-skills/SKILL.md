@@ -1,6 +1,6 @@
 ---
 name: writing-good-skills
-description: Use when creating or substantially revising a reusable skill package whose trigger wording, boundary, invariants, examples, or support-file split need structural judgment. Do not use for isolated wording tweaks, obvious local edits, or plain project documentation.
+description: Use when creating a new skill or making structural changes to an existing one — trigger logic, boundary, invariants, packaging, or examples require judgment about how to teach the capability. Invoke by default when skill quality is the concern. Do not use only when the change is a confirmed wording fix with no effect on trigger conditions, boundaries, or judgment.
 ---
 
 # Writing Good Skills
@@ -13,14 +13,17 @@ Do not write a diary, a note dump, a rigid SOP, or a hidden routing graph.
 
 ## Trigger Logic
 
+**Invocation default**: A skill with weak trigger logic or a bad description silently fails every time an agent decides not to load it. The cost of running this skill unnecessarily is a short review pass. The cost of skipping it is a skill that loads at the wrong time, skips at the wrong time, or teaches the wrong thing. Invoke whenever skill quality or structure is in question.
+
 Use this skill when the task is to:
 - create a skill from notes, habits, or a from-scratch idea
 - structurally review or revise an existing `SKILL.md` whose trigger logic, boundary, or packaging may be weak
 - fix a skill that feels vague, repetitive, bloated, over-broad, hard to discover, or unclear in scope
 - decide whether material belongs in a skill, `AGENTS.md`, `README.md`, or a note
 
-Do not use it for plain project documentation or repo-local operating rules.
-Do not use it for isolated wording tweaks, obvious local edits, or formatting fixes where no structural or boundary judgment is needed.
+Do not use this skill when:
+- the change is confirmed to be a wording fix only, with no effect on trigger conditions, boundaries, invariants, or judgment
+- the work is plain project documentation or repo-local operating rules with no reusable capability
 
 ## Core Law
 
@@ -87,7 +90,7 @@ Treat packaging as part of the design.
 When writing or revising a skill, make these decisions explicit:
 - task format — procedural (SOP) or judgment-heavy (capability + constraints): procedural tasks have fixed steps and low variation; judgment tasks have high variation or context-dependent paths. Apply the five-element framework only to judgment tasks. Do not rewrite a clear SOP as capability + constraints.
 - artifact boundary
-- trigger wording
+- trigger condition design — does the skill have an invocation default with cost asymmetry? are "Do not use" conditions observable facts or impression judgments? see `references/skill-trigger-design-principles.md`
 - invariants and failure-prevention rules
 - decision signals that should shape judgment
 - whether key judgment calls are subtle enough that rules alone won't prevent the wrong output — if so, add contrast examples

@@ -100,6 +100,31 @@ Check these when reviewing a description:
 - does it stay concise enough to be scanned quickly?
 - does it preserve capability-first discovery instead of trying to teach the whole skill?
 
+## Invocation Default Pattern
+
+A strong description expresses the **invocation default** — the direction in which uncertainty resolves.
+
+Most skills should lean toward invoking. Express this directly in the description:
+
+```yaml
+# Direction-3 pattern: "invoke unless confirmed otherwise"
+description: Use before writing any code. Do not use only when a complete plan already exists and execution is the only remaining step.
+```
+
+```yaml
+# Weak pattern: "use when substantial enough" (shifts burden to AI to judge)
+description: Use when the work is substantial enough to need a plan.
+```
+
+The first form makes the default explicit. The second leaves it to the AI to judge what "substantial enough" means — which is exactly the judgment the skill is meant to provide.
+
+**"Do not use" conditions in the description must be observable facts**, not impression assessments. Before including a "Do not use" condition, ask: can the AI confirm this without reading the code or the request in detail?
+
+- Weak: `"Do not use for trivial edits or simple tasks"` — "trivial" and "simple" require the judgment the skill is meant to improve
+- Strong: `"Do not use only when a complete plan already exists and execution is the only remaining step"` — checkable from context
+
+See `references/skill-trigger-design-principles.md` for the full framework.
+
 ## Rewrite Pattern
 
 When rewriting a weak description:
@@ -107,8 +132,10 @@ When rewriting a weak description:
 2. remove capability law that belongs in the main file
 3. keep only trigger conditions
 4. add concrete contexts or symptoms
-5. keep it concise
-6. keep boundary language, invariants, and action guidance in the main file, not in the description
+5. express the invocation default explicitly
+6. ensure "Do not use" conditions are observable facts, not impression judgments
+7. keep it concise
+8. keep boundary language, invariants, and action guidance in the main file, not in the description
 
 ## Fast Separation Test
 
