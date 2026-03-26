@@ -1,6 +1,6 @@
 ---
 name: engineering-implementation-thinking
-description: Use when implementing any change in an existing codebase where the quickest edit might not be the right one — to decide whether to make a local patch, preserve or tighten a boundary, or do a focused structural improvement. Invoke before writing code unless the work is purely mechanical with no structural judgment involved. Do not use when code evidence is still too thin to reason about change points — gather that evidence first.
+description: Use before writing any code to decide how to land the change — not just where. Knowing the change point does not answer whether the approach is right. Invoke unless the work is purely mechanical with no behavioral or structural implications. Do not use when code evidence is still too thin to reason about change points — gather that evidence first.
 ---
 
 # Engineering Implementation Thinking
@@ -12,6 +12,8 @@ This skill helps the agent decide how to land code responsibly in an existing sy
 ## Trigger Logic
 
 **Invocation default**: The cost of an unnecessary invocation is a few extra reasoning steps. The cost of a missed invocation is a patch that weakens structure, moves responsibility into the wrong layer, or makes the next change harder — often invisibly. Invoke this skill before writing code unless the work is confirmed to be purely mechanical with no structural judgment involved.
+
+**Knowing where to change is not the same as knowing how.** Identifying the change point (which file, which line) answers the first question. Whether the approach is the right one — given tradeoffs, failure modes, and what the current code is protecting — is a separate question that this skill exists to answer. Do not skip this skill on the grounds that the change point is already clear.
 
 Use this skill when:
 - a non-trivial change is being implemented in an existing codebase
