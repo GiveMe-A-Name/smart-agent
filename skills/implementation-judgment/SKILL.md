@@ -1,9 +1,9 @@
 ---
-name: engineering-implementation-thinking
+name: implementation-judgment
 description: Use before writing any code to decide how to land the change — not just where. Knowing the change point does not answer whether the approach is right. Invoke unless the work is purely mechanical with no behavioral or structural implications. Do not use when code evidence is still too thin to reason about change points — gather that evidence first.
 ---
 
-# Engineering Implementation Thinking
+# Implementation Judgment
 
 Implement changes with engineering judgment, not just task completion.
 
