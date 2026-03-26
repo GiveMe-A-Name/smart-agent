@@ -1,6 +1,6 @@
 ---
 name: receiving-code-review
-description: Use when the user already has code review feedback and needs to decide what to implement, what to challenge, or what to clarify before editing code. Trigger when they share PR comments or ask things like 'address this review', 'is this feedback correct?', or 'help me respond to review'. Do not use for requesting a review, performing a fresh review, ordinary implementation with no review feedback, implementing comments that have already been accepted without further evaluation, or checking changes after review feedback has already been applied.
+description: Use when review feedback exists and the next step is deciding what to implement, challenge, or clarify before changing code. The feedback source does not matter. Do not use for requesting or performing a review, ordinary implementation with no review feedback, or applying feedback that has already been accepted without further evaluation.
 ---
 
 # Receiving Code Review
@@ -9,15 +9,14 @@ Evaluate feedback technically before acting on it. Code review requires judgment
 
 ## Trigger Logic
 
-Use when review feedback already exists and the task is deciding how to handle it before changing code.
+Use when review feedback already exists and the task is deciding how to handle it before changing code. The source of the feedback does not matter — user-pasted comments, PR threads, or results returned by a dispatched reviewer sub-agent all trigger this skill equally.
 
 Common trigger signals:
-- The user pastes PR comments, review threads, screenshots, or a summary of reviewer feedback
-- The user asks to address, apply, respond to, or work through review comments
-- The user asks whether a review suggestion is correct, necessary, safe, or worth pushing back on
-- The user has multi-item feedback and it is not yet clear which items are valid, related, or blocked on clarification
-- The user says a reviewer asked for a refactor, abstraction, API change, test change, or "proper" implementation and wants help deciding what to do
-- The feedback comes from someone who may lack full codebase context, or the feedback conflicts with local architecture, compatibility constraints, or existing behavior
+- Review feedback is present: PR comments, review threads, screenshots, a summary, or structured output from a code-review sub-agent
+- The task is to address, apply, respond to, or work through that feedback
+- It is not yet clear which items are valid, related, or blocked on clarification
+- A suggestion involves a refactor, abstraction, API change, or "proper" implementation and a decision is needed on whether to act
+- The feedback may lack full codebase context, or conflicts with local architecture, compatibility constraints, or existing behavior
 
 ## Capability Boundary
 
@@ -38,7 +37,12 @@ It does NOT:
 
 ## Decision Signals
 
-**Source calibration:** Verification is always required before implementing. The depth of skepticism scales with how much context the reviewer demonstrably has about this codebase. Human partner feedback carries more context by default — implement after understanding. External reviewer suggestions require more explicit verification — they may not know the current implementation's reasons, platform constraints, or architectural decisions. But verification applies to both: a technically wrong suggestion is wrong regardless of source.
+**Source calibration:** Verification is always required. The depth of skepticism scales with how much context the reviewer demonstrably has about this codebase:
+- *Human partner* — implement after understanding; they carry architectural and intent context by default
+- *Dispatched reviewer sub-agent* — has full codebase access but may miss intent, history, or reasons behind current implementation; verify before implementing
+- *External reviewer* — may not know platform constraints, architectural decisions, or why current code exists; requires more explicit verification
+
+A technically wrong suggestion is wrong regardless of source.
 
 **Verification:** Before implementing any suggestion, check: (1) Is it technically correct for this codebase? (2) Does it break existing functionality? (3) Is there a reason the current implementation exists? (4) Does it work on all supported platforms and versions? (5) Does the reviewer understand the full context? Run these checks only after understanding all items in the feedback — partial understanding of the set invalidates per-item verification. If you cannot verify something, say so explicitly and ask for direction rather than proceeding blind.
 

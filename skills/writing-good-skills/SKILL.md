@@ -1,6 +1,6 @@
 ---
 name: writing-good-skills
-description: Use when creating a new skill or making structural changes to an existing one — trigger logic, boundary, invariants, packaging, or examples require judgment about how to teach the capability. Invoke by default when skill quality is the concern. Do not use only when the change is a confirmed wording fix with no effect on trigger conditions, boundaries, or judgment.
+description: Use whenever a skill is being created, modified, or its behavior is in question. Invoke by default — the cost of an unnecessary review pass is low; the cost of a skill that silently misbehaves is high. Do not use only when the change is a confirmed wording fix with no effect on trigger conditions, boundaries, or judgment.
 ---
 
 # Writing Good Skills
@@ -17,8 +17,7 @@ Do not write a diary, a note dump, a rigid SOP, or a hidden routing graph.
 
 Use this skill when the task is to:
 - create a skill from notes, habits, or a from-scratch idea
-- structurally review or revise an existing `SKILL.md` whose trigger logic, boundary, or packaging may be weak
-- fix a skill that feels vague, repetitive, bloated, over-broad, hard to discover, or unclear in scope
+- create, modify, or examine any `SKILL.md` — including when a skill's behavior diverges from what is expected
 - decide whether material belongs in a skill, `AGENTS.md`, `README.md`, or a note
 
 Do not use this skill when:
@@ -90,7 +89,7 @@ Treat packaging as part of the design.
 When writing or revising a skill, make these decisions explicit:
 - task format — procedural (SOP) or judgment-heavy (capability + constraints): procedural tasks have fixed steps and low variation; judgment tasks have high variation or context-dependent paths. Apply the five-element framework only to judgment tasks. Do not rewrite a clear SOP as capability + constraints.
 - artifact boundary
-- trigger condition design — does the skill have an invocation default with cost asymmetry? are "Do not use" conditions observable facts or impression judgments? see `references/skill-trigger-design-principles.md`
+- trigger condition design — skills are small; triggering unnecessarily costs a short review pass, but missing guidance produces downstream errors that cost more. This asymmetry is the default: lean toward broad, state-based triggers and invocation defaults. Use "Do not use" conditions to exclude edge cases rather than narrowing "Use when" conditions to specific scenarios. Enumerating scenarios is a warning sign — it produces triggers that miss cases not yet imagined. Ask: does the trigger describe a *state* (feedback exists, plan is missing, something is broken) or a *scenario* (user pastes X, sub-agent returns Y)? State-based triggers generalize; scenario-based triggers don't. See `references/skill-trigger-design-principles.md`
 - invariants and failure-prevention rules
 - decision signals that should shape judgment
 - whether key judgment calls are subtle enough that rules alone won't prevent the wrong output — if so, add contrast examples
@@ -145,6 +144,7 @@ See `references/description-patterns.md` and `references/response-modes.md` for 
 ## Self-Correction Signals
 
 Stop and revise if:
+- the trigger enumerates specific scenarios instead of describing a state — scenario-based triggers miss cases not yet imagined
 - the description summarizes workflow or teaches capability instead of trigger conditions
 - the draft reads like a note or meeting summary
 - the same rule keeps reappearing in several sections
