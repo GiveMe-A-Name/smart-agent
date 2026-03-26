@@ -9,14 +9,13 @@ Evaluate feedback technically before acting on it. Code review requires judgment
 
 ## Trigger Logic
 
-Use when review feedback already exists and the task is deciding how to handle it before changing code. The source of the feedback does not matter — user-pasted comments, PR threads, or results returned by a dispatched reviewer sub-agent all trigger this skill equally.
+**Invocation default**: Implementing review feedback without evaluation leads to blind compliance — applying suggestions that are technically wrong for this codebase, breaking existing behavior, or gold-plating things that were never needed. The cost of invoking this skill on feedback that turns out to be straightforward is a short verification pass. The cost of skipping it is a wrong implementation that passes review but breaks in production.
 
-Common trigger signals:
-- Review feedback is present: PR comments, review threads, screenshots, a summary, or structured output from a code-review sub-agent
-- The task is to address, apply, respond to, or work through that feedback
-- It is not yet clear which items are valid, related, or blocked on clarification
-- A suggestion involves a refactor, abstraction, API change, or "proper" implementation and a decision is needed on whether to act
-- The feedback may lack full codebase context, or conflicts with local architecture, compatibility constraints, or existing behavior
+Use when review feedback exists and the task is deciding what to do with it before touching code. The source does not matter — user-pasted comments, PR threads, screenshots, inline annotations, or structured output from a reviewer sub-agent all qualify.
+
+Do not use when:
+- no review feedback exists yet — the task is to write code, not evaluate feedback
+- feedback has already been fully evaluated and accepted, and the only remaining step is mechanical implementation with no judgment remaining
 
 ## Capability Boundary
 
