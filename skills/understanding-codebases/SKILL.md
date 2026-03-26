@@ -1,6 +1,6 @@
 ---
 name: understanding-codebases
-description: Use when proceeding without reading the code would require guessing about structure, ownership, or behavior. Invoke by default — issue descriptions, PR text, and user explanations are hypotheses, not code evidence. Do not use only when actual source files have already been read and the relevant behavior is grounded.
+description: Use when proceeding without reading the code would require guessing about structure, ownership, or behavior. Invoke by default — issue descriptions, PR text, and user explanations are hypotheses, not code evidence.
 ---
 
 # Codebase Understanding
@@ -23,10 +23,6 @@ Use this skill when:
 - tracing call flow, comparing nearby patterns, or proving ownership matters before suggesting where work belongs
 - proceeding would require guessing about code structure, ownership, or behavior
 
-Do not use this skill when:
-- a concrete current failure is already visible and the main task is diagnosing the likely owning layer before editing
-- you have already read actual source files and traced behavior sufficient to answer the question — issue descriptions, PR text, or user summaries do not satisfy this condition regardless of how specific they appear
-- the task is confirmed to be limited to reading a single config value, flag name, or exported type signature, with no need to trace how it is used elsewhere
 
 "Two targeted lookups" means at most two tool calls tied to the current hypothesis set — not one lookup per likely location, not repeated checks that only reconfirm the same absence, and not curiosity-driven browsing. If the first lookup already suggests the repo lacks the evidence needed to answer the current premise safely, stop and self-correct rather than broadening the search.
 

@@ -1,6 +1,6 @@
 ---
 name: implementation-judgment
-description: Use before writing any code to decide how to land the change — not just where. Knowing the change point does not answer whether the approach is right. Invoke unless the work is purely mechanical with no behavioral or structural implications. Do not use when code evidence is still too thin to reason about change points — gather that evidence first.
+description: Use before writing any code to decide how to land the change — not just where. Knowing the change point does not answer whether the approach is right. Invoke unless the work is purely mechanical with no behavioral or structural implications.
 ---
 
 # Implementation Judgment
@@ -21,11 +21,6 @@ Use this skill when:
 - architecture boundaries, contracts, compatibility concerns, or historical decisions materially affect the implementation
 - the quickest edit could complete the task, but might weaken structure or maintainability
 
-Do not use this skill when:
-- the work is purely mechanical, clerical, or stylistic with no structural judgment involved — fixing a typo, updating a string literal, renaming with no behavioral effect
-- the main question is whether work is complete rather than how it should be implemented
-
-If code evidence is still too thin to reason about change points, build that understanding first. If intent is still unclear, resolve that first. Return to this skill once both are grounded.
 
 ## Boundary
 

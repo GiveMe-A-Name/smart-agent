@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: Use before changing any code when something is broken or behaving unexpectedly. Invoke by default — skipping structured debugging leads to symptom fixes that hide root causes. Do not use only when the root cause is already confirmed with evidence and the remaining step is implementing a known fix.
+description: Use before changing any code when something is broken or behaving unexpectedly. Invoke by default — skipping structured debugging leads to symptom fixes that hide root causes.
 ---
 
 # Systematic Debugging
@@ -17,7 +17,6 @@ Use this skill when:
 - proceeding without investigation would require guessing what to change
 
 Do not use this skill when:
-- the root cause is already confirmed with evidence and the only remaining step is implementing a known fix
 - the work is a feature or refactor with no current failure
 
 **Entry point**: If a concrete failure is already visible, start with Ownership Diagnosis. If no visible failure exists yet, start with Investigation.

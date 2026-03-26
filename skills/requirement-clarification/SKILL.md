@@ -1,6 +1,6 @@
 ---
 name: requirement-clarification
-description: Use when proceeding without clarification risks building toward the wrong goal — the request leaves intent, constraints, or tradeoffs unresolved that only the user can answer. Do not use only when user intent is explicitly confirmed in the request with no remaining open questions about goals or direction.
+description: Use when proceeding without clarification risks building toward the wrong goal — the request leaves intent, constraints, or tradeoffs unresolved that only the user can answer.
 ---
 
 # Requirement Clarification
@@ -34,9 +34,6 @@ Use this skill when:
 - some unknowns may be answered from evidence, but the remaining ambiguity is still about what the user actually wants
 - the request mentions implementation ideas or code locations, but those details do not resolve the underlying goal question
 
-Do not use this skill when:
-- user intent is explicitly stated in the request with no remaining open questions about goals, constraints, or tradeoffs
-- the work is purely mechanical — the user has specified exactly what to do with no judgment calls about goals or direction
 
 ## Boundary
 
