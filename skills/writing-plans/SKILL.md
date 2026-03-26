@@ -1,20 +1,35 @@
 ---
 name: writing-plans
-description: Use when implementation work is substantial enough that a written plan should come before coding - for example a scoped feature, refactor, migration, or cross-module change with clear requirements where file mapping, sequencing, task breakdown, or verification strategy materially affect the outcome. Trigger on requests like 'write an implementation plan', 'map the files first', or 'plan this before coding', and on 'break this into steps' only when the work is genuinely multi-step and non-trivial. Do not use for trivial edits, already-planned execution, root-cause debugging, or open-ended brainstorming.
+description: Use before writing any code. Covers all sizes — even a Tiny plan (prose note + file path + verification) prevents mid-implementation surprises. Do not use only when a complete plan already exists and execution is the only remaining step.
 ---
 
 # Writing Plans
 
 A plan that doesn't match the task size is waste. A tiny bug gets a prose note. A new subsystem gets full task decomposition. Read the situation first — then write the plan that fits.
 
+## Trigger Logic
+
+**Invocation default**: Skipping a plan doesn't save time — it converts unknown unknowns into mid-implementation surprises. Even a Tiny plan (a prose note with a file path and verification step) forces the situation assessment that prevents wasted work. Invoke this skill before writing any code unless you are executing a plan that already exists and has no remaining decisions.
+
+Use this skill when:
+- you are about to implement a change and cannot immediately state the files involved, what specifically changes, and how to verify it
+- the work involves multiple steps, files, or domains where sequencing or task boundaries affect the outcome
+- the work is a refactor, migration, or architecture change where mapping what touches what matters before moving anything
+
+Do not use this skill when:
+- you are executing an already-agreed plan with all decisions made and no remaining judgment calls
+- the work is still open-ended exploration, root-cause investigation, or brainstorming with no settled implementation target yet
+
+If prerequisite understanding is still missing — codebase evidence too thin, or intent still unclear — build that first. Return to this skill once the situation can be assessed.
+
 ## Capability Boundary
 
 This skill owns the full planning cycle: from reading a spec to a plan ready for implementation.
 
 It does NOT own:
-- Execution — see superpowers:executing-plans or superpowers:subagent-driven-development
-- Spec creation / brainstorming — see superpowers:brainstorming
-- Root cause investigation — see superpowers:systematic-debugging
+- Execution of the plan
+- Spec creation or open-ended brainstorming
+- Root cause investigation
 
 ## Invariant
 
@@ -37,7 +52,7 @@ Before writing anything, read three dimensions:
 - **Large**: requires design decisions upfront, affects system architecture or multiple components
 
 **Nature** — What kind of work?
-- **Bug fix**: something is broken — assess root cause before planning (see superpowers:systematic-debugging). A plan without a known root cause is a guess.
+- **Bug fix**: something is broken — assess root cause before planning. A plan without a known root cause is a guess.
 - **Feature**: new capability — understand what already exists and what patterns to follow
 - **Refactor**: restructure without changing behavior — map what touches what before moving anything
 - **Architecture**: design decisions involved — identify constraints and trade-offs first
@@ -87,9 +102,7 @@ For medium/large plans only: dispatch a plan-document-reviewer subagent (see pla
 
 ## Execution Handoff
 
-After saving to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, offer:
-1. **Subagent-Driven** (superpowers:subagent-driven-development) — recommended for medium/large
-2. **Inline** (superpowers:executing-plans) — batch execution in this session
+After saving to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, offer to execute the plan.
 
 ## Failure Signals
 
@@ -107,7 +120,6 @@ After saving to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, offer:
 **Skipping assessment** — stop if:
 - You started writing before reading the relevant code
 - You don't know which files are involved
-- You planned a bug fix before running superpowers:systematic-debugging
 
 ## Examples
 
