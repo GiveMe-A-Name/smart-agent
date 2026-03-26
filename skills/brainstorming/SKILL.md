@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: "Use when the user needs design help before implementation: the problem, scope, constraints, tradeoffs, interfaces, or success criteria are not yet settled, and there is no agreed spec. Common cases include rough ideas, feature requests with unclear shape, solution-first asks with unresolved requirements, and requests to scope, compare approaches, or think through how something should work before coding. Do not use once a committed spec or settled architecture already exists, or for implementation planning, debugging, direct implementation, or tiny one-off opinions that do not need a written design."
+description: "Use before building anything when the problem, scope, constraints, tradeoffs, or success criteria are not yet settled. Invoke by default when no agreed spec exists — skipping design converts unresolved questions into implementation mistakes. Do not use only when a committed spec already exists and execution is the remaining step."
 ---
 
 # Brainstorming Ideas Into Designs
@@ -13,6 +13,8 @@ Do NOT write code, scaffold a project, or invoke any implementation skill until 
 
 ## Trigger Signals
 
+**Invocation default**: Skipping design when it is needed converts unresolved questions into implementation mistakes — wrong interfaces, missing constraints, or structure that has to be undone. The cost of an unnecessary design session is a short conversation. The cost of missing it is building the wrong thing. Invoke this skill whenever no committed spec exists and the work involves decisions about what to build or how it should work.
+
 This skill should load when the user's message implies design is needed before implementation, even if they do not explicitly ask for a spec.
 
 Common signals:
@@ -22,6 +24,10 @@ Common signals:
 - They describe a desired solution before clarifying the problem, users, constraints, tradeoffs, or success criteria
 - They are choosing between architectures, UX flows, API shapes, or system boundaries
 - They want to start building something new in an existing codebase, but the shape of the change is not yet agreed
+
+Do not use this skill when:
+- a committed spec already exists and the remaining work is execution, not design
+- the question has no design decisions — it is a factual lookup or a minor clarification with nothing to resolve about shape, scope, or approach
 
 ## Capability Boundary
 
