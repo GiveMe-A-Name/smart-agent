@@ -29,7 +29,7 @@ This skill owns:
 
 This skill does not own:
 - product clarification from scratch
-- broad repo exploration as the final output
+- repository analysis as an end in itself — if code evidence is missing, that work belongs before this skill, not inside it
 - generic task planning
 - unrestricted refactoring
 - final completion or release judgment
