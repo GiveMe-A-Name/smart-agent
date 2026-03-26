@@ -101,6 +101,18 @@ Do not hardcode specific skill names in redirect conditions. Express the princip
 
 ---
 
+## When "Do Not Use" Conditions Are Necessary
+
+"Do not use" conditions are optional. Do not add them reflexively.
+
+A "Do not use" condition is only necessary when:
+- there is a realistic scenario where an agent would wrongly invoke the skill
+- AND the positive trigger state does not already exclude that scenario
+
+If the positive trigger state is described with enough precision, exclusion conditions add noise without value — and in the description field, they create rationalization exits.
+
+Before writing a "Do not use" condition, ask: **what specific wrong invocation am I preventing?** If the answer is vague ("to avoid overuse"), the condition is reflexive. If the answer is a concrete scenario that the positive trigger genuinely does not exclude, the condition earns its place — in the body, not the description.
+
 ## Checklist for Reviewing a Skill's Trigger Logic
 
 Before finalizing any skill's trigger conditions, verify:

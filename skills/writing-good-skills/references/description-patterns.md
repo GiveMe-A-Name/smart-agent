@@ -118,10 +118,14 @@ description: Use when the work is substantial enough to need a plan.
 
 The first form makes the default explicit. The second leaves it to the AI to judge what "substantial enough" means — which is exactly the judgment the skill is meant to provide.
 
-**"Do not use" conditions in the description must be observable facts**, not impression assessments. Before including a "Do not use" condition, ask: can the AI confirm this without reading the code or the request in detail?
+**"Do not use" conditions in the description are escape hatches — even observable ones.** The description is the first gate. It is evaluated before the agent has invested in understanding the situation, so any exclusion condition placed there faces maximum rationalization pressure with minimum context.
 
-- Weak: `"Do not use for trivial edits or simple tasks"` — "trivial" and "simple" require the judgment the skill is meant to improve
-- Strong: `"Do not use only when a complete plan already exists and execution is the only remaining step"` — checkable from context
+Prefer moving "Do not use" conditions to the Trigger Logic body. In the body, the agent has already committed to reading the skill; the condition becomes part of how the skill reasons rather than a bypass gate.
+
+If a "Do not use" condition must appear in the description, it should be trivially confirmable from facts that exist independently of the current task — not assessments of the current situation. "A completed plan document exists at a specific path" is independent. "The root cause is already confirmed" is an impression the agent forms before investigating — exactly the kind of shortcut that causes trigger failures.
+
+- Escape hatch: `"Do not use only when the root cause is already confirmed with evidence"` — "already confirmed" is an impression made before investigation; the agent will rationalize it as true and skip
+- Better: move the condition to the Trigger Logic body, where the agent reasons about it after loading the skill, not before
 
 See `references/skill-trigger-design-principles.md` for the full framework.
 

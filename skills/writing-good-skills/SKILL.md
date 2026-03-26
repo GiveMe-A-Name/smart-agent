@@ -149,6 +149,8 @@ See `references/description-patterns.md` and `references/response-modes.md` for 
 
 Stop and revise if:
 - the trigger enumerates specific scenarios instead of describing a state — scenario-based triggers miss cases not yet imagined
+- the description contains "Do not use when" conditions — even observable exclusions give agents rationalization material before any investment in the situation; move them to the trigger logic body
+- "Do not use" conditions were added reflexively without a concrete wrong-invocation scenario in mind — check whether the positive trigger state already excludes the scenario, and delete the condition if it does
 - the description summarizes workflow or teaches capability instead of trigger conditions
 - the draft reads like a note or meeting summary
 - the same rule keeps reappearing in several sections
