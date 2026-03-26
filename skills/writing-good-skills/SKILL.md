@@ -57,7 +57,11 @@ Prefer boundary language when the goal is to prevent misuse, such as:
 - `If this grounding is still missing, state it explicitly`
 - `This request is outside this skill's scope`
 
-Routing language is acceptable only when it teaches real workflow knowledge without replacing the boundary. If removing named skill references makes the file stop making sense, the boundary was weak. A short `Relationship to ...` note is fine only when it clarifies scope without prescribing sequence.
+If a skill names another skill as something to invoke in a given scenario, treat it as a diagnostic signal: the named skill's trigger conditions are too weak to fire on their own. The fix belongs in the named skill's trigger logic — not here.
+
+Describe what type of work the scenario requires — "this requires systematic root-cause investigation before proposing fixes" — not which skill to invoke. If the agent cannot identify the right skill from that description, the right skill has a trigger problem worth fixing independently.
+
+A `Relationship to ...` note is acceptable only when it clarifies scope — stating what this skill does not cover. It must not prescribe what to invoke next.
 
 ## Support Folders
 
@@ -151,3 +155,4 @@ Stop and revise if:
 - the main `SKILL.md` is bloating because support detail stayed inline
 - core rules were moved out of the main file and it became hollow
 - support material was moved out, but the split made the package harder to use or judge
+- the skill names another specific skill as something to invoke — this signals the named skill's trigger conditions need fixing, not that this skill should encode the hand-off
