@@ -61,7 +61,7 @@ This skill does not own:
 ## Clarification Heuristics
 
 - For each unknown, decide before asking: can a targeted lookup or stable external knowledge resolve this, or does it require a human decision? Only escalate what cannot be answered from evidence.
-- Resolve local repository unknowns directly when one or two targeted lookups are enough; if deeper repository analysis is needed, treat it as supporting input rather than the result.
+- Resolve local repository unknowns directly when one or two targeted lookups are enough; if deeper repository analysis is needed, invoke `understanding-codebases` first and fold its findings into clarified intent — do not attempt deep code tracing inside this skill.
 - Use external knowledge only when it changes how the request should be interpreted.
 - When you must ask after exploration yields nothing, ask for a pointer to the code or location — something that lets you find the answer yourself. Asking the user to describe the problem shifts diagnosis to them and is a weaker fallback.
 - When stated requirements explicitly conflict, the clarification question is about priority or tradeoff — not about what each requirement means individually. Name the conflict and ask the user to choose.
@@ -74,7 +74,7 @@ Stop and revise when:
 | Signal | What it means | What to do |
 |---|---|---|
 | You are asking the human a question that repository evidence or stable external knowledge could likely answer | You are offloading avoidable ambiguity | Do the lookup or targeted research first; keep it shallow unless deeper analysis is truly required |
-| You are tracing behavior across several files, trying to prove ownership, or producing a codebase analysis report while still calling it clarification | The ambiguity is no longer local, or the work has crossed the skill boundary | State that deeper repository analysis is required, and fold any useful result back into clarified intent |
+| You are tracing behavior across several files, trying to prove ownership, or producing a codebase analysis report while still calling it clarification | The ambiguity is no longer local, or the work has crossed the skill boundary | Pause, invoke `understanding-codebases`, and fold its findings back into clarified intent |
 | You are treating current repository behavior or external best practice as a confirmed requirement without proof | Facts or guidance are being mistaken for intent | Separate repository evidence, outside guidance, and user goals |
 | You are escalating too many low-value questions, or you keep exploring after the remaining human decisions are already clear | Clarification has become open-ended exploration | Synthesize, narrow the decision surface, and stop |
 | You are stating inferred constraints as confirmed facts, or acting certain even though intent was never confirmed | Evidence labels are missing, or certainty is overstated | Relabel claims as confirmed, inferred, or unknown, and re-examine what still needs human intent |
