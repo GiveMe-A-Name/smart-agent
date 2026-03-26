@@ -7,7 +7,7 @@ description: Use before writing any code to decide how to land the change — no
 
 Implement changes with engineering judgment, not just task completion.
 
-This skill helps the agent decide how to land code responsibly in an existing system: work from clarified intent, read current code as evidence of prior decisions, respect meaningful constraints, and choose among a narrow patch, a focused structural improvement, or an explicit pause when understanding is still too weak.
+This skill applies engineering judgment to code changes — not just locating where to change, but reasoning about how the change should land given prior decisions, existing constraints, and long-term maintainability. The result may be a narrow patch, a focused structural improvement, or an explicit pause — but the value is in the judgment, not just the routing.
 
 ## Trigger Logic
 
@@ -17,8 +17,6 @@ This skill helps the agent decide how to land code responsibly in an existing sy
 
 Use this skill when:
 - a non-trivial change is being implemented in an existing codebase
-- clarified intent and enough code evidence are already available to decide how to land the change responsibly
-- the main question is whether to make a local patch, preserve or tighten a boundary, or do a focused structural improvement instead
 - understanding why the current code is shaped this way may change how the work should be done
 - architecture boundaries, contracts, compatibility concerns, or historical decisions materially affect the implementation
 - the quickest edit could complete the task, but might weaken structure or maintainability
@@ -56,7 +54,7 @@ This skill is not the right tool yet when the main missing piece is still:
 - clarifying what the user really wants or which decisions still require human intent
 
 Use this skill when the remaining question is:
-- given the clarified intent and grounded code evidence, should this be a local patch, a focused structural improvement, or an explicit pause?
+- given the clarified intent and grounded code evidence, is the implementation approach sound — does it respect existing structure, keep responsibilities coherent, and avoid making the next change harder?
 
 ## Invariants
 
