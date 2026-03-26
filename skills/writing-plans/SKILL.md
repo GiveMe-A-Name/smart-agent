@@ -17,7 +17,7 @@ Use this skill when:
 - the work is a refactor, migration, or architecture change where mapping what touches what matters before moving anything
 
 Do not use this skill when:
-- you are executing an already-agreed plan with all decisions made and no remaining judgment calls
+- you are executing an already-agreed plan where scope, targets, and sequencing are settled
 - the work is still open-ended exploration, root-cause investigation, or brainstorming with no settled implementation target yet
 
 If prerequisite understanding is still missing — codebase evidence too thin, or intent still unclear — build that first. Return to this skill once the situation can be assessed.
@@ -30,6 +30,7 @@ It does NOT own:
 - Execution of the plan
 - Spec creation or open-ended brainstorming
 - Root cause investigation
+- Engineering judgment about how each change should land — a plan names targets and sequence; reasoning about approach, tradeoffs, and fit with existing structure belongs to the execution phase, not the planning phase
 
 ## Invariant
 
@@ -102,7 +103,7 @@ For medium/large plans only: dispatch a plan-document-reviewer subagent (see pla
 
 ## Execution Handoff
 
-After saving to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, offer to execute the plan.
+After saving to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, offer to execute the plan. The plan settles scope and targets; execution still requires judgment about how each change lands.
 
 ## Failure Signals
 

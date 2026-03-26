@@ -11,15 +11,11 @@ This skill applies engineering judgment to code changes — not just locating wh
 
 ## Trigger Logic
 
-**Invocation default**: The cost of an unnecessary invocation is a few extra reasoning steps. The cost of a missed invocation is a patch that weakens structure, moves responsibility into the wrong layer, or makes the next change harder — often invisibly. Invoke this skill before writing code unless the work is confirmed to be purely mechanical with no structural judgment involved.
+**Invocation default**: The trigger state is simple: code is about to be written. The cost of an unnecessary invocation is a few extra reasoning steps. The cost of a missed invocation is a patch that weakens structure, moves responsibility into the wrong layer, or makes the next change harder — often invisibly. Invoke unless the work is purely mechanical with no behavioral effect.
 
-**Knowing where to change is not the same as knowing how.** Identifying the change point (which file, which line) answers the first question. Whether the approach is the right one — given tradeoffs, failure modes, and what the current code is protecting — is a separate question that this skill exists to answer. Do not skip this skill on the grounds that the change point is already clear.
+**Knowing where to change is not the same as knowing how.** Having a plan, a root cause, or a change point identified answers the first question. Whether the approach is the right one — given tradeoffs, failure modes, and what the current code is protecting — is a separate question. Prior investigation, planning, or root-cause analysis does not substitute for this judgment — they ground it.
 
-Use this skill when:
-- a non-trivial change is being implemented in an existing codebase
-- understanding why the current code is shaped this way may change how the work should be done
-- architecture boundaries, contracts, compatibility concerns, or historical decisions materially affect the implementation
-- the quickest edit could complete the task, but might weaken structure or maintainability
+**Prerequisites**: This skill requires code evidence and clarified intent to reason responsibly. If code evidence is still missing, build that understanding first and return here. If intent is still unclear, clarify that first and return here. These are sequencing dependencies — not reasons to skip this skill, but work to complete before this skill can be useful.
 
 
 ## Boundary
@@ -38,18 +34,6 @@ This skill does not own:
 - unrestricted refactoring
 - final completion or release judgment
 
-## Scope Edge
-
-This skill assumes the agent can obtain enough code evidence to reason responsibly, but it does not own repository analysis as an end in itself.
-
-If implementation judgment is blocked by missing code evidence, gather the missing evidence first. If that requires deeper repository-slice analysis across multiple files or layers, do that first before returning to this skill.
-
-This skill is not the right tool yet when the main missing piece is still:
-- understanding what this part of the codebase does, how behavior flows, or who owns the touched area
-- clarifying what the user really wants or which decisions still require human intent
-
-Use this skill when the remaining question is:
-- given the clarified intent and grounded code evidence, is the implementation approach sound — does it respect existing structure, keep responsibilities coherent, and avoid making the next change harder?
 
 ## Invariants
 
