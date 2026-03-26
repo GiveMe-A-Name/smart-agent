@@ -1,6 +1,6 @@
 ---
 name: requirement-clarification
-description: Use when the user's request is ambiguous, underspecified, or internally conflicting and the agent needs to clarify what the user actually wants before planning or implementation. Do not use when the main missing step is code exploration or implementation.
+description: Use when proceeding without clarification risks building toward the wrong goal — the request leaves intent, constraints, or tradeoffs unresolved that only the user can answer. Do not use only when user intent is explicitly confirmed in the request with no remaining open questions about goals or direction.
 ---
 
 # Requirement Clarification
@@ -26,18 +26,17 @@ When the request is still ambiguous, identify what kind of unknown is actually b
 - `repository fact`: what the current code does, how it is structured, what patterns exist — can often be resolved with a targeted lookup
 - `stable external knowledge`: well-established domain conventions or best practices — can often be resolved without asking the user
 
+**Invocation default**: Skipping clarification when intent is genuinely unclear converts hidden assumptions into wasted work — a plan or implementation built toward the wrong goal. The cost of an unnecessary clarification round is minor friction. The cost of missing it is delivering something the user did not want. Invoke this skill when open questions about goals, constraints, or tradeoffs would change the approach if answered differently.
+
 Use this skill when:
+- the request leaves intent, constraints, or tradeoffs unresolved in ways that would change the approach
 - the request is ambiguous, underspecified, or internally conflicting and proceeding risks working toward the wrong goal
-- the main missing step is clarifying what the user actually wants, which constraints matter, or which tradeoff they intend
-- some unknowns may be answered from shallow repository evidence or stable external knowledge, but the remaining ambiguity is still mainly about intent
-- the agent needs to separate user-owned decisions from questions it can resolve directly from evidence
-- the request may mention code locations or implementation ideas, but those details do not remove the need for human intent
+- some unknowns may be answered from evidence, but the remaining ambiguity is still about what the user actually wants
+- the request mentions implementation ideas or code locations, but those details do not resolve the underlying goal question
 
 Do not use this skill when:
-- intent is clear enough to support planning or implementation directly
-- the main missing step is deep repository exploration, code ownership analysis, or implementation choice, not intent clarification
-- the task is fully mechanical or already unambiguous
-- the agent is using clarification as a default first step before every task
+- user intent is explicitly stated in the request with no remaining open questions about goals, constraints, or tradeoffs
+- the work is purely mechanical — the user has specified exactly what to do with no judgment calls about goals or direction
 
 ## Boundary
 
@@ -61,7 +60,7 @@ This skill does not own:
 ## Clarification Heuristics
 
 - For each unknown, decide before asking: can a targeted lookup or stable external knowledge resolve this, or does it require a human decision? Only escalate what cannot be answered from evidence.
-- Resolve local repository unknowns directly when one or two targeted lookups are enough; if deeper repository analysis is needed, invoke `understanding-codebases` first and fold its findings into clarified intent — do not attempt deep code tracing inside this skill.
+- Resolve local repository unknowns directly when one or two targeted lookups are enough; if deeper repository analysis is needed, build that understanding first and fold its findings into clarified intent — do not attempt deep code tracing inside this skill.
 - Use external knowledge only when it changes how the request should be interpreted.
 - When you must ask after exploration yields nothing, ask for a pointer to the code or location — something that lets you find the answer yourself. Asking the user to describe the problem shifts diagnosis to them and is a weaker fallback.
 - When stated requirements explicitly conflict, the clarification question is about priority or tradeoff — not about what each requirement means individually. Name the conflict and ask the user to choose.
@@ -74,7 +73,7 @@ Stop and revise when:
 | Signal | What it means | What to do |
 |---|---|---|
 | You are asking the human a question that repository evidence or stable external knowledge could likely answer | You are offloading avoidable ambiguity | Do the lookup or targeted research first; keep it shallow unless deeper analysis is truly required |
-| You are tracing behavior across several files, trying to prove ownership, or producing a codebase analysis report while still calling it clarification | The ambiguity is no longer local, or the work has crossed the skill boundary | Pause, invoke `understanding-codebases`, and fold its findings back into clarified intent |
+| You are tracing behavior across several files, trying to prove ownership, or producing a codebase analysis report while still calling it clarification | The ambiguity is no longer local, or the work has crossed the skill boundary | Pause, build the codebase understanding needed, and fold its findings back into clarified intent |
 | You are treating current repository behavior or external best practice as a confirmed requirement without proof | Facts or guidance are being mistaken for intent | Separate repository evidence, outside guidance, and user goals |
 | You are escalating too many low-value questions, or you keep exploring after the remaining human decisions are already clear | Clarification has become open-ended exploration | Synthesize, narrow the decision surface, and stop |
 | You are stating inferred constraints as confirmed facts, or acting certain even though intent was never confirmed | Evidence labels are missing, or certainty is overstated | Relabel claims as confirmed, inferred, or unknown, and re-examine what still needs human intent |
