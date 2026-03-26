@@ -1,6 +1,6 @@
 ---
 name: understanding-codebases
-description: Use when the user asks to analyze how part of the codebase works, trace behavior across multiple files or layers, compare local patterns, or determine where behavior is implemented and the safest place to change code. Do not use for simple single-file lookups, requests that mainly need human decisions, or cases where a currently visible failure mainly needs pre-edit diagnosis.
+description: Use when the user asks to analyze how part of the codebase works, trace behavior across multiple files or layers, compare local patterns, or determine where behavior is implemented and the safest place to change code. Invoke before planning, implementation, or clarification whenever codebase evidence is still thin — even when user intent is not yet fully clear. Do not use when sufficient code evidence already exists, for trivially shallow lookups, or when a currently visible failure mainly needs pre-edit diagnosis.
 ---
 
 # Codebase Understanding
@@ -15,29 +15,28 @@ work is complete.
 
 ## Trigger Logic
 
+**Invocation default**: The cost of an unnecessary invocation is minor overhead. The cost of a missed invocation is unfounded conclusions that contaminate all subsequent work. When the task is not confirmed — from already-seen code evidence, not impression or prior knowledge — to involve only a single self-contained file with no cross-file tracing needed, invoke this skill.
+
 Use this skill when:
 - the user is asking how part of the codebase works, where behavior is implemented, or where a change should go
 - answering safely requires tracing behavior across multiple files or layers rather than naming one plausible file
 - the question is concrete, but current repository evidence is still too thin to answer confidently
 - a single obvious file or one or two targeted lookups do not ground the answer well enough
 - tracing call flow, comparing nearby patterns, or proving ownership matters before suggesting where work belongs
+- proceeding would require guessing about code structure, ownership, or behavior
 
 Do not use this skill when:
-- the main blocker is intent ambiguity, missing human decisions, or unclear improvement targets
 - a concrete current failure is already visible and the main task is diagnosing the likely owning layer before editing
-- a single file, obvious edit path, or one or two targeted lookups already answer the question
-- the task is a shallow lookup about terminology, existing flags, exposed configuration, exported options, or already-obvious behavior
-- the goal is only to decide whether the request is clear enough to continue clarification
-- the main question is still whether the request is clear enough or what the user actually wants
-- the agent is using repository understanding as a default warm-up before every action
+- you have already run one or two targeted lookups and obtained concrete code evidence — traced behavior, not just a plausible file name — sufficient to answer the question without relying on intuition
+- the task is confirmed to be limited to reading a single config value, flag name, or exported type signature, with no need to trace how it is used elsewhere
 
 "Two targeted lookups" means at most two tool calls tied to the current hypothesis set — not one lookup per likely location, not repeated checks that only reconfirm the same absence, and not curiosity-driven browsing. If the first lookup already suggests the repo lacks the evidence needed to answer the current premise safely, stop and self-correct rather than broadening the search.
 
 Before deepening repository exploration, distinguish among these cases:
 
-- `intent ambiguity`: the request mainly needs clarification or human decisions; do not use repository exploration to solve that
+- `intent ambiguity`: the request mainly needs clarification or human decisions; repository exploration does not replace that, but it often informs what questions to ask — if codebase evidence is thin, explore first, then clarify
 - `repo-fact gap`: the question is concrete, but repository evidence is missing; use this skill only if limited targeted lookups still do not ground the answer
-- `already answerable`: one or two targeted lookups already answer the question; do not invoke this skill
+- `already answerable`: you have already run targeted lookups that produced concrete, sufficient code evidence — not intuition or prior knowledge about the codebase; do not invoke this skill
 
 ## Boundary
 
