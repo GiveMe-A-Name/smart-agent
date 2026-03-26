@@ -1,6 +1,6 @@
 ---
 name: engineering-implementation-thinking
-description: Use when implementing a non-trivial change in an existing codebase and the main question is already how to land it responsibly, such as whether to make a local patch, preserve or tighten a boundary, or do a focused structural improvement instead of the quickest edit. Do not use when the right change point or owning boundary is still ungrounded.
+description: Use when implementing any change in an existing codebase where the quickest edit might not be the right one — to decide whether to make a local patch, preserve or tighten a boundary, or do a focused structural improvement. Invoke before writing code unless the work is purely mechanical with no structural judgment involved. Do not use when code evidence is still too thin to reason about change points — gather that evidence first.
 ---
 
 # Engineering Implementation Thinking
@@ -11,6 +11,8 @@ This skill helps the agent decide how to land code responsibly in an existing sy
 
 ## Trigger Logic
 
+**Invocation default**: The cost of an unnecessary invocation is a few extra reasoning steps. The cost of a missed invocation is a patch that weakens structure, moves responsibility into the wrong layer, or makes the next change harder — often invisibly. Invoke this skill before writing code unless the work is confirmed to be purely mechanical with no structural judgment involved.
+
 Use this skill when:
 - a non-trivial change is being implemented in an existing codebase
 - clarified intent and enough code evidence are already available to decide how to land the change responsibly
@@ -20,12 +22,10 @@ Use this skill when:
 - the quickest edit could complete the task, but might weaken structure or maintainability
 
 Do not use this skill when:
-- the change is tiny, local, and has one obvious low-risk path
-- the main missing step is still requirement clarification, repository understanding, or ownership analysis
-- the safest change point or owning boundary is still ungrounded from code evidence
-- the work is purely mechanical, clerical, or stylistic
+- the work is purely mechanical, clerical, or stylistic with no structural judgment involved — fixing a typo, updating a string literal, renaming with no behavioral effect
 - the main question is whether work is complete rather than how it should be implemented
-- the agent is using engineering judgment as a default warm-up for every non-trivial implementation task
+
+If code evidence is still too thin to reason about change points, build that understanding first. If intent is still unclear, resolve that first. Return to this skill once both are grounded.
 
 ## Boundary
 
