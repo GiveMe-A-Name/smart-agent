@@ -52,6 +52,7 @@ These are understanding moves, not a fixed sequence. Use the ones that help answ
 
 - Anchor on the current question.
 - Identify the current hypothesis before spending lookup budget.
+- Treat the exploration target as a hypothesis, not a confirmed starting point. A file that matches your search is a candidate for where the answer lives — not evidence that you are in the right place. Verify the artifact is the right one to explore before anchoring a slice on it.
 - Build the smallest repository slice that can answer it safely.
 - Trace toward behavior-changing code instead of stopping at facades.
 - Compare nearby patterns when they materially inform the answer.
@@ -80,6 +81,7 @@ Stop and revise when:
 - a negative lookup already supports "missing repo evidence," but you keep searching without a materially different hypothesis
 - your follow-up lookup changes paths or tools but only reconfirms the same absence
 - you are drifting into planning or still exploring after the question is already grounded
+- you anchored your slice on a search result without verifying the exploration target is correct — finding a matching file is a hypothesis, not a confirmed destination
 
 ## Judgment in Practice
 
