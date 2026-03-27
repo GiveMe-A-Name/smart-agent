@@ -48,6 +48,7 @@ It does NOT:
 **What to examine:**
 
 - *Intent alignment* — Does what was implemented match what was intended? Restate the stated goal, then assess whether the code achieves it. Misalignment between intent and implementation is often more significant than any individual bug.
+- *Necessity* — For each structural element in the diff (parameter, abstraction, helper, config option, exported symbol): what usage evidence justifies its presence? Theoretical justification ("supports testability", "could be useful") does not qualify. Evidence is actual usage by production callers. Test files are not production callers. Test coverage is not usage evidence — a test proves that an element exists and behaves as specified, not that it should exist. When a code element has tests but no production callers, the tests are artifacts of its existence, not justification for it — both the element and its tests are candidates for removal.
 - *Caller and usage impact* — How is the changed code called? If a function signature, return type, or behavior changed, trace to its callers and check whether they handle the new behavior correctly. Changes that look self-contained often break at the call site.
 - *Correctness* — Does the code do what it claims? Are edge cases and error paths handled? Are there logical errors?
 - *Security* — Injection vectors, unvalidated inputs, exposed secrets, privilege escalation, unsafe deserialization?

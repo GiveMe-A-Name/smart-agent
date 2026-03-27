@@ -42,6 +42,7 @@ This skill does not own:
 - Do not infer unconfirmed product intent from code shape alone.
 - Do not let deadline or delivery pressure justify moving responsibility into the wrong layer.
 - Prefer the least invasive change that keeps responsibilities clear and future changes easier.
+- Do not treat theoretical justification as a substitute for usage evidence. "This supports testability", "this could be useful", "this is clean design" are arguments, not evidence. Evidence is: who calls this, who depends on this, what breaks if this is removed.
 
 ## Core Questions
 

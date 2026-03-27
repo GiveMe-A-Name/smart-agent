@@ -43,7 +43,12 @@ It does NOT:
 
 A technically wrong suggestion is wrong regardless of source.
 
-**Verification:** Before implementing any suggestion, check: (1) Is it technically correct for this codebase? (2) Does it break existing functionality? (3) Is there a reason the current implementation exists? (4) Does it work on all supported platforms and versions? (5) Does the reviewer understand the full context? Run these checks only after understanding all items in the feedback — partial understanding of the set invalidates per-item verification. If you cannot verify something, say so explicitly and ask for direction rather than proceeding blind.
+**Verification:** Before implementing any suggestion, check: 
+1. Is it technically correct for this codebase? 
+2. Does it break existing functionality? 
+3. Is there a reason the current implementation exists — grounded in usage evidence, not theoretical justification? "This supports testability" or "this could be extensible" answers "could this be justified?", not "is it justified?" Usage evidence (actual callers, actual non-default invocations in production code) answers the latter. 
+4. Does it work on all supported platforms and versions? 
+5. Does the reviewer understand the full context? Run these checks only after understanding all items in the feedback — partial understanding of the set invalidates per-item verification. If you cannot verify something, say so explicitly and ask for direction rather than proceeding blind.
 
 **YAGNI:** When a reviewer suggests "implementing properly" — adding a feature, endpoint, or abstraction — grep the codebase for actual usage first. If nothing calls it, the right move is flagging removal, not more complete implementation.
 
