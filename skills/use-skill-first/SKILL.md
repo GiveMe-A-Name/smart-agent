@@ -1,6 +1,6 @@
 ---
 name: use-skill-first
-description: Use at the start of any conversation — establishes the discipline of checking for applicable skills before any action, including before executing each individual todo item.
+description: Use at the start of any conversation before any action is taken — even if the conversation begins with discussion or questions rather than an immediate task.
 ---
 
 # Use Skill First
@@ -9,9 +9,9 @@ Check for applicable skills before every action — not just at conversation sta
 
 ## Trigger Logic
 
-**Invocation default**: Invoke at the start of every conversation. The cost of an unnecessary invocation is a brief check. The cost of skipping is taking action without available guidance that could change the approach.
+**Invocation default**: Invoke once at the very start of every conversation — regardless of whether the first message is a task, a question, or just discussion. Once invoked, the discipline applies for the entire conversation. Do not re-invoke mid-conversation.
 
-Do not invoke again mid-conversation if a skill check was already performed for the current action.
+The cost of an unnecessary invocation is a brief check. The cost of skipping is taking action without available guidance that could change the approach.
 
 ## The 1% Rule
 
@@ -42,6 +42,7 @@ These thoughts indicate a skill check is being skipped. Stop and check if you re
 | "I'm in execution mode now, past the planning stage" | Execution steps can require their own skill checks |
 | "I know what to do for this step" | Knowing what to do ≠ knowing the best way to do it |
 | "I'll do this first, then check if needed" | The skill check must happen before the action, not after |
+| "This is just a discussion, no task yet" | The skill must be invoked at conversation start regardless of message type |
 
 ## Invariants
 
