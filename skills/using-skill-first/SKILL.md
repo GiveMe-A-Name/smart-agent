@@ -1,15 +1,17 @@
 ---
-name: use-skill-first
-description: Use at the start of any conversation before any action is taken — even if the conversation begins with discussion or questions rather than an immediate task.
+name: using-skill-first
+description: Use once per session, before the first action is taken, to establish the habit of checking for applicable skills before every action.
 ---
 
-# Use Skill First
+# Using Skill First
 
-Check for applicable skills before every action — not just at conversation start, but before each distinct step, including each item in a todo list.
+Check for applicable skills before every action — before each distinct step, including each item in a todo list.
 
 ## Trigger Logic
 
-**Invocation default**: Invoke once at the very start of every conversation — regardless of whether the first message is a task, a question, or just discussion. Once invoked, the discipline applies for the entire conversation. Do not re-invoke mid-conversation.
+**Invocation default**: Invoke once per session, before the first action is taken. Once invoked, the discipline applies for the entire session. Do not re-invoke mid-conversation.
+
+If the conversation begins with discussion or questions and no action is required, do not invoke this skill yet — wait until the first action is about to be taken.
 
 The cost of an unnecessary invocation is a brief check. The cost of skipping is taking action without available guidance that could change the approach.
 
@@ -23,7 +25,7 @@ The cost of an unnecessary invocation is a brief check. The cost of skipping is 
 
 ## Skill Checks Are Per-Action, Not Per-Conversation
 
-Checking skills at the start of a conversation does not cover each subsequent action. Before executing any action — including each item in a todo list — check whether a skill applies to that specific action.
+Checking skills before the first action does not cover each subsequent action. Before executing any action — including each item in a todo list — check whether a skill applies to that specific action.
 
 Listing todos is itself an action. Executing each todo is a separate action. Both require their own skill check.
 
@@ -37,12 +39,12 @@ These thoughts indicate a skill check is being skipped. Stop and check if you re
 
 | Thought | What it signals |
 |---------|-----------------|
-| "I already checked skills at the start" | That check covered the overall task, not this specific action |
+| "I already checked skills before the first action" | That check covered the overall task, not this specific action |
 | "This todo is small, no skill needed" | Small steps are where guidance is most often missed |
 | "I'm in execution mode now, past the planning stage" | Execution steps can require their own skill checks |
 | "I know what to do for this step" | Knowing what to do ≠ knowing the best way to do it |
 | "I'll do this first, then check if needed" | The skill check must happen before the action, not after |
-| "This is just a discussion, no task yet" | The skill must be invoked at conversation start regardless of message type |
+| "This is just a discussion, no task yet" | If an action is about to happen, this skill must be invoked first |
 
 ## Invariants
 
@@ -55,4 +57,4 @@ These thoughts indicate a skill check is being skipped. Stop and check if you re
 Stop and reassess if:
 - You are about to write code without having checked for relevant skills for that step
 - You are executing a todo item without having checked for relevant skills for that item
-- You last performed a skill check at conversation start and have since taken multiple distinct actions without re-checking
+- You last performed a skill check before the first action and have since taken multiple distinct actions without re-checking
