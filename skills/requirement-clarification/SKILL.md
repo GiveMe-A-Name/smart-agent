@@ -1,6 +1,6 @@
 ---
 name: requirement-clarification
-description: Invoke when the request leaves intent, constraints, or tradeoffs unresolved that only the user can answer. When uncertain whether requirements are clear enough, invoke. Cost of unnecessary invocation: brief clarification round. Cost of missing: building toward the wrong goal.
+description: Invoke when the request leaves intent, constraints, or tradeoffs unresolved that only the user can answer. When uncertain whether requirements are clear enough, invoke.
 ---
 
 # Requirement Clarification

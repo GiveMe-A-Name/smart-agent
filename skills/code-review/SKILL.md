@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Invoke when the task is to evaluate code changes for correctness, quality, and production readiness — local working-tree diffs or remote PRs. Do not use when review feedback already exists and the task is deciding how to respond to it, or for reviewing non-code artifacts. Cost of unnecessary invocation: brief review overhead. Cost of missing: shipping code with correctness or quality issues.
+description: Invoke when the task is to evaluate code changes for correctness, quality, and production readiness — local working-tree diffs or remote PRs. Do not use when review feedback already exists and the task is deciding how to respond to it, or for reviewing non-code artifacts.
 ---
 
 # Code Review

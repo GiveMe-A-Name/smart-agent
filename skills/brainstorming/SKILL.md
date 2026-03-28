@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: Invoke before building anything unless a committed spec already exists and execution is the only remaining step. When problem, scope, constraints, tradeoffs, or success criteria are not yet settled, invoke. When uncertain whether a spec is complete, invoke. Cost of unnecessary invocation: brief design discussion. Cost of missing: unresolved questions become implementation mistakes.
+description: Invoke before building anything unless a committed spec already exists and execution is the only remaining step. When problem, scope, constraints, tradeoffs, or success criteria are not yet settled, invoke. When uncertain whether a spec is complete, invoke.
 ---
 
 # Brainstorming Ideas Into Designs

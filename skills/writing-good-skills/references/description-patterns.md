@@ -123,8 +123,10 @@ The first form makes the default explicit. The second leaves it to the AI to jud
 Use this format to make cost asymmetry explicit:
 
 ```yaml
-description: Invoke [when/unless] [observable condition]. Cost of unnecessary invocation: [specific minor cost]. Cost of missing: [specific major harm].
+description: "Invoke [when/unless] [observable condition]. Cost of unnecessary invocation: [specific minor cost]. Cost of missing: [specific major harm]."
 ```
+
+**Quote the description when it contains colons.** YAML treats an unquoted `: ` as a key-value separator, which breaks frontmatter parsing in tools like `npx skills`. Wrap the entire description in double quotes whenever it contains `Cost of unnecessary invocation:` or any other `: ` sequence.
 
 **Important: Prefer "when" over "unless" in descriptions.** The "unless" form introduces a "Do not use" condition at the first gate, where rationalization pressure is highest. Only use "unless" when the exclusion condition is trivially confirmable from facts that exist independently of the current task — not assessments made before investigation.
 
@@ -132,17 +134,17 @@ Examples:
 
 ```yaml
 # Preferred: positive trigger with "when"
-description: Invoke when requirements are unclear or stakeholders have conflicting needs. Cost of unnecessary invocation: 2-3 clarifying questions. Cost of missing: building the wrong thing, requiring rework.
+description: "Invoke when requirements are unclear or stakeholders have conflicting needs. Cost of unnecessary invocation: 2-3 clarifying questions. Cost of missing: building the wrong thing, requiring rework."
 ```
 
 ```yaml
 # Acceptable: "unless" with trivially confirmable fact
-description: Invoke unless the change is confirmed to be a wording fix with no effect on trigger conditions, boundaries, or judgment. Cost of unnecessary invocation: brief review pass. Cost of missing: a skill that silently misbehaves or triggers incorrectly.
+description: "Invoke unless the change is confirmed to be a wording fix with no effect on trigger conditions, boundaries, or judgment. Cost of unnecessary invocation: brief review pass. Cost of missing: a skill that silently misbehaves or triggers incorrectly."
 ```
 
 ```yaml
 # Bad: "unless" with impression-based condition
-description: Invoke unless the root cause is already obvious. Cost of...
+description: "Invoke unless the root cause is already obvious. Cost of..."
 # Problem: "already obvious" is an impression formed before investigation
 ```
 

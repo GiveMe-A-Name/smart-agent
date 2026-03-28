@@ -1,6 +1,6 @@
 ---
 name: understanding-codebases
-description: Invoke when proceeding without reading the code would require guessing about structure, ownership, or behavior. Invoke by default — issue descriptions, PR text, and user explanations are hypotheses, not code evidence. When uncertain whether you have enough code evidence, invoke. Cost of unnecessary invocation: brief code reading. Cost of missing: decisions based on assumptions instead of evidence.
+description: Invoke when proceeding without reading the code would require guessing about structure, ownership, or behavior. Invoke by default — issue descriptions, PR text, and user explanations are hypotheses, not code evidence. When uncertain whether you have enough code evidence, invoke.
 ---
 
 # Codebase Understanding
