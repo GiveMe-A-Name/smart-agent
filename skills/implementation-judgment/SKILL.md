@@ -43,6 +43,7 @@ This skill does not own:
 - Do not let deadline or delivery pressure justify moving responsibility into the wrong layer.
 - Prefer the least invasive change that keeps responsibilities clear and future changes easier.
 - Do not treat theoretical justification as a substitute for usage evidence. "This supports testability", "this could be useful", "this is clean design" are arguments, not evidence. Evidence is: who calls this, who depends on this, what breaks if this is removed.
+- **Before exiting this skill, you MUST complete the Self-Check section at the end**
 
 ## Core Questions
 
@@ -67,3 +68,12 @@ Stop and revise when:
 - you are preserving an existing pattern without judging whether it is still the right one
 - you are expanding the work into redesign beyond what the change needs
 - you cannot explain how the implementation supports both current intent and future maintainability
+
+## Self-Check Before Exiting
+
+- [ ] Did I follow all invariants (understand surrounding code, base on usage evidence)?
+- [ ] Did I catch any self-correction signals?
+- [ ] Does the implementation keep responsibilities clear and future changes easier?
+- [ ] Am I exiting because the implementation is genuinely sound, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**

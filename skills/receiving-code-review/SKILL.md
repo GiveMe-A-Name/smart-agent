@@ -1,6 +1,6 @@
 ---
 name: receiving-code-review
-description: Use when review feedback exists and the next step is deciding what to implement, challenge, or clarify before changing code. The feedback source does not matter. Do not use for requesting or performing a review, ordinary implementation with no review feedback, or applying feedback that has already been accepted without further evaluation.
+description: Invoke when review feedback exists and the next step is deciding what to implement, challenge, or clarify before changing code. The feedback source does not matter. Do not use for requesting or performing a review, ordinary implementation with no review feedback, or applying feedback that has already been accepted without further evaluation. Cost of unnecessary invocation: brief evaluation overhead. Cost of missing: implementing feedback without judgment or missing opportunities to clarify.
 ---
 
 # Receiving Code Review
@@ -33,6 +33,8 @@ It does NOT:
 **No performative agreement.** Never say "You're absolutely right!", "Great point!", "Thanks for catching that!", or any expression of gratitude. Actions speak — fix it and show the change.
 
 **Clarify all before implementing any.** If any item in multi-item feedback is unclear, stop and ask before touching anything. Items may be related; partial understanding leads to wrong implementation.
+
+**Before exiting this skill, you MUST complete the Self-Check section at the end.**
 
 ## Decision Signals
 
@@ -72,3 +74,12 @@ Stop and reorient if:
 **If you pushed back and were wrong:** `"You were right — I checked [X] and it does [Y]. Fixing."` No apology, no defense. State the correction and move on.
 
 **GitHub inline comments:** Reply in the comment thread, not as a top-level PR comment — `gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`
+
+## Self-Check Before Exiting
+
+- [ ] Did I follow all invariants (verify before implementing, no performative agreement, clarify all first)?
+- [ ] Did I verify each suggestion is technically sound with usage evidence?
+- [ ] Did I catch any failure signals?
+- [ ] Am I exiting because feedback is genuinely evaluated and addressed, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**

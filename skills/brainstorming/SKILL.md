@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: "Use before building anything when the problem, scope, constraints, tradeoffs, or success criteria are not yet settled. Invoke by default when no agreed spec exists — skipping design converts unresolved questions into implementation mistakes. Do not use only when a committed spec already exists and execution is the remaining step."
+description: Invoke before building anything unless a committed spec already exists and execution is the only remaining step. When problem, scope, constraints, tradeoffs, or success criteria are not yet settled, invoke. When uncertain whether a spec is complete, invoke. Cost of unnecessary invocation: brief design discussion. Cost of missing: unresolved questions become implementation mistakes.
 ---
 
 # Brainstorming Ideas Into Designs
@@ -83,6 +83,7 @@ Stop the loop once no medium/high-risk issues remain, even if minor issues persi
 - Spec is committed to git before the user reviews it
 - Verbal approval of a design in conversation is not the same as approval of the written spec
 - No unrelated refactoring — only improvements that directly serve the current goal
+- **Before exiting this skill, you MUST complete the Self-Check section at the end**
 
 ## Failure Signals
 
@@ -94,3 +95,12 @@ Stop and reassess if:
 - You have asked more than 5–6 questions without reaching approach proposals (see the "Enough questions" decision signal)
 - The spec review loop has run 3 times without clearing medium/high-risk issues — surface to human, do not loop again
 - The user pushes back on doing a design and wants to go straight to code — hold the HARD-GATE; do not compromise, explain why the design step matters
+
+## Self-Check Before Exiting
+
+- [ ] Did I follow all invariants (one question per message, 2-3 approaches, spec committed)?
+- [ ] Did I catch any failure signals?
+- [ ] Did the user approve the committed spec (not just verbal approval)?
+- [ ] Am I exiting because the design is genuinely complete and approved, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**

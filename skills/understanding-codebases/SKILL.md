@@ -1,6 +1,6 @@
 ---
 name: understanding-codebases
-description: Use when proceeding without reading the code would require guessing about structure, ownership, or behavior. Invoke by default — issue descriptions, PR text, and user explanations are hypotheses, not code evidence.
+description: Invoke when proceeding without reading the code would require guessing about structure, ownership, or behavior. Invoke by default — issue descriptions, PR text, and user explanations are hypotheses, not code evidence. When uncertain whether you have enough code evidence, invoke. Cost of unnecessary invocation: brief code reading. Cost of missing: decisions based on assumptions instead of evidence.
 ---
 
 # Codebase Understanding
@@ -45,6 +45,13 @@ This skill does not own:
 - writing a change plan or sequencing implementation work
 - final engineering judgment about how a change should be implemented once repository evidence is understood
 - recommending verification strategy or completion judgment
+
+## Invariants
+
+- Do not proceed based on assumptions; ground decisions in code evidence
+- Issue descriptions, PR text, and user explanations are hypotheses, not evidence
+- Stop once the answer is grounded well enough to avoid intuition
+- **Before exiting this skill, you MUST complete the Self-Check section at the end**
 
 ## Core Moves
 
@@ -113,3 +120,12 @@ State the role of each file precisely. For example: `middleware/auth.ts` is the 
 - Drifting into planning after the repository slice is already grounded
 
 See `examples/fake-new-hypothesis.md` for a contrast pair showing how a lookup that looks like a new hypothesis can actually just be rechecking the same absence.
+
+## Self-Check Before Exiting
+
+- [ ] Did I follow all invariants (ground in code evidence, not assumptions)?
+- [ ] Did I separate what is proven, hypothesized, and still unknown?
+- [ ] Did I avoid stopping at the first plausible file without verification?
+- [ ] Am I exiting because understanding is genuinely grounded, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**

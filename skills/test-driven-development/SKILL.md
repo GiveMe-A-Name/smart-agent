@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Use before writing any implementation code — when a feature, bugfix, refactor, or behavior change is about to be coded. Invoke unless the work is confirmed to be pure configuration, type declarations, or explicitly throwaway exploration with no production intent.
+description: Invoke before writing any implementation code unless the work is confirmed to be pure configuration, type declarations, or explicitly throwaway exploration with no production intent. When a feature, bugfix, refactor, or behavior change is about to be coded, invoke. When uncertain whether tests are needed, invoke. Cost of unnecessary invocation: brief test design consideration. Cost of missing: untested code that may break without detection.
 ---
 
 # Test-Driven Development
@@ -40,6 +40,13 @@ This skill does not own:
 If yes → TDD. If no → explain which no-behavior criterion applies, then skip.
 
 This question cuts through rationalization. "It's simple" is not an answer to it. Simple code can have bugs. The question is whether there is behavior to verify.
+
+## Invariants
+
+- Test must exist before implementation code is written
+- If skipping TDD, must name a specific no-behavior criterion (not "it's simple")
+- Test must fail before implementation makes it pass
+- **Before exiting this skill, you MUST complete the Self-Check section at the end**
 
 ### No-Behavior Signals (TDD optional)
 
@@ -92,3 +99,12 @@ Stop and revise when:
 - a test is asserting on mock elements or mock call counts instead of real behavior
 - you skipped TDD and named "it's simple" or "I'll test after" as the reason
 - you skipped TDD without naming a no-behavior criterion
+
+## Self-Check Before Exiting
+
+- [ ] Did I follow all invariants (test before implementation, fail before pass)?
+- [ ] If I skipped TDD, did I name a specific no-behavior criterion (not "it's simple")?
+- [ ] Did I catch any self-correction signals?
+- [ ] Am I exiting because tests are genuinely in place, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**

@@ -1,6 +1,6 @@
 ---
 name: requirement-clarification
-description: Use when proceeding without clarification risks building toward the wrong goal — the request leaves intent, constraints, or tradeoffs unresolved that only the user can answer.
+description: Invoke when the request leaves intent, constraints, or tradeoffs unresolved that only the user can answer. When uncertain whether requirements are clear enough, invoke. Cost of unnecessary invocation: brief clarification round. Cost of missing: building toward the wrong goal.
 ---
 
 # Requirement Clarification
@@ -54,6 +54,14 @@ This skill does not own:
 - verification strategy
 - completion judgment
 
+## Invariants
+
+- For each unknown, decide before asking: can evidence resolve this, or does it require human decision?
+- Only escalate what cannot be answered from repository evidence or stable external knowledge
+- Separate confirmed requirements from inferred context and unresolved decisions
+- Stop once remaining uncertainty is small, explicit, and human-owned
+- **Before exiting this skill, you MUST complete the Self-Check section at the end**
+
 ## Clarification Heuristics
 
 - For each unknown, decide before asking: can a targeted lookup or stable external knowledge resolve this, or does it require a human decision? Only escalate what cannot be answered from evidence.
@@ -90,3 +98,12 @@ See `examples/resolve-vs-escalate.md` for a contrast pair showing when a questio
 See `examples/compress-to-root-question.md` for a contrast pair showing how to identify the single root question when multiple unknowns share the same underlying gap.
 
 See `examples/conflicting-requirements.md` for a contrast pair showing how to handle requirements that explicitly contradict each other.
+
+## Self-Check Before Exiting
+
+- [ ] Did I follow all invariants (resolve from evidence first, separate confirmed from inferred)?
+- [ ] Did I catch any self-correction signals?
+- [ ] Does the result restate the request with a small set of real human decisions?
+- [ ] Am I exiting because requirements are genuinely clarified, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**

@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Use when the task is to evaluate code changes for correctness, quality, and production readiness — local working-tree diffs or remote PRs. Do not use when review feedback already exists and the task is deciding how to respond to it, or for reviewing non-code artifacts.
+description: Invoke when the task is to evaluate code changes for correctness, quality, and production readiness — local working-tree diffs or remote PRs. Do not use when review feedback already exists and the task is deciding how to respond to it, or for reviewing non-code artifacts. Cost of unnecessary invocation: brief review overhead. Cost of missing: shipping code with correctness or quality issues.
 ---
 
 # Code Review
@@ -42,6 +42,8 @@ It does NOT:
 **Severity must reflect actual risk.** Critical means data loss, security vulnerability, broken functionality, or blocking regression — not style, not preference. Inflating severity makes all feedback less trustworthy.
 
 **Give a clear verdict.** Every review ends with: Ready / Not ready / Ready with fixes. An ambiguous conclusion defers the merge decision to the author, which is the reviewer's job.
+
+**Before exiting this skill, you MUST complete the Self-Check section at the end.**
 
 ## Decision Signals
 
@@ -99,3 +101,12 @@ See `templates/review-output.md` for the full output structure.
 - How to fix (if not obvious)
 
 **Verdict options:** `Ready to merge` / `Not ready` / `Ready with fixes`
+
+## Self-Check Before Exiting
+
+- [ ] Did I follow all invariants (understand intent first, read context, only feedback on code I read)?
+- [ ] Did I give a clear verdict (Ready / Not ready / Ready with fixes)?
+- [ ] Does every issue have: file:line, what is wrong, why it matters?
+- [ ] Am I exiting because the review is genuinely complete, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**

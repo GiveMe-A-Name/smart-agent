@@ -1,6 +1,6 @@
 ---
 name: writing-good-skills
-description: Use whenever a skill is being created, modified, or its behavior is in question. Invoke by default — the cost of an unnecessary review pass is low; the cost of a skill that silently misbehaves is high. Do not use only when the change is a confirmed wording fix with no effect on trigger conditions, boundaries, or judgment.
+description: Invoke whenever a skill is being created, modified, or its behavior is in question unless the change is a confirmed wording fix with no effect on trigger conditions, boundaries, or judgment. Invoke by default — when uncertain whether a skill change affects behavior, invoke. Cost of unnecessary invocation: brief review pass. Cost of missing: a skill that silently misbehaves or triggers incorrectly.
 ---
 
 # Writing Good Skills
@@ -40,6 +40,13 @@ Keep the main `SKILL.md` lean, but do not hollow it out.
 These five stay in the main `SKILL.md`, not in support files.
 
 Keep skills capability-first: they should teach judgment, not encode orchestration. See `Boundary Clarity And Routing Language` below for how to apply this.
+
+## Invariants
+
+- Every skill must have the five core elements: trigger logic, capability boundary, invariants, decision signals, failure signals
+- Keep the main SKILL.md lean but not hollow
+- Skills teach judgment, not orchestration
+- **Before exiting this skill, you MUST complete the Self-Check section at the end**
 
 ## Boundary Clarity And Routing Language
 
@@ -158,3 +165,12 @@ Stop and revise if:
 - core rules were moved out of the main file and it became hollow
 - support material was moved out, but the split made the package harder to use or judge
 - the skill names another specific skill as something to invoke — this signals the named skill's trigger conditions need fixing, not that this skill should encode the hand-off
+
+## Self-Check Before Exiting
+
+- [ ] Does the skill have all five core elements (trigger logic, boundary, invariants, decision signals, failure signals)?
+- [ ] Is the trigger state-based (not scenario-based)?
+- [ ] Did I catch any self-correction signals?
+- [ ] Am I exiting because the skill is genuinely well-designed, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**

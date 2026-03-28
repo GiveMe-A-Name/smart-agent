@@ -1,6 +1,6 @@
 ---
 name: writing-plans
-description: Use before writing any code. Covers all sizes — even a Tiny plan (prose note + file path + verification) prevents mid-implementation surprises. Do not use only when a complete plan already exists and execution is the only remaining step.
+description: Invoke before any implementation unless you are executing an already-committed plan with no remaining decisions. Covers all sizes — even a Tiny plan (prose note + file path + verification) prevents mid-implementation surprises. When uncertain whether a plan exists or is complete, invoke. Cost of unnecessary invocation: brief planning overhead. Cost of missing: mid-implementation surprises and wasted work.
 ---
 
 # Writing Plans
@@ -32,7 +32,7 @@ It does NOT own:
 - Root cause investigation
 - Engineering judgment about how each change should land — a plan names targets and sequence; reasoning about approach, tradeoffs, and fit with existing structure belongs to the execution phase, not the planning phase
 
-## Invariant
+## Invariants
 
 ```
 NO PLAN WITHOUT SITUATION ASSESSMENT FIRST
@@ -41,6 +41,8 @@ NO PLAN WITHOUT SITUATION ASSESSMENT FIRST
 You cannot start writing until you can state: *"This is a [size] [nature] task. The relevant code is [X]. The constraint is [Y]."*
 
 If you can't name the files involved, you haven't assessed enough.
+
+**Before exiting this skill, you MUST complete the Self-Check section at the end.**
 
 ## Situation Assessment
 
@@ -125,3 +127,12 @@ After saving to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, offer to execute 
 ## Examples
 
 See `examples.md` in this directory for Tiny / Small / Medium plan examples.
+
+## Self-Check Before Exiting
+
+- [ ] Did I follow all invariants (situation assessment first, plan matches task size)?
+- [ ] Did I catch any failure signals (over-planning, under-planning, skipping assessment)?
+- [ ] Are file paths exact and changes concrete (not vague)?
+- [ ] Am I exiting because the plan is genuinely complete, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**

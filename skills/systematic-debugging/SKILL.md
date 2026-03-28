@@ -29,7 +29,7 @@ It does NOT:
 - Claim the fix is complete without running verification
 - Own architectural changes — 3+ fix failures that keep exposing new coupling is an escalation signal, not a scope expansion for this skill
 
-## Invariant
+## Invariants
 
 ```
 NO FIXES WITHOUT ROOT CAUSE FIRST
@@ -38,6 +38,8 @@ NO FIXES WITHOUT ROOT CAUSE FIRST
 Root cause means you can state: *"The bug is at [specific location] because [mechanism], which produces [symptom]."*
 
 Naming a symptom is not a root cause. Naming a hypothesis is not a root cause. Root cause requires evidence.
+
+**Before exiting this skill, you MUST complete the Self-Check section at the end.**
 
 ## Ownership Diagnosis
 
@@ -131,3 +133,12 @@ See `examples/symptom-vs-root-cause.md` for annotated before/after showing how t
 See `examples/symptom-vs-owning-layer.md` for a contrast pair showing how a stack-trace line can be the symptom site without being the owning layer.
 
 See `examples/fixture-bypass-detection.md` for a contrast pair showing how bypass information can appear to be acknowledged while still being set aside in favor of stack-trace evidence.
+
+## Self-Check Before Exiting
+
+- [ ] Did I establish root cause with evidence (not just a hypothesis)?
+- [ ] Can I state: "The bug is at [location] because [mechanism], which produces [symptom]"?
+- [ ] Did I verify the fix actually resolves the root cause?
+- [ ] Am I exiting because the bug is genuinely fixed and verified, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**
