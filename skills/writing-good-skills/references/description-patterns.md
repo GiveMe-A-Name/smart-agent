@@ -118,6 +118,43 @@ description: Use when the work is substantial enough to need a plan.
 
 The first form makes the default explicit. The second leaves it to the AI to judge what "substantial enough" means — which is exactly the judgment the skill is meant to provide.
 
+### Recommended Format Template
+
+Use this format to make cost asymmetry explicit:
+
+```yaml
+description: Invoke [when/unless] [observable condition]. Cost of unnecessary invocation: [specific minor cost]. Cost of missing: [specific major harm].
+```
+
+**Important: Prefer "when" over "unless" in descriptions.** The "unless" form introduces a "Do not use" condition at the first gate, where rationalization pressure is highest. Only use "unless" when the exclusion condition is trivially confirmable from facts that exist independently of the current task — not assessments made before investigation.
+
+Examples:
+
+```yaml
+# Preferred: positive trigger with "when"
+description: Invoke when requirements are unclear or stakeholders have conflicting needs. Cost of unnecessary invocation: 2-3 clarifying questions. Cost of missing: building the wrong thing, requiring rework.
+```
+
+```yaml
+# Acceptable: "unless" with trivially confirmable fact
+description: Invoke unless the change is confirmed to be a wording fix with no effect on trigger conditions, boundaries, or judgment. Cost of unnecessary invocation: brief review pass. Cost of missing: a skill that silently misbehaves or triggers incorrectly.
+```
+
+```yaml
+# Bad: "unless" with impression-based condition
+description: Invoke unless the root cause is already obvious. Cost of...
+# Problem: "already obvious" is an impression formed before investigation
+```
+
+This format forces explicit reasoning about:
+- Observable trigger conditions (not impressions)
+- The actual cost of false positives (usually minor)
+- The actual cost of false negatives (usually major)
+
+When the costs are made explicit, the right default becomes obvious.
+
+**When in doubt, use "when" and move exclusion conditions to the Trigger Logic body** where the agent has already committed to reading the skill.
+
 **"Do not use" conditions in the description are escape hatches — even observable ones.** The description is the first gate. It is evaluated before the agent has invested in understanding the situation, so any exclusion condition placed there faces maximum rationalization pressure with minimum context.
 
 Prefer moving "Do not use" conditions to the Trigger Logic body. In the body, the agent has already committed to reading the skill; the condition becomes part of how the skill reasons rather than a bypass gate.
