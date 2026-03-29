@@ -27,6 +27,7 @@ This skill owns:
 - evaluating failure modes, edge cases, and implicit contracts before writing code
 - deciding whether a local patch is sufficient, a focused structural improvement is warranted, or an explicit pause is needed
 - balancing delivery speed, simplicity, system coherence, and future maintainability
+- **when invoked after `receiving-code-review`**: deciding how accepted review feedback should land without introducing structural damage — the reviewer identified *what* to change, this skill decides *how*
 
 This skill does not own:
 - product clarification from scratch
@@ -34,6 +35,7 @@ This skill does not own:
 - generic task planning
 - unrestricted refactoring beyond what the current change needs
 - final completion or release judgment
+- evaluating whether review feedback should be accepted — that belongs to `receiving-code-review`
 
 
 ## Invariants
@@ -136,6 +138,33 @@ After working through the relevant judgment dimensions, decide the scope of inte
 Use `references/risk-triage.md` when the scope decision is not clear from the judgment dimensions alone. See `examples/patch-vs-structural-improvement.md` for the classic scope decision case.
 
 
+## When Invoked After Receiving Code Review
+
+When this skill is invoked from `receiving-code-review` — meaning review feedback has been accepted and the question is now how the change should land — apply additional judgment:
+
+### Implement the reviewer's intent, not their literal suggestion
+
+A reviewer may correctly identify a problem but suggest the wrong fix. When the feedback is "this validation should be centralized," the reviewer's intent is eliminating scattered validation — not necessarily the specific refactoring they proposed. Find the implementation that addresses the reviewer's concern while preserving the design integrity of the original code.
+
+### Preserve design integrity under accepted feedback
+
+Accepted review feedback can still damage structure if implemented carelessly. Before writing code:
+1. **Does the accepted change fit within the original design direction?** If yes, implement it as a natural extension. If the accepted change requires altering the design direction, state this explicitly — the design intent shift should be a conscious decision, not a side effect of review response.
+2. **Does the reviewer's suggested implementation location align with where this responsibility should live?** The reviewer may be right about the what (this needs to change) but wrong about the where (it belongs in a different layer than they suggested).
+3. **Are there ripple effects the reviewer didn't anticipate?** A change that looks local in the diff may have contract implications for callers, test changes, or compatibility concerns. Surface these before implementing.
+
+### Don't let review feedback override structural judgment
+
+The fact that a change was suggested by a reviewer does not exempt it from the same structural judgment applied to any other change. All Judgment Dimensions still apply — Abstraction Correctness, Complexity Placement, Failure Mode Awareness, Deletability, Contract Awareness, and Dependency Direction. Review feedback that introduces the wrong abstraction is still the wrong abstraction. Review feedback that scatters complexity is still scattered complexity.
+
+### Scope the response change appropriately
+
+Review feedback sometimes reveals that a larger issue exists than what the reviewer commented on. When implementing accepted feedback:
+- If the fix is truly local, make it local
+- If the feedback exposed a pattern problem, scope the improvement to the immediate vicinity — do not let it expand into a full redesign
+- If the feedback requires a design change that goes beyond the original CL's scope, flag this and get explicit agreement before proceeding
+
+
 ## Self-Correction Signals
 
 Stop and revise when:
@@ -148,6 +177,7 @@ Stop and revise when:
 - you are scattering error handling across layers without a clear owner
 - you are expanding the work into redesign beyond what the change needs
 - you cannot explain how the implementation supports both current intent and future maintainability
+- you are implementing accepted review feedback by copying the reviewer's suggestion literally without applying structural judgment to how it should land
 
 
 ## Self-Check Before Exiting
@@ -156,6 +186,7 @@ Stop and revise when:
 - [ ] Did I follow all invariants (usage evidence over theoretical justification, question existing shapes)?
 - [ ] Did I catch any self-correction signals?
 - [ ] Does the implementation keep responsibilities clear and future changes easier?
+- [ ] If invoked after `receiving-code-review`: did I implement the reviewer's intent (not just their literal words) while preserving design integrity?
 - [ ] Am I exiting because the implementation is genuinely sound, or rationalizing?
 
 **If any check fails, return to the relevant section before exiting.**
