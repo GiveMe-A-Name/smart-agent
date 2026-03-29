@@ -5,9 +5,9 @@ description: Invoke when proceeding without reading the code would require guess
 
 # Codebase Understanding
 
-Build grounded understanding of the code before suggesting implementation — focused on the slice relevant to the current question, not a tour of the whole repository.
+Build grounded, task-relevant understanding of the code before suggesting implementation — focused on the slice that matters to the current question, not a tour of the whole repository.
 
-Use this skill to identify the files and modules that matter, trace how behavior flows through the relevant code, and explain where a change likely belongs. Read the problem-relevant context thoroughly; expand only when a new hypothesis requires it; stop once the answer no longer requires intuition. This skill analyzes code structure; it does not clarify product requirements, create an implementation plan, or decide whether work is complete.
+This skill teaches how to investigate code with purpose: identify the files and modules that matter, trace how behavior flows, discover the patterns and conventions the codebase follows, and explain where a change likely belongs. The result is a grounded understanding with clear separation between what is proven, what is hypothesized, and what is still unknown.
 
 ## Trigger Logic
 
@@ -16,64 +16,165 @@ Use this skill to identify the files and modules that matter, trace how behavior
 **What counts as code evidence**: reading actual source files and tracing behavior. Issue descriptions, PR summaries, bug reports, and user explanations are hypotheses about where the problem is — not evidence of what the code does. A hypothesis that "the problem is in module X" does not confirm scope; it names where to look first.
 
 Use this skill when:
-- the user is asking how part of the codebase works, where behavior is implemented, or where a change should go
-- answering safely requires tracing behavior across multiple files or layers rather than naming one plausible file
-- the question is concrete, but current repository evidence is still too thin to answer confidently
-- a single obvious file or one or two targeted lookups do not ground the answer well enough
-- tracing call flow, comparing nearby patterns, or proving ownership matters before suggesting where work belongs
+- answering safely requires tracing behavior across multiple files or layers
+- the question is concrete, but current repository evidence is too thin to answer confidently
 - proceeding would require guessing about code structure, ownership, or behavior
 
-
-"Two targeted lookups" means at most two tool calls tied to the current hypothesis set — not one lookup per likely location, not repeated checks that only reconfirm the same absence, and not curiosity-driven browsing. If the first lookup already suggests the repo lacks the evidence needed to answer the current premise safely, stop and self-correct rather than broadening the search.
-
-Before deepening repository exploration, distinguish among these cases:
+Before deepening exploration, distinguish among these cases:
 
 - `intent ambiguity`: the request mainly needs clarification or human decisions; repository exploration does not replace that, but it often informs what questions to ask — if codebase evidence is thin, explore first, then clarify
-- `repo-fact gap`: the question is concrete, but repository evidence is missing; use this skill only if limited targeted lookups still do not ground the answer
-- `already answerable`: you have already run targeted lookups that produced concrete, sufficient code evidence — not intuition or prior knowledge about the codebase; do not invoke this skill
+- `repo-fact gap`: the question is concrete, but repository evidence is missing; use this skill
+- `already answerable`: you have already run targeted lookups that produced concrete, sufficient code evidence; do not invoke this skill
 
 ## Boundary
 
 This skill owns:
 - building a task-specific repository slice for the current question
 - tracing enough call flow to ground ownership, behavior, or candidate change points
+- discovering codebase conventions and patterns relevant to the task
 - comparing nearby implementations when local patterns matter
 - stating what is proven, hypothesized, and still unknown
 
 This skill does not own:
 - clarifying product intent, scope, or acceptance criteria
 - writing a change plan or sequencing implementation work
-- final engineering judgment about how a change should be implemented once repository evidence is understood
+- final engineering judgment about how a change should be implemented
 - recommending verification strategy or completion judgment
 
 ## Invariants
 
 - Do not proceed based on assumptions; ground decisions in code evidence
 - Issue descriptions, PR text, and user explanations are hypotheses, not evidence
+- Every search or file read must test a stated hypothesis — not satisfy curiosity
 - Stop once the answer is grounded well enough to avoid intuition
 - **Before exiting this skill, you MUST complete the Self-Check section at the end**
 
-## Core Moves
+## Investigation Techniques
 
-These are understanding moves, not a fixed sequence. Use the ones that help answer the current code-understanding question.
+These are techniques to select from based on the task — not a fixed sequence. Choose the ones that answer the current question most efficiently.
 
-- Anchor on the current question.
-- Identify the current hypothesis before spending lookup budget.
-- Treat the exploration target as a hypothesis, not a confirmed starting point. A file that matches your search is a candidate for where the answer lives — not evidence that you are in the right place. Verify the artifact is the right one to explore before anchoring a slice on it.
-- Build the smallest repository slice that can answer it safely.
-- Trace toward behavior-changing code instead of stopping at facades.
-- Compare nearby patterns when they materially inform the answer.
-- Use a second lookup only when it tests a materially different hypothesis, such as "the first entry-path guess was wrong," rather than repeating the same absence check in another likely place.
-- Stop once the answer is grounded well enough to avoid intuition.
+### Anchor on Entry Points
+
+Start from where behavior begins. Entry points vary by codebase type:
+- **Web apps**: route handlers, API endpoints, middleware chains
+- **CLI tools**: command definitions, argument parsers
+- **Libraries**: exported public API, main module index
+- **Event-driven**: event listeners, message handlers, webhook receivers
+
+From the entry point, trace inward toward where decisions are made and state changes.
+
+### Trace the Delegation Chain
+
+Most entry points delegate to deeper layers. Trace through the layers until you reach code that makes decisions or changes state — not just code that routes or configures.
+
+Recognize and move past these delegation layers quickly:
+- **Facades/wrappers**: re-export, rename, or add minimal logic
+- **Configuration layers**: wire dependencies together but contain no business logic
+- **Middleware/interceptors**: modify context but rarely own core behavior
+- **Adapters**: translate between interfaces without adding decisions
+
+Stop when you reach code that contains conditional logic, data transformations, or state mutations relevant to your question.
+
+### Analyze Consumers (Reverse Tracing)
+
+When you need to understand a piece of code's impact or role, trace who calls it:
+- Use "Find References" / search for function/class name across the codebase
+- Distinguish direct callers from transitive dependents
+- Note whether the code is called from one place (likely safe to change) or many (change requires broader understanding)
+
+This is essential when evaluating whether a candidate change point is the right one — a function called from 15 places carries different risk than one called from 2.
+
+### Discover Patterns and Conventions
+
+Before proposing how to implement something, find how the codebase already does similar things:
+- Search for analogous features (e.g., if adding a new API endpoint, find existing endpoints)
+- Note naming conventions, file organization patterns, error handling approaches
+- Look at how tests are structured for similar functionality
+- Check for shared utilities, base classes, or helper functions that your code should use
+
+Following existing patterns is usually the right default. Deviating should be a conscious, justified decision — not ignorance.
+
+### Read Types, Interfaces, and Schemas
+
+Type definitions, interfaces, and schemas are the fastest way to understand a module's contract without reading every line of implementation:
+- **Typed languages**: interface files, type definitions, abstract classes
+- **API boundaries**: OpenAPI specs, GraphQL schemas, protobuf definitions
+- **Database**: migration files, model definitions, schema files
+- **Config**: config types, environment variable definitions
+
+These tell you what data flows where and what each module promises to its consumers.
+
+### Use Tests as Documentation
+
+Test files often reveal intended behavior more reliably than comments or docs:
+- Test names describe expected behavior in concrete terms
+- Test fixtures show realistic input/output examples
+- Edge case tests reveal boundary conditions the original author considered
+- Missing tests reveal areas of uncertainty or risk
+
+When a module's purpose is unclear, its tests are often the best explanation.
+
+### Consult History When "Why" Matters
+
+When code seems strange, over-engineered, or contradictory, the answer is often in its history:
+- **git blame**: who wrote this line and when — follow to the commit message
+- **Commit messages and PR descriptions**: explain the intent behind a change
+- **Recent change frequency**: files changed often may be unstable or central
+- **Large refactoring commits**: reveal architectural decisions and migration patterns
+
+Use history to understand design decisions — not to audit code line by line.
+
+### Read Directory Structure for Architecture
+
+Before diving into files, spend a moment understanding how the project is organized:
+- Top-level directories often map to architectural layers or domains
+- `package.json`, `Cargo.toml`, `go.mod`, or equivalent reveal dependencies and project shape
+- Monorepo structures reveal module boundaries
+- Shared/common directories reveal cross-cutting utilities
+
+This gives you a mental map that makes subsequent file-level investigation faster.
+
+## Task-Driven Investigation
+
+Different tasks have different optimal starting points. Choose the strategy that matches the task:
+
+**Fixing a bug:**
+1. Start from the symptom (error message, wrong behavior, failing test)
+2. Search for the symptom in code (error strings, variable names, log messages)
+3. Trace the execution path that produces the symptom
+4. Identify where the actual behavior diverges from expected behavior
+5. Check: are there tests that should have caught this? What do they test?
+
+**Adding a feature:**
+1. Find how similar features are implemented (pattern discovery)
+2. Identify the conventions: file location, naming, registration, testing
+3. Trace the data flow for a similar feature end to end
+4. Identify the extension points where your feature plugs in
+5. Check: what shared utilities or base classes should you use?
+
+**Understanding for refactoring:**
+1. Map the dependency graph of the code in question (who calls what)
+2. Identify all consumers of the code you plan to change
+3. Understand the implicit contracts (what callers assume)
+4. Look for tests that verify the current behavior
+5. Check: is this code called in ways that constrain how it can change?
+
+**Understanding architecture or "how does X work":**
+1. Start from directory structure and entry points
+2. Read types/interfaces to understand module contracts
+3. Trace one concrete request or operation end to end
+4. Note the architectural layers and how they communicate
+5. Check: are there architectural docs, ADRs, or README files that explain intent?
 
 ## Grounded Understanding
 
-You have enough understanding for the current question when, from code evidence, you can do the relevant subset of the following:
+You have enough understanding for the current question when, from code evidence, you can do the relevant subset of:
 
-- explain the repository slice that matters to this question
-- trace enough call flow to answer safely
-- point to concrete evidence for ownership, behavior, conventions, or candidate change points when relevant
-- state the major unknowns that remain
+- explain which files matter and what role each plays (not just list them)
+- trace the call flow relevant to the question
+- point to the conventions the codebase uses for similar work
+- identify the candidate change points with evidence for why they are correct
+- state what remains unknown or unverified
 
 If you still need intuition to bridge the answer, keep investigating.
 
@@ -82,50 +183,50 @@ If you still need intuition to bridge the answer, keep investigating.
 Stop and revise when:
 
 - you are suggesting changes before building a local repository slice
-- you stopped at export, registration, config, or facade layers
+- you stopped at export, registration, config, or facade layers without tracing deeper
 - you listed files without explaining relationships or call flow
 - you are treating guesses about ownership or change placement as facts
-- a negative lookup already supports "missing repo evidence," but you keep searching without a materially different hypothesis
-- your follow-up lookup changes paths or tools but only reconfirms the same absence
+- you skipped pattern discovery — proposing an approach without checking how the codebase already handles similar cases
+- you read implementation details but skipped types/interfaces that would have given you the contract faster
+- you are doing undirected exploration without a hypothesis to test
 - you are drifting into planning or still exploring after the question is already grounded
-- you anchored your slice on a search result without verifying the exploration target is correct — finding a matching file is a hypothesis, not a confirmed destination
+- you anchored your slice on a search result without verifying the exploration target is correct
 
 ## Judgment in Practice
 
+### Example 1: Tracing Behavior
+
 **Task**: "Where does the auth token get validated?"
 
-**Decision 1 — Should I invoke this skill?**
-The question is concrete, but answering it safely requires more than naming a plausible file. I need to trace from request entry toward behavior-changing code and distinguish orchestrators from the real validation point. → Invoke this skill.
+**Investigation strategy**: This requires entry point identification + delegation chain tracing.
 
-**Decision 2 — What is my starting hypothesis?**
-My first hypothesis is that auth validation starts in request middleware. That is only a starting point, not the answer. I need repository evidence.
+1. **Hypothesis**: Auth validation likely starts in request middleware. Search for auth-related middleware.
+2. **First finding**: `middleware/auth.ts` has a `validateToken` call that delegates to `services/token.ts`. This grounds the entry path, but the file delegates — not yet the behavior-changing code.
+3. **Follow the delegation**: Read `services/token.ts` — it performs signature checks and expiry validation. This is the behavior-changing code.
+4. **Result**: `middleware/auth.ts` is the entry point and orchestration layer; `services/token.ts` contains the actual validation logic. Any deeper delegation not directly confirmed stays labeled as hypothesis.
 
-**Decision 3 — First lookup: entry path found. Is that enough?**
-I found `middleware/auth.ts` with a `validateToken` call. This grounds the entry path, but the file appears to delegate the real work. That is useful evidence, not yet the behavior-changing code. → Continue.
+**What this prevents**: Stopping at the first plausible file; treating a function name like `validateToken` as proof of where validation really happens.
 
-**Decision 4 — Second lookup: follow delegation, not curiosity.**
-My next hypothesis is that the delegated module contains the actual validation logic or leads directly to it. I spend the second lookup on the module called by `middleware/auth.ts`, such as `services/token.ts`, because it tests a new hypothesis rather than repeating the same absence check elsewhere.
+### Example 2: Adding a Feature by Pattern Discovery
 
-**Decision 5 — What counts as enough evidence?**
-If `services/token.ts` performs signature checks, expiry checks, or calls a concrete verifier that I actually inspected, I can now point to the real validation path and stop. If it only delegates again and I have not traced into the next layer, I should not present that downstream verifier as proven. I should say the validation path likely continues there, but that final step remains unverified.
+**Task**: "Add a new webhook event type for user deletion"
 
-**Decision 6 — How do I report the result?**
-State the role of each file precisely. For example: `middleware/auth.ts` is the request entry and orchestration layer; `services/token.ts` contains or routes the validation flow; any downstream verifier is only a proven validation point if I actually traced into it. Anything not directly confirmed from code stays labeled as a hypothesis or unknown.
+**Investigation strategy**: This requires pattern discovery + convention tracing.
 
-**What this skill prevents here:**
-- Stopping at the first plausible file and calling it the answer
-- Treating a function name like `validateToken` as proof of where validation really happens
-- Spending more lookups just to reconfirm the same absence in neighboring files
-- Presenting an untraced downstream module as a proven change point
-- Drifting into planning after the repository slice is already grounded
+1. **Find a similar feature**: Search for an existing webhook event type (e.g., `user.created`). Find it defined in `events/user-created.ts`.
+2. **Discover the pattern**: The event type is registered in `events/index.ts`, has a corresponding schema in `schemas/events/`, a handler in `handlers/webhooks/`, and a test in `tests/events/`.
+3. **Trace the convention**: Events follow a naming pattern, use a base class `WebhookEvent`, register through a central registry, and have integration tests that verify delivery.
+4. **Result**: To add `user.deleted`, follow the same pattern: create event definition, add schema, register it, add handler, write tests matching existing test structure. The extension point is the event registry, not the webhook dispatcher.
 
-See `examples/fake-new-hypothesis.md` for a contrast pair showing how a lookup that looks like a new hypothesis can actually just be rechecking the same absence.
+**What this prevents**: Implementing the feature in an ad-hoc way that ignores existing conventions; missing the registration step; putting code in the wrong layer.
+
+See `examples/fake-new-hypothesis.md` for a contrast pair showing how a lookup that looks like a new hypothesis can actually just be rechecking the same absence. See `examples/undirected-vs-task-driven.md` for the difference between curiosity-driven browsing and hypothesis-driven investigation.
 
 ## Self-Check Before Exiting
 
-- [ ] Did I follow all invariants (ground in code evidence, not assumptions)?
+- [ ] Did I ground conclusions in code evidence, not assumptions or prior knowledge?
 - [ ] Did I separate what is proven, hypothesized, and still unknown?
-- [ ] Did I avoid stopping at the first plausible file without verification?
+- [ ] Did I check how the codebase handles similar cases (pattern discovery)?
 - [ ] Am I exiting because understanding is genuinely grounded, or rationalizing?
 
 **If any check fails, return to the relevant section before exiting.**

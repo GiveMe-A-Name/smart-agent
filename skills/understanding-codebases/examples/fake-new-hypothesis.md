@@ -1,7 +1,7 @@
 # Fake New Hypothesis
 
-This contrast pair illustrates the most common misapplication of the two-lookup rule:
-spending a second lookup on a different file but testing the same hypothesis —
+This contrast pair illustrates a common investigation failure:
+spending a follow-up lookup on a different file but testing the same hypothesis —
 "maybe the logic is in a nearby place I haven't checked yet."
 
 ---
