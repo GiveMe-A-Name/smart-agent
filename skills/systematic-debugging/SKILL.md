@@ -5,31 +5,25 @@ description: Use before changing any code when something is broken or behaving u
 
 # Systematic Debugging
 
-Random fixes waste time and create new bugs. Every bug has a root cause — find it, then fix it once.
+Debugging is an inverse problem: you observe effects and must infer causes. This skill equips you with the mental models, principles, and judgment to find root causes — not a fixed procedure to follow step by step. Assess the situation, choose the right thinking tool, and adapt as evidence emerges.
 
 ## Trigger Logic
 
-**Invocation default**: Skipping structured debugging when something is broken leads to symptom fixes that mask root causes and create new failures. The cost of unnecessary debugging steps is minor overhead. The cost of missing them is a fix that doesn't hold — or hides the real problem. Invoke this skill before changing any code in response to a failure or unexpected behavior.
+**Invocation default**: The cost of unnecessary debugging is minor overhead. The cost of skipping it is a fix that doesn't hold or hides the real problem. Invoke before changing any code in response to a failure or unexpected behavior.
 
-Use this skill when:
+Use when:
 - something is broken or behaving unexpectedly and the fix is not yet known
 - a bug was reported but the root cause has not been established
 - proceeding without investigation would require guessing what to change
 
-Do not use this skill when:
+Do not use when:
 - the work is a feature or refactor with no current failure
-
-**Entry point**: If a concrete failure is already visible, start with Ownership Diagnosis. If no visible failure exists yet, start with Investigation.
 
 ## Capability Boundary
 
-This skill owns the full debugging cycle: from a visible failure or reported bug to a single verified fix.
+This skill owns the full debugging cycle: from a visible failure to a single verified fix. It does NOT own architectural changes — 3+ fix failures that keep exposing new coupling is an escalation signal, not a scope expansion.
 
-It does NOT:
-- Claim the fix is complete without running verification
-- Own architectural changes — 3+ fix failures that keep exposing new coupling is an escalation signal, not a scope expansion for this skill
-
-## Invariants
+## The Invariant
 
 ```
 NO FIXES WITHOUT ROOT CAUSE FIRST
@@ -37,87 +31,147 @@ NO FIXES WITHOUT ROOT CAUSE FIRST
 
 Root cause means you can state: *"The bug is at [specific location] because [mechanism], which produces [symptom]."*
 
-Naming a symptom is not a root cause. Naming a hypothesis is not a root cause. Root cause requires evidence.
+The test: can you predict what will happen if you make a specific change? If yes, you have a root cause. If no, you have a hypothesis — keep investigating.
 
-**Before exiting this skill, you MUST complete the Self-Check section at the end.**
+**Before exiting this skill, you MUST complete the Self-Check at the end.**
 
-## Ownership Diagnosis
+---
 
-When a concrete failure is already visible, determine which layer owns it before hypothesizing or editing.
+## Mental Models
 
-**Restate the failure in specific terms.** Not "the test fails" — but what value was expected, what was received, and at which assertion.
+These are your thinking tools. Each one is a lens for seeing a bug differently. You don't use them in order — you reach for whichever one fits the situation.
 
-**Separate the symptom site from the owning layer.** The file or line where the error surfaces is where the symptom appears, not necessarily where the behavior should change. A stack trace points to the symptom site; ownership requires tracing the behavior back to its source.
+### Debugging Is a Search Problem
 
-**Check the four competing explanations before blaming the implementation:**
-- **Expectation**: is the assertion itself wrong — testing for the wrong thing?
-- **Fixture**: is the test setup producing bad input or state?
-- **Environment**: is something outside the code (config, timing, dependencies) causing this?
-- **Implementation**: is the production code actually wrong?
+A bug is one broken thing among thousands of working things. Every action you take should eliminate possibilities. If an action doesn't shrink the search space, it's wasted.
 
-**Stay anchored to the visible failure path.** Do not broaden to repository mapping until the visible failure path is exhausted. If broader ownership analysis is required, name it explicitly rather than pretending local diagnosis is still enough.
+The expert debugger asks: *"What's the fastest experiment I can run that eliminates the most remaining possibilities?"* — not *"What might be wrong?"*
 
-## Enough Grounding to Edit
+When the search space is large, use **divide and conquer**: split it in half, test which half contains the bug, discard the other, repeat. This gives logarithmic convergence — even in a million-line codebase, ~20 well-chosen binary splits find the bug.
 
-Editing is grounded enough to begin when:
-- the current failure can be restated clearly
-- there is a plausible owning layer backed by evidence rather than proximity
-- the main competing explanations have been compared rather than skipped
-- the remaining unknowns are explicit and do not make the edit blind
+Ways to split:
+- **Through code**: checkpoint halfway through execution. Data correct at midpoint? Bug is in the second half.
+- **Through time**: `git bisect`. "Worked Tuesday, broken now" → bisect finds the exact breaking commit.
+- **Through components**: in layered systems (UI → API → Service → DB), check data at each boundary. Bug lives between the last correct boundary and the first incorrect one.
+- **Through input**: some inputs trigger it, others don't. Bisect the input space — which field, which value range?
 
-Do not start editing when the likely owner is still just the nearest file, when the failure could still belong to expectation or fixture logic, or when the unknowns are large enough that any edit would be guesswork.
+### Observation Over Theory
 
-## Investigation
+*"Quit thinking and look."* — Agans
 
-**Read error messages completely.**
-Don't stop at the first line. Identify: the error type, the full stack trace, the first frame in your own code (not library internals), and any data values in the message. "What the error says" and "where in your code it originated" are different questions — answer both before moving on.
+The natural impulse is to theorize immediately. Resist it. Observation first, theory second. Theories formed without data are usually wrong — and worse, they anchor you to a false explanation.
 
-**Reproduce before hypothesizing.**
-If you cannot reproduce the failure consistently, you do not understand it yet. Run the failing thing in isolation. If it passes in isolation but fails in a full suite, use `find-polluter.sh`. Gather more data before theorizing.
+What observation looks like in practice:
+- Read the **full** error message. Not just the first line — the type, the full stack trace, the first frame in *your* code, the data values. "What the error says" and "where in your code it originated" are different questions.
+- **Print the actual value.** Don't assume you know what a variable is. The thing you're most sure about ("that can't be null here") is often exactly what's wrong.
+- **Instrument at boundaries.** In multi-component systems, add logging at each boundary, run once, read where data breaks. One instrumented run costs less than three wrong hypotheses.
+- **Find a working example** of the same pattern and diff it against the broken case. List every difference, however small.
 
-**Check recent changes before theorizing.**
-Most bugs are caused by recent changes. Before forming a hypothesis: `git log --oneline -20`, check recent dep or config changes. "What changed?" is faster and more reliable than "what could be wrong?"
+### Symptom Site ≠ Owning Layer
 
-**In multi-component systems, instrument at every boundary first.**
-When failure could be in any layer, do not guess which layer. Add logging at each component boundary, run once, and read where data breaks. One instrumented run costs less than three wrong hypotheses.
+The file or line where the error surfaces is where the symptom appears, not necessarily where the fix belongs. A stack trace points to the symptom site; the owning layer requires tracing the behavior back to its source.
 
-**Find a working example and read it completely.**
-When a similar pattern exists in the codebase, find one that works and diff it against the broken case. List every difference between working and broken, however small. Do not assume a difference is irrelevant before testing it.
+When you see an error at `file.ts:42`, your first question is NOT "what's wrong at line 42?" — it's *"what put the system in a state where line 42 fails?"* The answer often lives in a completely different file, layer, or even repository.
 
-## Hypothesis Discipline
+Before accepting the stack-trace location as the bug:
+- **Expectation wrong?** Is the assertion itself testing for the wrong thing?
+- **Fixture wrong?** Is the test setup producing bad input or state?
+- **Environment wrong?** Is something outside the code (config, timing, deps) causing this?
+- **Implementation wrong?** Is the production code actually at fault?
 
-Form one hypothesis at a time, stated explicitly: *"I think X is the root cause because Y."*
+Check all four before committing to one.
 
-Test with the smallest possible change — one variable at a time. If the hypothesis is wrong, form a new one from the evidence, not on top of the failed fix.
+### Causal Chain Depth
 
-## Architecture Escalation
+Every surface cause has a deeper cause. The depth at which you fix determines whether the bug class recurs or just this one instance.
 
-If 3 or more fix attempts each fail and each reveals a new coupling problem in a different place, stop. This pattern — each fix exposes a new symptom elsewhere — means the design is structurally wrong. Surface this to your human partner before attempting another fix.
+Use the **5 Whys** to trace the chain:
+
+1. Why did the API return 500? → Database query threw an exception.
+2. Why did the query throw? → It received a null parameter.
+3. Why was the parameter null? → The upstream service omitted it.
+4. Why did upstream omit it? → The field was renamed in a migration but not in the serializer.
+5. Why wasn't the serializer updated? → Migration and serializer are in different repos with no shared contract.
+
+The fix at level 1 (null check) is a band-aid. The fix at level 5 (shared contract + test) eliminates the entire class of bug. Every time you think you've found the cause, ask one more "why."
+
+### Reproduction as Understanding
+
+If you can't make the bug happen on demand, you don't understand it yet.
+
+- **Consistent reproduction** means you've identified the triggering conditions.
+- **Minimizing the reproduction** reveals what the bug depends on. If a 1000-line test triggers it, can a 10-line test? Each piece you remove and the bug survives tells you what the bug does NOT depend on. A truly small reproduction often makes the cause obvious.
+- **Fast reproduction** enables rapid iteration. If each attempt takes 3 minutes, invest time upfront to make it take 10 seconds. This pays for itself within a few cycles.
+- **Intermittent failures** mean there's an uncontrolled variable — timing, ordering, external state. That variable IS the bug. Find it.
+
+---
+
+## Principles
+
+These always hold, regardless of which mental model you're using.
+
+1. **Evidence before action.** No editing until you can restate the failure in specific terms and point to evidence for which layer owns it.
+2. **One variable at a time.** Change one thing per experiment. If you change three things and it works, you don't know which fixed it — and the other two may have introduced new bugs.
+3. **Keep an audit trail.** Write down what you tried, in what order, what happened. When you're 2 hours in, you won't remember minute 15. Any detail could be the important one.
+4. **Fix at the source.** The root cause tells you where to fix. If you fix at the symptom site, you're papering over the problem.
+5. **Verify with the failing test.** Not "I think it should work" — run it. If there's no test, write one.
+6. **If you didn't fix it, it ain't fixed.** If the bug disappeared and you don't know why, it will come back. Understand what changed.
+7. **Check the plug.** Before diving deep, rule out the boring causes: stale build, wrong branch, wrong file, bad config, wrong environment, cached artifact. These account for a surprising percentage of "bugs."
+
+---
+
+## Judgment: Reading the Situation
+
+This is the hard part — knowing which tool to reach for. Here's how experienced engineers read the situation:
+
+| What you're seeing | What it suggests | Reach for |
+|---|---|---|
+| Clear error message pointing to a specific location | May be a direct hit, but verify — could be symptom site, not owner | **Symptom site ≠ Owning layer** — trace backward before editing |
+| "It used to work" / something changed recently | Likely a regression | `git log`, `git bisect` — **divide and conquer through time** |
+| Fails in full suite, passes in isolation | Test pollution or ordering dependency | `find-polluter.sh`, bisection — **reproduction** |
+| Intermittent / flaky | Uncontrolled variable: timing, state, ordering | **Reproduction** — find the variable, see `condition-based-waiting.md` |
+| Multi-component system, unclear which layer | Need to isolate the broken layer | **Observation** — instrument boundaries, check data at each crossing |
+| You've formed a theory but haven't tested it | Risk of confirmation bias | **Search problem** — design an experiment that could DISPROVE your theory |
+| 2+ failed hypotheses, feeling stuck | Assumptions may be wrong | **Check the plug**, question assumptions, get a fresh view — explain the problem aloud |
+| Each fix exposes a new failure elsewhere | Structural/design problem, not a single bug | **Architecture escalation** — surface to human partner |
+| Error deep in a call stack, unclear origin | Need to trace backward to the original trigger | **Causal chain depth** + `root-cause-tracing.md` |
+| Fix worked but you want it to stay fixed | Need to prevent the bug class, not just this instance | **Causal chain depth** + `defense-in-depth.md` |
+
+**The meta-skill**: after each action, ask *"Did this shrink my search space?"* If not, change approach. Don't repeat the same type of action hoping for a different result.
+
+---
+
+## Cognitive Traps
+
+These are what actually make debugging hard. Technical complexity is secondary — psychology is primary.
+
+| Trap | How it manifests | Countermeasure |
+|---|---|---|
+| **Confirmation bias** | You see evidence for your theory, ignore evidence against it | Actively try to DISPROVE your hypothesis, not prove it |
+| **Anchoring** | You fixate on your first theory and bend all evidence to fit | After 2 failed experiments on the same theory, force yourself to generate 3 alternative explanations |
+| **Proximity bias** | You blame the nearest code to the stack trace | Explicitly ask: "Is the symptom site the owning layer? What evidence do I have?" |
+| **Sunk cost** | You keep a failing approach because you already invested hours | Time spent is gone. Ask: "What's the fastest path from HERE?" not "How do I salvage what I've done?" |
+| **Availability bias** | You assume it's the same kind of bug you saw last week | Similar symptoms can have completely different causes. Check the evidence for THIS bug |
+| **Assumption blindness** | You're certain something is true without verifying | The thing you're most confident about is often wrong. Print it. Check it. Verify. |
+| **Theory-before-data** | You jump to "I bet it's X" before observing | Force yourself to state 3 observations before forming any hypothesis |
+
+---
 
 ## Failure Signals
 
-Stop and return to investigation if you catch yourself:
+Stop and reassess if you catch yourself doing any of these:
 
 | Signal | What it means | What to do |
 |---|---|---|
-| Editing before restating the exact failure | Diagnosis is still implicit | Restate the failure in specific terms first |
-| Picked the stack-trace file as owner without proof | Symptom site and owning layer are mixed | Re-trace the failure path to the behavior source |
-| Assumed the test is wrong or the code is wrong without checking alternatives | Competing explanations were skipped | Check expectation, fixture, and environment before blaming implementation |
-| Broadening to repository mapping before exhausting the visible failure path | Escalated too early | Stay anchored to the visible failure path first |
-| Exhausted the visible failure path but still cannot identify the likely owner | Local diagnosis is insufficient | State explicitly what broader ownership analysis is needed |
-| Proposing a fix before naming a diagnosis or root cause with evidence | Patching symptoms | Finish diagnosis and confirm root cause first |
-| Weakening assertions or increasing timeouts to move on | Hiding the symptom | Keep the assertion; find the cause |
-| Diagnosis sounds like generic caution or early speculation rather than evidence | The skill did not change behavior | Restate which specific failure evidence grounds each claim |
-| Saying "it's probably X, let me try that" | Hypothesis without evidence | State the evidence that supports the hypothesis before testing |
-| Making multiple changes at once | Can't isolate what fixed it | One variable at a time |
-| Planning to verify manually instead of running the failing test | Verification is weak | Run the test |
-| Adapting a reference pattern without reading it fully | Copying without understanding | Read the working example completely before using it |
-| On fix attempt 3+ without questioning the architecture | Fix loop is masking a design problem | Escalate to architecture review |
-
-**If your human partner says:**
-- *"Is that not happening?"* — you assumed without verifying
-- *"Will it show us...?"* — you skipped adding evidence-gathering
-- *"Stop guessing"* — you proposed a fix without a stated root cause
+| Editing before restating the exact failure | Diagnosis is still implicit | State the failure in specific terms first |
+| Picked the stack-trace file as owner without proof | Symptom site confused with owning layer | Trace the failure path to the behavior source |
+| Skipped competing explanations | Jumped to conclusion | Check expectation, fixture, environment before blaming implementation |
+| Multiple changes at once | Can't isolate what fixed it | Revert. One variable at a time. |
+| Weakening assertions or increasing timeouts | Hiding the symptom, not finding the cause | Keep the assertion; find the cause |
+| "It's probably X, let me try that" | Hypothesis without evidence | State the evidence first |
+| Fix attempt 3+ without questioning architecture | Fix loop masking a design problem | Escalate |
+| "I don't know why it works now, but it does" | Accidental fix, not understood | Find out why. If you didn't fix it deliberately, it will regress |
+| Adapting a reference pattern without reading it fully | Copying without understanding | Read the working example completely first |
 
 ## Supporting Techniques
 
@@ -128,17 +182,19 @@ Stop and return to investigation if you catch yourself:
 
 ## Examples
 
-See `examples/symptom-vs-root-cause.md` for annotated before/after showing how to distinguish a symptom from a root cause — the most common place to stop too early.
+See `examples/symptom-vs-root-cause.md` — the most common place to stop too early.
 
-See `examples/symptom-vs-owning-layer.md` for a contrast pair showing how a stack-trace line can be the symptom site without being the owning layer.
+See `examples/symptom-vs-owning-layer.md` — how a stack-trace line can be the symptom site without being the owning layer.
 
-See `examples/fixture-bypass-detection.md` for a contrast pair showing how bypass information can appear to be acknowledged while still being set aside in favor of stack-trace evidence.
+See `examples/fixture-bypass-detection.md` — how bypass information can appear acknowledged while being set aside.
 
 ## Self-Check Before Exiting
 
 - [ ] Did I establish root cause with evidence (not just a hypothesis)?
 - [ ] Can I state: "The bug is at [location] because [mechanism], which produces [symptom]"?
-- [ ] Did I verify the fix actually resolves the root cause?
-- [ ] Am I exiting because the bug is genuinely fixed and verified, or rationalizing?
+- [ ] Could I predict the fix outcome before running it?
+- [ ] Did I verify the fix resolves the original failure?
+- [ ] Did I check for the bug's relatives (same pattern elsewhere)?
+- [ ] Am I exiting because the bug is genuinely fixed, or rationalizing?
 
-**If any check fails, return to the relevant section before exiting.**
+**If any check fails, return to the relevant mental model before exiting.**
