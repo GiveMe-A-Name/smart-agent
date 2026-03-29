@@ -61,9 +61,7 @@ What remains is too thin to guide any real decision.
 ```markdown
 ---
 name: fix-github-issue
-description: Use when the task is to diagnose and fix a reported GitHub issue,
-including understanding the failure, locating the relevant code, and verifying
-the fix does not regress existing behavior.
+description: "Invoke when the task is to diagnose and fix a reported GitHub issue — understanding the failure, locating the relevant code, and verifying the fix does not regress existing behavior. Cost of unnecessary invocation: brief issue triage. Cost of missing: implementing without understanding the failure, or shipping a fix that breaks existing behavior."
 ---
 
 # Fix GitHub Issue

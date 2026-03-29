@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: Use before changing any code when something is broken or behaving unexpectedly. Invoke by default — skipping structured debugging leads to symptom fixes that hide root causes.
+description: "Invoke when something is broken or behaving unexpectedly and the fix is not yet confirmed. Cost of unnecessary invocation: minor overhead. Cost of missing: a fix that masks the root cause — the bug returns in a different form. When in doubt, invoke before touching any code."
 ---
 
 # Systematic Debugging

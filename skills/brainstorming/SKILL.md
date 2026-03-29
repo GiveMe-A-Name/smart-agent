@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: Invoke before building anything unless a committed spec already exists and execution is the only remaining step. When problem, scope, constraints, tradeoffs, or success criteria are not yet settled, invoke. When uncertain whether a spec is complete, invoke.
+description: "Invoke when a feature, product change, workflow, or new component is being considered and no committed spec exists. Cost of unnecessary invocation: a short design conversation. Cost of missing: building the wrong thing — wrong interfaces, missing constraints, structure that must be undone. When uncertain whether a spec exists or is complete, invoke."
 ---
 
 # Brainstorming Ideas Into Designs
@@ -26,8 +26,8 @@ Common signals:
 - They want to start building something new in an existing codebase, but the shape of the change is not yet agreed
 
 Do not use this skill when:
-- a committed spec already exists and the remaining work is execution, not design
-- the question has no design decisions — it is a factual lookup or a minor clarification with nothing to resolve about shape, scope, or approach
+- a committed spec already exists, the approach and interfaces are decided, and the remaining step is writing code against that spec
+- the question is a factual lookup or a clarification with no decisions to make about shape, scope, tradeoffs, or approach
 
 ## Capability Boundary
 

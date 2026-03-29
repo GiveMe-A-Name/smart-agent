@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Invoke when the task is to evaluate code changes for correctness, quality, and production readiness — local working-tree diffs or remote PRs. Do not use when review feedback already exists and the task is deciding how to respond to it, or for reviewing non-code artifacts.
+description: "Invoke when code changes exist — local diff, staged changes, or a remote PR — and the task is to evaluate them. Cost of unnecessary invocation: a short review pass. Cost of missing: bugs in production, or false safety from an incomplete review."
 ---
 
 # Code Review
@@ -17,8 +17,8 @@ Use when:
 - user asks to "review", "check", or "audit" code changes
 
 Do not use when:
-- review feedback already exists and the task is deciding what to implement, challenge, or clarify — that is a feedback evaluation task, not a code review
-- the task is planning, implementing, or debugging — this skill evaluates finished work, not work in progress
+- review feedback already exists and the next step is deciding what to implement, challenge, or clarify — that is `receiving-code-review`, not a code review
+- no diff or changed code exists to evaluate yet — if you are writing code, invoke this skill after the code exists
 
 ## Capability Boundary
 

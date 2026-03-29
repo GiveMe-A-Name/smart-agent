@@ -123,4 +123,5 @@ Before finalizing any skill's trigger conditions, verify:
 - [ ] Is there a "default warm-up" condition that gives blanket permission to skip? (remove)
 - [ ] Do redirect conditions say "do X first, then return here" rather than just "do not use"?
 - [ ] Are specific skill names hardcoded in redirect conditions? (replace with principle descriptions)
-- [ ] Does the frontmatter description reflect Direction 3 — "invoke unless confirmed otherwise" rather than "use when substantial enough"?
+- [ ] Does the description use "when" as the trigger? (prefer "when" over "unless" — see `description-patterns.md`)
+- [ ] Are any "Do not use" conditions placed in the description? If so, move them to the Trigger Logic body.

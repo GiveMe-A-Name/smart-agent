@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Invoke before writing any implementation code unless the work is confirmed to be pure configuration, type declarations, or explicitly throwaway exploration with no production intent. When a feature, bugfix, refactor, or behavior change is about to be coded, invoke. When uncertain whether tests are needed, invoke.
+description: "Invoke before writing any implementation code for a feature, bugfix, refactor, or behavior change. Cost of unnecessary invocation: a short judgment pass. Cost of missing: untested code, silent regressions, and design problems discovered too late to fix cheaply. When uncertain whether the work has testable behavior, invoke."
 ---
 
 # Test-Driven Development

@@ -1,6 +1,6 @@
 ---
 name: writing-plans
-description: Invoke before any implementation unless you are executing an already-committed plan with no remaining decisions. Covers all sizes — even a Tiny plan (prose note + file path + verification) prevents mid-implementation surprises. When uncertain whether a plan exists or is complete, invoke.
+description: "Invoke before implementing any change when you cannot immediately state the files involved, what specifically changes, and how to verify it. Cost of unnecessary invocation: a prose note or short task list. Cost of missing: mid-implementation surprises, wasted work from missing dependencies, or a codebase left in a broken state. When uncertain whether a sufficient plan exists, invoke."
 ---
 
 # Writing Plans

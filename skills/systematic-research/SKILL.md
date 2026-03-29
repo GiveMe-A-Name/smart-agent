@@ -1,6 +1,6 @@
 ---
 name: systematic-research
-description: "Invoke when the task requires gathering, evaluating, or synthesizing information from outside the local codebase and current context. Invoke by default when external evidence is needed — the cost of skipping is conclusions built on unverified assumptions."
+description: "Invoke when the task requires information from outside the local codebase — documentation, APIs, library behavior, external systems, or current state of the world. Cost of unnecessary invocation: a short framing pass. Cost of missing: conclusions that sound authoritative but rest on unverified assumptions or stale knowledge. When in doubt, invoke."
 ---
 
 # Systematic Research

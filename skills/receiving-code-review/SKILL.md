@@ -1,6 +1,6 @@
 ---
 name: receiving-code-review
-description: Invoke when review feedback exists and the next step is deciding what to implement, challenge, or clarify before changing code. The feedback source does not matter. Do not use for requesting or performing a review, ordinary implementation with no review feedback, or applying feedback that has already been accepted without further evaluation.
+description: "Invoke when review feedback exists — PR comments, inline annotations, or user-pasted suggestions — and the task is deciding what to do with it before touching code. Cost of unnecessary invocation: a short verification pass. Cost of missing: blind compliance with technically wrong suggestions, or structural damage from uncritically applied feedback."
 ---
 
 # Receiving Code Review

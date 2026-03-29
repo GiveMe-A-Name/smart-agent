@@ -1,6 +1,6 @@
 ---
 name: implementation-judgment
-description: Use before writing any code to decide how to land the change — not just where. Knowing the change point does not answer whether the approach is right. Invoke unless the work is purely mechanical with no behavioral or structural implications.
+description: "Invoke before writing any code once the change point is identified. Knowing where to change does not answer whether the approach is right. Cost of unnecessary invocation: a few extra reasoning steps. Cost of missing: a patch that weakens structure, moves responsibility to the wrong layer, or locks in a wrong abstraction — often invisibly."
 ---
 
 # Implementation Judgment
@@ -11,7 +11,7 @@ This skill applies engineering judgment to code changes — not just locating wh
 
 ## Trigger Logic
 
-**Invocation default**: The trigger state is simple: code is about to be written. The cost of an unnecessary invocation is a few extra reasoning steps. The cost of a missed invocation is a patch that weakens structure, moves responsibility into the wrong layer, introduces a subtle failure mode, or locks in a wrong abstraction — often invisibly. Invoke unless the work is purely mechanical with no behavioral effect.
+**Invocation default**: The trigger state is simple: code is about to be written. The cost of an unnecessary invocation is a few extra reasoning steps. The cost of a missed invocation is a patch that weakens structure, moves responsibility into the wrong layer, introduces a subtle failure mode, or locks in a wrong abstraction — often invisibly. Invoke before writing code. The only exception is when the change has zero behavioral effect: a rename with no logic change, a file move, or a comment fix — observable facts, not impressions.
 
 **Knowing where to change is not the same as knowing how.** Having a plan, a root cause, or a change point identified answers the first question. Whether the approach is the right one — given tradeoffs, failure modes, and what the current code is protecting — is a separate question. Prior investigation, planning, or root-cause analysis does not substitute for this judgment — they ground it.
 

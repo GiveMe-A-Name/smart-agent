@@ -1,19 +1,25 @@
 ---
 name: using-skill-first
-description: Use once per session, before the first action is taken, to establish the habit of checking for applicable skills before every action.
+description: "Invoke at the start of every session and before every distinct action. Skills encode hard-won engineering judgment — skipping the check discards available guidance and forces the agent to reinvent what the skill already knows. Cost of unnecessary invocation: a brief lookup. Cost of missing: every action taken without the experience the skill would have provided."
 ---
 
-# Using Skill First
+# Using Skills First
 
 Check for applicable skills before every action — before each distinct step, including each item in a todo list.
 
 ## Trigger Logic
 
-**Invocation default**: Invoke once per session, before the first action is taken. Once invoked, the discipline applies for the entire session. Do not re-invoke mid-conversation.
+**Invocation default**: Invoke once at the start of each session, before the first action is taken. Once invoked, the discipline applies for the entire session. Do not re-invoke mid-conversation.
 
-If the conversation begins with discussion or questions and no action is required, do not invoke this skill yet — wait until the first action is about to be taken.
+If the conversation begins with discussion or questions and no action is required, do not invoke yet — wait until the first action is about to be taken.
 
-The cost of an unnecessary invocation is a brief check. The cost of skipping is taking action without available guidance that could change the approach.
+The cost of an unnecessary check is a brief lookup. The cost of skipping is taking action without guidance that could change the approach — and that guidance loss compounds across every subsequent step.
+
+## Why This Matters
+
+Skills encode judgment that took time to develop: what questions to ask before building, how to find root causes instead of symptoms, when to write the test before the code. When an agent skips the skill check, that accumulated experience is discarded. The agent reinvents reasoning the skill already provides — or worse, skips the reasoning entirely.
+
+The most common failure is not "I checked and chose the wrong skill." It is "I started writing code / investigating / planning without checking at all."
 
 ## The 1% Rule
 
@@ -31,32 +37,31 @@ Listing todos is itself an action. Executing each todo is a separate action. Bot
 
 ## Skill Assessment Framework
 
-Before any action, systematically assess applicable skills using this framework.
+Before any action, systematically assess applicable skills.
 
 ### For models with thinking mode:
 
 **In your thinking process:**
-1. **State the action** - What am I about to do? What is the goal?
-2. **List potentially applicable skills** - Even 1% chance counts. Go through the available skill list.
-3. **For each potentially applicable skill, evaluate**:
-   - Does the trigger condition match the current state?
-   - Am I certain it doesn't apply, or just assuming based on impression?
-   - What's the cost of invoking vs missing?
-4. **Make decision**: invoke, skip (with observable reasoning), or uncertain (default to invoke)
+1. **State the action** — What am I about to do? What is the goal?
+2. **Go through the available skill list** — For each skill, read its description. Even a 1% match counts.
+3. **For each potentially applicable skill, evaluate**: does the trigger condition match the current state? Am I certain it doesn't apply, or just assuming based on impression?
+4. **Make decision**: invoke, skip (with stated observable reasoning), or uncertain (default: invoke)
 
 **In your response:**
 - If invoking skill(s) → proceed directly (skill invocation is visible to user)
 - If skipping a skill that might seem applicable (>10% chance) → briefly state why in observable terms
-- If uncertain → output the assessment and ask for guidance
+- If uncertain → default to invoking
 
 ### For models without thinking mode:
 
 Before any action, briefly assess:
 1. What action am I taking?
-2. Which skills might apply (1% rule)?
-3. For each: invoke or skip (state reasoning if skipping seemingly applicable skills)
+2. Which skills might apply? Go through the skill list, check each description against what you're about to do. Apply the 1% rule.
+3. For each: invoke or skip (state reasoning if skipping a seemingly applicable skill)
 
-**Key principle**: When uncertain, default to invoking. The cost asymmetry favors false positives over false negatives.
+**Key principle**: A skill's description IS its trigger criterion. Read it against the current action — don't reason from memory about what the skill "is for."
+
+When uncertain, default to invoking. The cost asymmetry favors false positives over false negatives.
 
 ## Capability Boundary
 
@@ -74,12 +79,15 @@ These thoughts indicate a skill check is being skipped. Stop and check if you re
 | "I know what to do for this step" | Knowing what to do ≠ knowing the best way to do it |
 | "I'll do this first, then check if needed" | The skill check must happen before the action, not after |
 | "This is just a discussion, no task yet" | If an action is about to happen, this skill must be invoked first |
+| "No skill in the list covers this exactly" | Read each description against the action — adjacent descriptions often apply |
+| "I've used this pattern before, I don't need guidance" | Familiarity ≠ having the best approach; skills encode more than common patterns |
 
 ## Invariants
 
 - Skill check precedes every action — not after, not during
 - Listing a todo list does not substitute for checking skills before each todo
 - The 1% rule has no exceptions for urgency, simplicity, or familiarity
+- The check is against the available skill list, not memory of what skills exist
 
 ## Failure Signals
 

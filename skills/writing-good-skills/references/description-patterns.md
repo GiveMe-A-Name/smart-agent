@@ -39,14 +39,14 @@ Think of it as label text on the drawer, not the tool inside the drawer.
 Example:
 
 ```yaml
-description: Use when creating or substantially revising a reusable skill package whose trigger wording, boundary, invariants, examples, or support-file split need structural judgment. Do not use for isolated wording tweaks, obvious local edits, or plain project documentation.
+description: "Invoke when creating or modifying a SKILL.md, or when a skill is triggering at the wrong time, teaching the wrong thing, or behaving differently than expected. Cost of unnecessary invocation: brief structural review. Cost of missing: a skill that silently misbehaves while appearing well-formed."
 ```
 
 Why it works:
-- it describes use conditions
-- it names realistic contexts
-- it does not tempt the agent to skip the body
-- it supports capability-first discovery instead of process-first shorthand
+- it describes the observable states that trigger loading — not what steps the skill performs
+- it names concrete contexts an agent can recognize before loading the skill
+- cost asymmetry makes the default obvious: the risk of skipping is high, the cost of loading is low
+- no "Do not use" in the description — exclusions (e.g., "not for wording-only tweaks") belong in the Trigger Logic body, where the agent has already committed to reading the skill
 
 ## What Discovery Copy Must Not Do
 
@@ -104,19 +104,19 @@ Check these when reviewing a description:
 
 A strong description expresses the **invocation default** — the direction in which uncertainty resolves.
 
-Most skills should lean toward invoking. Express this directly in the description:
+Most skills should lean toward invoking. State the cost asymmetry directly to make the default obvious:
 
 ```yaml
-# Direction-3 pattern: "invoke unless confirmed otherwise"
-description: Use before writing any code. Do not use only when a complete plan already exists and execution is the only remaining step.
+# Strong: positive "when" trigger with cost asymmetry
+description: "Invoke before writing any code. Cost of unnecessary invocation: brief situation assessment. Cost of missing: starting without knowing files, scope, or dependencies — discovered mid-implementation when work must be redone."
 ```
 
 ```yaml
-# Weak pattern: "use when substantial enough" (shifts burden to AI to judge)
+# Weak: burden shifted to AI to judge what "substantial" means
 description: Use when the work is substantial enough to need a plan.
 ```
 
-The first form makes the default explicit. The second leaves it to the AI to judge what "substantial enough" means — which is exactly the judgment the skill is meant to provide.
+The first form makes the default obvious from the costs. The second leaves "substantial enough" for the AI to judge — exactly the judgment the skill is meant to provide.
 
 ### Recommended Format Template
 
@@ -128,25 +128,28 @@ description: "Invoke [when/unless] [observable condition]. Cost of unnecessary i
 
 **Quote the description when it contains colons.** YAML treats an unquoted `: ` as a key-value separator, which breaks frontmatter parsing in tools like `npx skills`. Wrap the entire description in double quotes whenever it contains `Cost of unnecessary invocation:` or any other `: ` sequence.
 
-**Important: Prefer "when" over "unless" in descriptions.** The "unless" form introduces a "Do not use" condition at the first gate, where rationalization pressure is highest. Only use "unless" when the exclusion condition is trivially confirmable from facts that exist independently of the current task — not assessments made before investigation.
+**Important: Prefer "when" over "unless" in descriptions.** The "unless" form introduces a "Do not use" condition at the first gate, where rationalization pressure is highest. Only use "unless" when the exclusion condition is a fully external, verifiable fact — not an assessment made about the current task.
 
 Examples:
 
 ```yaml
-# Preferred: positive trigger with "when"
+# Best: positive "when" trigger with cost asymmetry — no exclusion in description
 description: "Invoke when requirements are unclear or stakeholders have conflicting needs. Cost of unnecessary invocation: 2-3 clarifying questions. Cost of missing: building the wrong thing, requiring rework."
 ```
 
 ```yaml
-# Acceptable: "unless" with trivially confirmable fact
-description: "Invoke unless the change is confirmed to be a wording fix with no effect on trigger conditions, boundaries, or judgment. Cost of unnecessary invocation: brief review pass. Cost of missing: a skill that silently misbehaves or triggers incorrectly."
+# Last resort — "unless" with a fully external, independently verifiable fact
+# (A file either exists at the path or it does not. No task-specific judgment required.)
+description: "Invoke unless a completed plan document already exists at docs/plans/ for this task. Cost of unnecessary invocation: brief review. Cost of missing: starting without known files, scope, or dependencies."
 ```
 
 ```yaml
-# Bad: "unless" with impression-based condition
+# Bad: impression-based condition — requires assessing the current task before loading
 description: "Invoke unless the root cause is already obvious. Cost of..."
-# Problem: "already obvious" is an impression formed before investigation
+# Problem: "already obvious" is formed before investigation — exactly when the skill is most needed
 ```
+
+The middle form ("unless" with external fact) is technically acceptable but rare. In practice: when in doubt, use "when" and move the exclusion to the Trigger Logic body. In the body, the agent has already committed to reading the skill — the condition becomes part of reasoning rather than a bypass gate.
 
 This format forces explicit reasoning about:
 - Observable trigger conditions (not impressions)

@@ -1,6 +1,6 @@
 ---
 name: dispatching-parallel-agents
-description: Invoke when the user wants to split clearly independent work across multiple sub-agents or parallel agents. Do not use for a single bug or when diagnosis, files, state, or dependencies overlap.
+description: "Invoke when multiple tasks are clearly independent — non-overlapping files, no shared state or diagnosis — and parallel execution would meaningfully reduce total time. Cost of unnecessary invocation: a brief independence check. Cost of missing: sequential execution of work that could have completed in parallel."
 ---
 
 # Dispatching Parallel Agents

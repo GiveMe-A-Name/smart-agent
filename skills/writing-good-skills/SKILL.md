@@ -1,6 +1,6 @@
 ---
 name: writing-good-skills
-description: "Invoke whenever a skill is being created, modified, or its behavior is in question unless the change is a confirmed wording fix with no effect on trigger conditions, boundaries, or judgment. Invoke by default — when uncertain whether a skill change affects behavior, invoke."
+description: "Invoke when creating a skill, modifying a SKILL.md, or when a skill's behavior diverges from expectations. Cost of unnecessary invocation: a brief structural review. Cost of missing: a skill that silently triggers at the wrong time, encodes routing instead of capability, or teaches the wrong behavior while appearing complete. When uncertain whether a change affects trigger conditions or boundaries, invoke."
 ---
 
 # Writing Good Skills
