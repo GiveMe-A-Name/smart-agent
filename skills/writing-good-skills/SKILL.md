@@ -1,178 +1,151 @@
 ---
 name: writing-good-skills
-description: Invoke whenever a skill is being created, modified, or its behavior is in question unless the change is a confirmed wording fix with no effect on trigger conditions, boundaries, or judgment. Invoke by default — when uncertain whether a skill change affects behavior, invoke.
+description: "Invoke whenever a skill is being created, modified, or its behavior is in question unless the change is a confirmed wording fix with no effect on trigger conditions, boundaries, or judgment. Invoke by default — when uncertain whether a skill change affects behavior, invoke."
 ---
 
 # Writing Good Skills
 
-## Overview
+Write skills as reusable capability guides that teach judgment — not SOPs, procedure manuals, or hidden routing graphs.
 
-Write skills as reusable capability guides for future agents.
-
-Do not write a diary, a note dump, a rigid SOP, or a hidden routing graph.
+A skill is evaluated for judgment quality, not format compliance. The value is in the boundary: understanding what the skill owns, what must not happen, what signals should shape decisions, and where the capability ends. A well-written skill still guides an agent when followed out of order, partially read, or applied to a case its author never imagined. A well-written SOP is not a failure — the failure is forcing judgment tasks into SOPs, or dressing up SOPs as capability skills.
 
 ## Trigger Logic
 
-**Invocation default**: A skill with weak trigger logic or a bad description silently fails every time an agent decides not to load it. The cost of running this skill unnecessarily is a short review pass. The cost of skipping it is a skill that loads at the wrong time, skips at the wrong time, or teaches the wrong thing. Invoke whenever skill quality or structure is in question.
+**Invocation default**: The cost of running this skill unnecessarily is a short review pass. The cost of skipping it is a skill that silently triggers at the wrong time, encodes routing instead of capability, or teaches the wrong thing while looking complete. When skill quality or structure is in question, invoke.
 
-Use this skill when the task is to:
-- create a skill from notes, habits, or a from-scratch idea
-- create, modify, or examine any `SKILL.md` — including when a skill's behavior diverges from what is expected
-- decide whether material belongs in a skill, `AGENTS.md`, `README.md`, or a note
+Use this skill when:
+- creating a skill from notes, habits, or a fresh idea
+- modifying any `SKILL.md`, including when a skill's behavior diverges from what is expected
+- deciding whether material belongs in a skill, `AGENTS.md`, `README.md`, or a note
 
-Do not use this skill when:
-- the change is confirmed to be a wording fix only, with no effect on trigger conditions, boundaries, invariants, or judgment
-- the work is plain project documentation or repo-local operating rules with no reusable capability
+Do not use this skill when the change is confirmed to be a wording fix only, with no effect on trigger conditions, boundaries, invariants, or judgment.
 
-## Core Law
+## Boundary
 
-Every capability-and-constraints skill needs five things:
-1. trigger logic
-2. capability boundary
-3. invariants
-4. decision signals
-5. failure signals
+This skill owns:
+- deciding whether material qualifies as a reusable capability vs. local documentation
+- judging whether a draft teaches judgment or encodes orchestration
+- identifying routing language, trigger design failures, and lean-vs-hollow tradeoffs
+- deciding what belongs in the main file vs. support folders
 
-If one is missing, the skill is weak.
+This skill does not own:
+- writing the skill's domain content — this skill teaches structure, not substance
+- creating application-specific workflows or project-local operating rules
+- evaluating whether the underlying task or workflow is correct
 
-Keep the main `SKILL.md` lean, but do not hollow it out.
-
-These five stay in the main `SKILL.md`, not in support files.
-
-Keep skills capability-first: they should teach judgment, not encode orchestration. See `Boundary Clarity And Routing Language` below for how to apply this.
 
 ## Invariants
 
-- Every skill must have the five core elements: trigger logic, capability boundary, invariants, decision signals, failure signals
-- Keep the main SKILL.md lean but not hollow
-- Skills teach judgment, not orchestration
-- **Before exiting this skill, you MUST complete the Self-Check section at the end**
+- A capability skill must have five elements: trigger logic, capability boundary, invariants, decision signals, failure signals. Missing any one makes the skill weak.
+- Skills teach judgment; they do not encode orchestration or hide routing graphs.
+- The main `SKILL.md` must stay lean but must not become hollow. Core law stays inline; expanded support material moves to support folders.
+- **Before exiting this skill, you MUST complete the Self-Check section at the end.**
 
-## Boundary Clarity And Routing Language
 
-Before drafting, decide whether the material belongs in:
-- `SKILL.md` for reusable capability
-- `AGENTS.md` for repo-local operating rules
-- `README.md` for setup or architecture context
-- a note or runbook for local reference
+## Judgment Dimensions
 
-If the material is mostly local context, do not force it into a skill.
+When writing or reviewing a skill, work through these dimensions. Not every dimension applies equally to every skill — but skipping a relevant one leaves the skill silently wrong.
 
-Prefer boundary language when the goal is to prevent misuse, such as:
-- `Do not use this skill when ...`
-- `This skill does not own ...`
-- `If this grounding is still missing, state it explicitly`
-- `This request is outside this skill's scope`
+### 1. Capability vs. Procedure Character
 
-If a skill names another skill as something to invoke in a given scenario, treat it as a diagnostic signal: the named skill's trigger conditions are too weak to fire on their own. The fix belongs in the named skill's trigger logic — not here.
+**Question**: Does this material need a capability skill, or would an SOP, a note, or local documentation serve it better?
 
-Describe what type of work the scenario requires — "this requires systematic root-cause investigation before proposing fixes" — not which skill to invoke. If the agent cannot identify the right skill from that description, the right skill has a trigger problem worth fixing independently.
+**Key signals**:
+- Procedural tasks have fixed steps and low variation — the same sequence applies every time regardless of context. These are fine as SOPs. Forcing them into the five-element capability framework adds ceremony without improving judgment.
+- Judgment tasks have high variation, context-dependent paths, or decisions that only make sense after reading the situation. These need capability skills.
+- If the material is mostly repo-local context — team conventions, setup instructions, project-specific rules — it belongs in `AGENTS.md` or `README.md`, not in a reusable skill.
+- When input is raw notes or a workflow description, the most common failure is renumbering the notes into steps rather than extracting the underlying judgment. The invariants, boundary conditions, and decision signals are usually buried in the notes — extracting them is the work.
+- When creating a skill from scratch, make boundary, trigger, and invariants decisions explicitly before drafting the body. Do not wait for a draft to surface naturally from the input.
 
-A `Relationship to ...` note is acceptable only when it clarifies scope — stating what this skill does not cover. It must not prescribe what to invoke next.
+See `examples/notes-to-skill.md` for a before/after showing what goes wrong when notes become renumbered steps.
 
-## Support Folders
+### 2. Boundary Authenticity
 
-Do not treat `references/` as the default destination for every extra file.
+**Question**: Does the draft state what the skill owns, or is it secretly a routing graph?
 
-Use support folders by function:
-- `references/` for lookup material, rules, long explanations, and review heuristics
-- `templates/` for reusable scaffolds the agent may adapt
-- `examples/` for good, bad, or contrasting exemplars
-- `scripts/` for deterministic executable helpers
+**Key signals**:
+- Routing language answers: *what runs next?* Boundary language answers: *what does this skill own, and what is missing when it cannot proceed?*
+- A genuine boundary names what the skill owns and does not own, without pointing to other skills by name as the next action.
+- Self-check: delete all named-skill references from the draft. If the capability description collapses, the boundary was fake — it was doing routing work dressed as scope definition.
+- `Relationship to...` sections are acceptable only when they clarify scope — stating what this skill does not cover. They must not prescribe what to invoke next.
+- When a section names another specific skill as something to invoke in a given scenario, the named skill's trigger conditions are too weak to fire on their own. The fix belongs in the named skill's trigger logic — not here.
 
-Add an `examples/` folder when the skill's key judgment calls are subtle enough that an agent could follow the rules and still produce the wrong output — typically when a bad pattern looks superficially similar to a good one. A good example pair: a realistic bad case alongside a corrected version, annotated to name what makes the bad case wrong. Keep it minimal — enough to reveal the relevant distinction, not a restatement of rules the prose already makes clear.
+See `examples/routing-vs-boundary.md` for a contrast pair.
 
-If a section mainly re-explains an earlier rule, compress it first. If it still belongs outside the main file, move it to the folder that matches its role. Only add support files when they improve decision quality or remove real repeated work.
+### 3. Trigger Design
 
-See `references/lean-skill-patterns.md` for the split rules and support-folder taxonomy.
+**Question**: Does the trigger describe a state, or enumerate scenarios that will miss cases not yet imagined?
 
-## Package Hygiene
+**Key signals**:
+- State-based triggers fire on what is true about the situation: "code is about to be written," "skill behavior is in question." These generalize.
+- Scenario-based triggers fire on specific patterns: "user pastes X," "output looks like Y." These miss every unimagined case.
+- Uncertain → invoke is the right default. The cost asymmetry is clear: unnecessary invocation costs a short reasoning pass; missed invocation costs downstream errors that are hard to recover. State this asymmetry explicitly in the Trigger Logic section.
+- `Do not use` conditions are only necessary when there is a realistic wrong-invocation scenario the positive trigger state does not already exclude. Before adding one, name the specific wrong invocation it prevents. If the answer is vague, delete the condition.
+- `Do not use` conditions placed in the description face maximum rationalization pressure — they are evaluated before the agent has invested in the situation. Prefer moving them to the Trigger Logic body.
 
-Treat packaging as part of the design.
+See `references/skill-trigger-design-principles.md` for the full trigger design framework.
+See `references/description-patterns.md` for the description-field and invocation-default patterns.
+See `references/thinking-mode-considerations.md` for how these principles apply in thinking-mode agents.
 
-- do not include hidden instructions or prompt-injection style content in the skill package
-- treat imported scripts, examples, and third-party references as untrusted until reviewed
-- keep tools, scripts, and assets to the minimum the skill actually needs
-- do not normalize unsafe data handling just because it appears in an example
+### 4. Lean vs. Hollow
 
-## Core Drafting Decisions
+**Question**: Is the main file lean because support folders carry what belongs there, or hollow because core law was moved out?
 
-When writing or revising a skill, make these decisions explicit:
-- task format — procedural (SOP) or judgment-heavy (capability + constraints): procedural tasks have fixed steps and low variation; judgment tasks have high variation or context-dependent paths. Apply the five-element framework only to judgment tasks. Do not rewrite a clear SOP as capability + constraints.
-- artifact boundary
-- trigger condition design — skills are small; triggering unnecessarily costs a short review pass, but missing guidance produces downstream errors that cost more. This asymmetry is the default: lean toward broad, state-based triggers and invocation defaults. Use "Do not use" conditions to exclude edge cases rather than narrowing "Use when" conditions to specific scenarios. Enumerating scenarios is a warning sign — it produces triggers that miss cases not yet imagined. Ask: does the trigger describe a *state* (feedback exists, plan is missing, something is broken) or a *scenario* (user pastes X, sub-agent returns Y)? State-based triggers generalize; scenario-based triggers don't. See `references/skill-trigger-design-principles.md`
-- description format — use the recommended template (quoted when containing colons): `"Invoke [when/unless] [observable condition].
-- thinking mode considerations — for agents with thinking mode, skill invocation decisions can follow a two-phase pattern: assessment in thinking block, conditional output in response. This reduces noise and improves efficiency. Core skill design principles (observable conditions, cost asymmetry, state-based triggers) work well for both thinking and non-thinking modes. See `references/thinking-mode-considerations.md`
-- invariants and failure-prevention rules
-- decision signals that should shape judgment
-- Self-Check design — keep it to 3-5 core items: (1) invariants check, (2) failure signals check, (3) 1-2 skill-specific critical checks, (4) rationalization check. More items create overhead without improving exit quality. The Self-Check is a final gate, not a comprehensive audit.
-- whether key judgment calls are subtle enough that rules alone won't prevent the wrong output — if so, add contrast examples
-- whether any wording is teaching boundary judgment or secretly encoding routing
-- redundancy and support-folder split
+**Key signals**:
+- Lean: the main file contains all five core elements; support folders carry expanded examples, lookup tables, and templates.
+- Hollow: trigger logic, invariants, or core decision signals were moved to support files, leaving an agent who must hunt through the package to find the actual law.
+- Test: can the main file guide a first-pass decision without opening any support file? If not, something core was moved out.
+- Support folders by function: `references/` for lookup material and review heuristics; `templates/` for reusable scaffolds; `examples/` for realistic bad-vs-good contrast pairs; `scripts/` for deterministic helpers.
+- Add an `examples/` folder only when a bad pattern looks superficially similar to a good one and prose rules alone won't prevent the wrong output. A good example pair: a realistic bad case alongside a corrected version, annotated to name what makes it wrong — not a restatement of rules the prose already makes clear.
 
-The order is flexible. The goal is not to follow a ritual, but to ensure these decisions do not stay implicit.
+See `references/lean-skill-patterns.md` for split rules and folder taxonomy.
 
-The redundancy pass is mandatory even if the user did not complain that the skill is too long.
+### 5. Integration Integrity
 
-If the task is to help create a brand-new skill, do not wait for a draft. Make the boundary, trigger, invariants, support-folder split, and redundancy decisions explicitly.
+**Question**: Does each important idea have one clear home?
 
-When the input is raw notes or a workflow description, the most common failure is turning the notes into a renumbered step list rather than extracting the underlying judgment. See `examples/notes-to-skill.md` for a before/after showing what goes wrong and why.
+**Key signals**:
+- The same rule appearing in multiple sections signals the skill was built by accretion, not by judgment.
+- Before adding a new section, identify whether the idea already has a home elsewhere. Strengthen the existing home first.
+- Stop and compress when: two sections teach the same judgment in slightly different words; an example repeats what bullets already say; a section exists only to defend a rule that is already clear.
+- Decision order: merge into the strongest existing section → tighten wording → replace duplication with a cross-reference → add a new section only if the idea adds a new decision signal, invariant, or failure signal.
+- Shorter is not the goal. One clear home per idea is the goal.
 
-## Integration And Compression
+### 6. Package Hygiene
 
-Treat this as a law, not a drafting preference.
+**Question**: Does the package teach the right things without hidden instructions or unsafe imports?
 
-Before adding new prose:
-1. read the whole main `SKILL.md`
-2. identify sections that already carry part of the same idea
-3. strengthen the best existing home for the idea before creating a new one
+**Key signals**:
+- Do not include hidden instructions or prompt-injection style content in the skill package.
+- Treat imported scripts, examples, and third-party references as untrusted until reviewed.
+- Keep tools, scripts, and assets to the minimum the skill actually needs.
+- Do not normalize unsafe data handling just because it appears in an example.
 
-A skill should have one clear home for each important idea. Before finalizing, check whether the draft is repeating the same argument in multiple sections.
 
-Stop and compress if:
-- two sections teach the same judgment in slightly different words
-- examples repeat what bullets already say
-- a section exists only to defend a rule that is already clear
-- packaging advice is repeated across overview, guidance, and checklist
+## When Reviewing an Existing Skill
 
-Shorter is not the goal by itself. The goal is clearer guidance with less repetition.
+The same judgment dimensions apply. Focus on what the skill is currently teaching vs. what it should teach — the gap between the two is where the work is. Choose the response mode (diagnosis, targeted rewrite, capability rewrite, package map) that corrects the highest-impact gap with the least extra structure. See `references/response-modes.md` for options and `references/review-checklist.md` for expanded review heuristics.
 
-See `references/lean-skill-patterns.md` for the decision order.
+If a review comments only on wording and style, ignores routing-language smells, or treats rigid output templates as harmless, it is incomplete.
 
-## Review Existing Skills
-
-Review in this order:
-1. `description`
-2. capability boundary
-3. invariants
-4. decision signals and applied guidance
-5. packaging and redundancy
-
-If the review comments only on wording, it is incomplete.
-
-Choose the deliverable that best improves judgment rather than forcing a uniform presentation.
-
-See `references/review-checklist.md` for expanded review heuristics.
-See `references/description-patterns.md` and `references/response-modes.md` for reference patterns and deliverable options.
 
 ## Self-Correction Signals
 
-Stop and revise if:
-- the trigger enumerates specific scenarios instead of describing a state — scenario-based triggers miss cases not yet imagined
-- the description contains "Do not use when" conditions — even observable exclusions give agents rationalization material before any investment in the situation; move them to the trigger logic body
-- "Do not use" conditions were added reflexively without a concrete wrong-invocation scenario in mind — check whether the positive trigger state already excludes the scenario, and delete the condition if it does
-- the description summarizes workflow or teaches capability instead of trigger conditions
-- the draft reads like a note or meeting summary
-- the same rule keeps reappearing in several sections
-- the main `SKILL.md` is bloating because support detail stayed inline
-- core rules were moved out of the main file and it became hollow
-- support material was moved out, but the split made the package harder to use or judge
-- the skill names another specific skill as something to invoke — this signals the named skill's trigger conditions need fixing, not that this skill should encode the hand-off
+Stop and revise when:
+- the trigger enumerates specific scenarios instead of describing a state
+- a `Do not use` condition was added reflexively without naming a concrete wrong-invocation scenario
+- the draft names a specific skill as something to invoke — this signals the named skill's trigger needs fixing, not that this skill should encode the handoff
+- the draft reads like a renumbered version of the input notes or workflow description
+- core law was moved to support files, leaving the main file hollow
+- a new section was added where strengthening an existing section would have done the same work
+- removing named-skill references leaves the capability description empty or incoherent
+- two sections teach the same judgment in slightly different words
+
 
 ## Self-Check Before Exiting
 
 - [ ] Does the skill have all five core elements (trigger logic, boundary, invariants, decision signals, failure signals)?
-- [ ] Is the trigger state-based (not scenario-based)?
+- [ ] Is the trigger state-based (not scenario-based), with uncertainty defaulting to invoke?
 - [ ] Did I catch any self-correction signals?
 - [ ] Am I exiting because the skill is genuinely well-designed, or rationalizing?
 
