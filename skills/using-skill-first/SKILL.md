@@ -1,6 +1,6 @@
 ---
 name: using-skill-first
-description: "Invoke at the start of every session and before every distinct action. Skills encode hard-won engineering judgment — skipping the check discards available guidance and forces the agent to reinvent what the skill already knows. Cost of unnecessary invocation: a brief lookup. Cost of missing: every action taken without the experience the skill would have provided."
+description: "Invoke once per session, before the first action is taken. Installs the discipline of scanning the skill list before every subsequent action — those scans happen in thinking, not by re-invoking this skill. Cost of unnecessary invocation: a brief lookup. Cost of missing: an entire session of actions taken without checking available guidance."
 ---
 
 # Using Skills First
