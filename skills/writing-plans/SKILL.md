@@ -96,6 +96,28 @@ The thinking above always applies. What changes is how much you write down.
 
 **Large work** (architecture, design decisions, many components): Full decomposition — but detailed only for the near tasks. Identify dependencies, risks, and unknowns. Structure early tasks to resolve the biggest uncertainties. Leave later tasks at goal-level until the early work reveals the real landscape. If the work contains independent subsystems, split into separate plans.
 
+### Think About Estimation and Uncertainty
+
+Estimation is not prediction — it is communication of uncertainty. Great engineers don't produce precise estimates; they produce honest ones with calibrated confidence.
+
+**Confidence intervals over point estimates.** "It will take 3 days" is a guess dressed as a fact. "2-5 days, likely 3, depending on whether the existing API supports batch operations" communicates the same information plus the uncertainty and what drives it. The range tells stakeholders where the risk lives.
+
+**Identify the unknowns that drive the range.** Most tasks have a "fast path" (everything works as expected) and a "slow path" (you discover a complication). Name the specific unknowns that separate the two:
+- "Fast: 2 days if the payment API supports idempotency keys. Slow: 5 days if we need to build our own deduplication."
+- "Fast: 1 day if the existing test harness covers this case. Slow: 3 days if we need to build new test infrastructure."
+
+The unknowns are the valuable part of the estimate — they tell you what to investigate first (risk-first ordering).
+
+**Known unknowns vs. unknown unknowns.** Known unknowns can be named and estimated: "I don't know if the API supports X, but I can find out in 2 hours." Unknown unknowns are the things you don't know you don't know — they appear as surprises mid-implementation. The wider your estimate range should be when:
+- The domain is new to you
+- The code you're changing is complex and poorly tested
+- The feature touches multiple systems you don't control
+- There is no precedent in the codebase for this type of change
+
+**Revise as you learn.** An estimate made at the start of a task should be updated as you learn more. The first task in a plan often reveals information that changes the estimate for later tasks. This is not a failure of estimation — it is the estimation process working correctly. Communicate updated estimates early, not when the deadline has already passed.
+
+**Don't estimate what you can measure.** If the question is "how long does the migration take?" and you can run it on a test dataset, measure it. If the question is "will this approach work?" and you can build a 30-minute spike, spike it. Estimation is for when measurement is too expensive — prefer measurement when it's cheap.
+
 ## Quality Principles (all tiers)
 
 Regardless of size, a usable plan is concrete:
@@ -146,11 +168,8 @@ See `examples.md` in this directory for Tiny / Small / Medium / Large plan examp
 
 ## Self-Check Before Exiting
 
-- [ ] Did I complete the situation assessment (size, nature, current state)?
-- [ ] Did I choose and state a decomposition strategy?
-- [ ] Does every task leave the codebase in a working state (commit point rule)?
-- [ ] Are tasks ordered risk-first (hardest/most uncertain first)?
-- [ ] Is this a vertical slice plan (each task delivers verifiable value)?
+- [ ] Did I complete the situation assessment (size, nature, current state) and state a decomposition strategy?
+- [ ] Is each task a vertical slice (delivers verifiable value, leaves codebase working), ordered risk-first?
 - [ ] Are file paths exact and changes concrete (not vague)?
 - [ ] Did I catch any failure signals (over-planning, under-planning, horizontal slicing)?
 - [ ] Am I exiting because the plan is genuinely complete, or rationalizing?

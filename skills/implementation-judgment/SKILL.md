@@ -128,6 +128,42 @@ See `examples/implicit-contract-break.md` for a case where a "safe" refactoring 
 - When tempted to add a dependency "just for one function," consider the transitive cost: you're also depending on everything that function depends on.
 - If two modules keep needing to change together, they are coupled regardless of whether there is an explicit dependency between them. Consider whether they should be merged or whether a missing abstraction needs to be introduced between them.
 
+### 7. Performance Awareness
+
+**Question**: What is the performance impact of this change? Is the change respecting the performance boundaries of the system?
+
+**Key signals**:
+- Hot path vs cold path: Is this code on a hot path? Changes on hot paths deserve more scrutiny for performance.
+- Algorithmic complexity: Does this change introduce O(n²) or worse complexity where O(n) or O(n log n) was expected? Does it add work inside a loop that could be done outside?
+- I/O on the critical path: Does the change add database queries, network calls, or disk I/O to a path that was previously CPU-only? Every I/O call is a potential latency cliff.
+- N+1 patterns: Does the change query a resource per item in a collection when a batch query would serve? This is the single most common performance regression in database-backed systems.
+- Memory allocation patterns: Does the change create objects in a tight loop, build unbounded collections, or hold references that prevent garbage collection?
+- Caching and memoization: If the same computation is performed repeatedly with the same inputs, should it be cached? Conversely, does a cache introduced here create a stale-data risk that outweighs the performance gain?
+- The premature optimization trap: Not every path needs optimization. If performance impact is speculative, measure before acting. But if the change is on a known hot path or introduces a known anti-pattern (N+1, unbounded collection, blocking I/O in async context), flag it — that is not premature, it is informed.
+
+### 8. Observability and Operability
+
+**Question**: When this code fails in production, will the person debugging it at 3am have the information they need?
+
+**Key signals**:
+- Structured logging: Does the change add, preserve, or degrade logging at key decision points? Log entries should carry enough context (request ID, user ID, relevant identifiers) to reconstruct what happened without reproducing the issue.
+- Error context propagation: When errors cross boundaries (function → caller → API → user), is enough context preserved? An error message that says "operation failed" helps nobody. An error that says "failed to update user 12345: database connection timeout after 30s" enables diagnosis.
+- Metrics and alerting surface: If this change introduces a new failure mode, is there a way to detect it through metrics? A silent failure that accumulates over days is worse than a loud crash.
+- Health checks and readiness signals: If the change affects system readiness (new dependency, new resource requirement), does the health check reflect this?
+- Debuggability under pressure: Could someone unfamiliar with this code, reading only logs and metrics, understand what happened? The audience is a tired on-call engineer, not the original author.
+
+### 9. Security Posture
+
+**Question**: Does this change maintain or improve the system's security posture? What attack surface does it introduce?
+
+**Key signals**:
+- Input validation: Does the change handle untrusted input? All data from external sources (user input, API responses, file contents, environment variables) must be validated before use. Validation should happen at the boundary, not scattered across layers.
+- Authentication and authorization: If the change exposes a new endpoint, route, or data path, are auth checks in place? Check that authorization is enforced at the right layer — not just at the UI, but at the API/service layer.
+- Data exposure: Does the change risk exposing sensitive data in logs, error messages, API responses, or URLs? PII, credentials, tokens, and internal system details should never appear where they shouldn't.
+- Dependency trust: If the change adds a new dependency, what is the trust level? Evaluate the dependency's maintenance status, security history, and the blast radius of a supply-chain compromise.
+- Principle of least privilege: Does the change request only the permissions it needs? Over-privileged code is a larger blast radius when compromised.
+- Cryptographic hygiene: If the change involves encryption, hashing, or token generation, are current algorithms and practices used? Hardcoded secrets, weak hashing (MD5/SHA1 for security), and custom crypto are red flags.
+
 
 ## Scope Decision
 
@@ -157,7 +193,7 @@ Accepted review feedback can still damage structure if implemented carelessly. B
 
 ### Don't let review feedback override structural judgment
 
-The fact that a change was suggested by a reviewer does not exempt it from the same structural judgment applied to any other change. All Judgment Dimensions still apply — Abstraction Correctness, Complexity Placement, Failure Mode Awareness, Deletability, Contract Awareness, and Dependency Direction. Review feedback that introduces the wrong abstraction is still the wrong abstraction. Review feedback that scatters complexity is still scattered complexity.
+The fact that a change was suggested by a reviewer does not exempt it from the same structural judgment applied to any other change. All Judgment Dimensions still apply — Abstraction Correctness, Complexity Placement, Failure Mode Awareness, Deletability, Contract Awareness, Dependency Direction, Performance Awareness, Observability, and Security Posture. Review feedback that introduces the wrong abstraction is still the wrong abstraction. Review feedback that scatters complexity is still scattered complexity.
 
 ### Scope the response change appropriately
 

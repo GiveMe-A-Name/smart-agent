@@ -166,6 +166,54 @@ Run the project's preflight, lint, or test suite when the change is substantial 
 
 ---
 
+## Specialized Review Lenses
+
+Apply these focused lenses when the change touches the relevant domain. They are not checklists to run on every review — they are depth adjustments for high-risk areas.
+
+### Security Review Lens
+
+Apply when the change touches: authentication, authorization, user input handling, data storage, external API integration, cryptography, file uploads, or any code that runs with elevated privileges.
+
+**Input and injection:**
+- Is user input validated at the boundary before being used? Look for SQL injection (string concatenation in queries), XSS (unescaped output in HTML), command injection (user data in shell commands), path traversal (user data in file paths).
+- Are parameterized queries used for all database access? String interpolation in SQL is never acceptable.
+- If the change parses structured input (JSON, XML, YAML), is there protection against oversized payloads, deeply nested structures, or entity expansion attacks?
+
+**Authentication and authorization:**
+- If a new endpoint or data path is added, are both authentication (who are you?) and authorization (are you allowed to do this?) enforced?
+- Is authorization checked at the service/API layer, not just the UI? A missing server-side check means the UI is the only barrier.
+- Are there IDOR (Insecure Direct Object Reference) risks? Can user A access user B's data by guessing or incrementing an ID?
+
+**Data exposure:**
+- Are sensitive fields (passwords, tokens, PII) excluded from logs, error messages, and API responses?
+- If the change adds logging, does it avoid logging request bodies, headers with tokens, or other sensitive data?
+- Are secrets (API keys, passwords, certificates) stored in environment variables or a secrets manager — never in code, config files committed to git, or comments?
+
+**Dependencies:**
+- If a new dependency is added: is it actively maintained? Has it had known security vulnerabilities? What is the blast radius if it is compromised?
+
+### Performance Review Lens
+
+Apply when the change touches: database queries, API endpoints serving user traffic, data processing pipelines, anything on a hot path, or any code that scales with data volume or user count.
+
+**Query and I/O patterns:**
+- Does the change introduce N+1 query patterns (one query per item in a collection instead of a batch query)?
+- Are database queries using appropriate indexes? A missing index on a WHERE clause column becomes a full table scan at scale.
+- Is there I/O inside a loop that could be batched or parallelized?
+- Are connections properly pooled and released? Leaked connections exhaust the pool under load.
+
+**Scaling characteristics:**
+- What is the algorithmic complexity? O(n^2) in a test with 10 items passes; with 100,000 items in production it doesn't.
+- Are collections unbounded? A list that grows with data volume without pagination or limits is a memory time bomb.
+- Does the change degrade gracefully under load, or does it cliff (work fine until a threshold, then catastrophic failure)?
+
+**Resource management:**
+- Are large objects or streams properly closed/disposed after use?
+- If caching is introduced, what is the eviction strategy? Unbounded caches are memory leaks with latency benefits.
+- Are timeouts set on all external calls? A missing timeout on an HTTP call means one slow dependency can freeze the entire system.
+
+---
+
 ## Failure Signals
 
 Stop and reassess if:
@@ -203,12 +251,9 @@ See `templates/review-output.md` for the full output structure.
 
 ## Self-Check Before Exiting
 
-- [ ] Did I understand the intent of the change before reviewing the implementation?
-- [ ] Did I ask "should this change exist?" and "is this the right approach?" (Layers 0-1)?
-- [ ] Did I read enough context around each changed function (not just the diff hunks)?
-- [ ] Did I check the callers of changed functions for breakage?
-- [ ] Does every issue have: file:line, what is wrong, why it matters?
-- [ ] Is my severity calibration honest (not inflated, not deflated)?
+- [ ] Did I understand intent and evaluate Layers 0-1 (should this exist? right approach?) before reviewing implementation?
+- [ ] Did I read enough context around each changed function — including callers — not just the diff hunks?
+- [ ] Does every issue have file:line, what is wrong, why it matters — with honest severity calibration?
 - [ ] Did I give a clear verdict (Ready / Not ready / Ready with fixes)?
 - [ ] Am I exiting because the review is genuinely complete, or rationalizing?
 
