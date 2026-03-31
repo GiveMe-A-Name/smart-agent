@@ -100,6 +100,42 @@ Use technical evidence — reference tests, code, or platform constraints. Never
 Ask a specific question. "Can you clarify?" is useless. "Are you suggesting we move validation into the controller layer, or that we add a separate validation middleware? The former changes our error-handling contract with callers." is useful.
 
 
+## Handling Multi-Reviewer Feedback
+
+When feedback comes from multiple reviewers, new failure modes emerge that don't exist with single-reviewer feedback.
+
+### Contradictory suggestions
+
+Reviewer A says "extract this into a service" while Reviewer B says "keep this co-located for simplicity." This is not a vote to be tallied — it is a design disagreement that needs resolution.
+
+**How to handle:**
+- Identify what each reviewer is optimizing for. Often contradictions arise because reviewers have different implicit priorities (performance vs. readability, flexibility vs. simplicity, consistency with area X vs. area Y).
+- Check whether both suggestions address the same concern from different angles, or whether they address different concerns entirely. If the latter, both may be valid and the "contradiction" is an illusion.
+- When the contradiction is genuine: state both positions clearly, explain which one aligns with the design intent and why, and ask for resolution from the reviewers or escalate to the human partner. Do not silently pick one side.
+- Never implement contradictory suggestions in different parts of the same change. Inconsistency within a single PR is worse than either option alone.
+
+### Overlapping feedback
+
+Multiple reviewers flag the same issue, sometimes with different proposed fixes. This is a signal that the problem is real — but you still need to evaluate the proposed fixes independently.
+
+**How to handle:**
+- Acknowledge the convergence (the problem is likely genuine if independently identified).
+- Evaluate each proposed fix on its merits. The first reviewer's fix is not automatically better than the second's.
+- Respond to all threads, even if the fix is the same. Each reviewer should see that their feedback was evaluated.
+
+### Volume management
+
+A PR with 30+ comments from multiple reviewers requires triage, not linear processing.
+
+**Prioritization order:**
+1. **Blocking/Critical issues** — bugs, security, correctness. These must be fixed regardless. Start here.
+2. **Design-level feedback** (Layer 0-1) — suggestions that question whether the change should exist or whether the approach is right. These may invalidate other feedback if accepted, so evaluate them before implementing lower-layer fixes.
+3. **Implementation feedback** (Layer 2-3) — correctness, error handling, test quality. Group related feedback — multiple comments about error handling may be addressed by a single structural fix rather than point-by-point patching.
+4. **Style/preference feedback** — author's call unless a style guide mandates otherwise. Batch these for a final pass.
+
+If design-level feedback is accepted and requires significant rework, state explicitly that lower-layer feedback will be addressed in the reworked code rather than the current version. Don't fix typos in code that's about to be rewritten.
+
+
 ## Response Language
 
 **Correct feedback:** `"Fixed. [what changed]"` — or just fix it in code without comment.
@@ -124,6 +160,9 @@ Stop and reorient if:
 - You are implementing feedback that contradicts the design intent without explicitly acknowledging the intent change and getting confirmation
 - A suggestion is technically wrong but social pressure makes direct pushback feel impossible — state the technical finding anyway. If you genuinely cannot raise it in context, flag it to your human partner with "Strange things are afoot at the Circle K." This is a signal to escalate, not permission to defer.
 - You are about to implement non-trivial structural changes from review feedback without invoking `implementation-judgment` first
+- Two reviewers gave contradictory suggestions and you silently picked one without surfacing the conflict
+- You are processing 20+ comments linearly instead of triaging by severity and layer first
+- You are fixing style issues in code that design-level feedback may require rewriting
 
 
 ## Self-Check Before Exiting
@@ -132,6 +171,7 @@ Stop and reorient if:
 - [ ] Did I distinguish between comments that challenge correctness versus comments that challenge design?
 - [ ] Did I apply evidence (not just arguments) to support my decisions?
 - [ ] Did I follow all invariants (verify before implementing, no performative agreement, clarify all first)?
+- [ ] If multi-reviewer feedback: did I surface contradictions instead of silently resolving them? Did I triage by severity before processing linearly?
 - [ ] Did I catch any failure signals?
 - [ ] Am I exiting because feedback is genuinely evaluated and addressed, or rationalizing?
 

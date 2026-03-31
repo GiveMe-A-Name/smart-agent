@@ -164,6 +164,29 @@ See `examples/implicit-contract-break.md` for a case where a "safe" refactoring 
 - Principle of least privilege: Does the change request only the permissions it needs? Over-privileged code is a larger blast radius when compromised.
 - Cryptographic hygiene: If the change involves encryption, hashing, or token generation, are current algorithms and practices used? Hardcoded secrets, weak hashing (MD5/SHA1 for security), and custom crypto are red flags.
 
+### 10. State Management and Data Integrity
+
+**Question**: Does this change correctly manage shared state? Will state transitions remain consistent under all conditions — including concurrent access, partial failure, and restart?
+
+**Key signals**:
+- **Shared mutable state is the most common source of subtle bugs in refactoring.** When moving code between components, trace every piece of state the code reads or writes. If a refactor splits a function that previously managed state atomically into two functions that now manage it across a boundary, you have created a consistency window that didn't exist before.
+- **Identify the source of truth.** For every piece of state this code touches, there should be exactly one authoritative source. If data is denormalized or cached, the code must handle staleness explicitly — not assume freshness. The judgment: when you see the same data in two places, ask which one wins on conflict and what happens when they disagree.
+- **State transitions should be explicit and enforceable.** If an entity can be in states A, B, C, the valid transitions (A→B, B→C, but not A→C) should be enforced in code, not implied by call ordering. Implicit state machines are where "impossible" states happen. The question is not "does the current code path follow the right order?" but "what prevents a future caller from violating the order?"
+- **Crash recovery determines real data integrity.** If the system fails mid-operation, what state is persisted? Can the system recover automatically, or does recovery require manual intervention? This is especially critical for multi-step operations that modify persistent state. The judgment: any operation that modifies persistent state in multiple steps either needs atomicity (transaction) or idempotent recovery (can be safely re-run).
+- **Local state and remote state will diverge.** When integrating external services, a successful API call followed by a local crash means the remote side has progressed but your system doesn't know. Design for this — idempotency keys, reconciliation jobs, or explicit "pending" states. The question is not "will this happen?" (it will) but "when it happens, does the system self-heal or require manual intervention?"
+- **Schema migrations create a dual-state window.** Any migration that changes schema while the application is running creates a window where old code reads new schema (or vice versa). Ensure migrations are backward-compatible with the currently deployed code, or coordinate deployment order explicitly. This overlaps with Dimension 11 (Migration) — here the concern is the state consistency during the window, not the migration plan itself.
+
+### 11. Migration and Backward Compatibility
+
+**Question**: Does this change require a migration — of data, configuration, API consumers, or deployment sequence? Is the migration safe to run in production?
+
+**Key signals**:
+- Schema migrations that rename or remove columns while the application is running will break queries in the old code. Safe migrations add first, backfill, deploy new code, then remove old columns in a subsequent migration. A single migration that both adds and removes is a production risk.
+- API changes that modify response shapes, remove fields, or change error formats break existing consumers. Even "internal" APIs may have consumers you don't know about — scripts, cron jobs, partner integrations. Treat all API changes as potentially breaking unless proven otherwise.
+- Configuration changes that rename environment variables, change default values, or alter config file structure can break deployments silently. The application starts, but behaves differently in ways that won't surface until a specific code path is hit.
+- Feature flags and gradual rollout reduce blast radius. When the change is risky or affects a large user base, consider a flag that allows rolling back without a deploy.
+- Deployment ordering matters. If this change requires "deploy service A before service B," document that explicitly. Implicit deployment ordering is a deployment outage waiting to happen.
+
 
 ## Scope Decision
 
@@ -174,6 +197,30 @@ After working through the relevant judgment dimensions, decide the scope of inte
 - **Explicit pause**: when you don't yet understand why the code is shaped the way it is, or multiple judgment dimensions point in conflicting directions.
 
 Use `references/risk-triage.md` when the scope decision is not clear from the judgment dimensions alone. See `examples/patch-vs-structural-improvement.md` for the classic scope decision case.
+
+
+## Avoiding Analysis Paralysis
+
+The judgment dimensions above are thinking tools for implementation decisions, not gates that must all be cleared before writing code. This section specifically addresses getting stuck cycling through dimensions during implementation — not general indecision about requirements, design, or whether to start work at all.
+
+**When to stop analyzing dimensions and write code:**
+- If 2-3 dimensions clearly apply and the others are obviously irrelevant to this specific change, stop. A 5-line bug fix does not need formal reasoning through all 11 dimensions.
+- If you've identified one structural concern and can address it with a focused change, act on it. Don't hunt through remaining dimensions to justify a larger scope.
+- If two dimensions point in opposite directions (e.g., "extract for clarity" vs. "keep duplicated for deletability"), pick the one that matches the change's likely evolution — then document the tradeoff in a code comment, not in extended analysis.
+- If you've spent more time reasoning about which dimension applies than the implementation itself would take, the analysis has exceeded its value.
+
+**The test for "enough implementation judgment":** Can you state in one sentence why this approach is the right structural choice for this change? If yes, write the code. If no, either you need more information about the codebase (go read code) or you need to pick the simpler option and move on.
+
+
+## AI Agent Pitfalls
+
+These are failure patterns specific to how AI coding agents operate. They are distinct from the general self-correction signals below because they stem from the nature of LLM reasoning, not from general engineering mistakes.
+
+- **Assumption forcing**: When requirements are ambiguous, the natural tendency is to fill in gaps with plausible-sounding assumptions rather than asking for clarification. This produces code that compiles and looks reasonable but solves a different problem than intended. When requirements leave room for interpretation on functional behavior, ask — don't guess.
+- **Over-abstracting on first pass**: The tendency to introduce abstractions, interfaces, and generic patterns on the first implementation — before any concrete usage exists. A single concrete implementation is almost always better than a speculative abstraction. Write the concrete version first; abstract only when the second or third caller reveals a genuine pattern.
+- **Scope creep through "while I'm here" improvements**: When touching a file, the pull to "fix" adjacent issues — rename a variable, restructure a helper, add a missing type annotation. Each is individually harmless; in aggregate, they make the diff unreadable and the change unreviewable. Stay on task. Note improvements for later; don't bundle them.
+- **Confident hallucination of APIs and behaviors**: Generating code that uses plausible-but-nonexistent APIs, incorrect function signatures, or outdated library interfaces. Always verify external API usage against actual documentation or source code — never rely solely on training-data memory.
+- **Losing track of shared state during refactoring**: When splitting or moving functions across modules, losing track of what state was being read or modified. This is the #1 failure mode identified in research on AI coding agent failures. Before any refactor that moves code across boundaries, explicitly trace every piece of state the code touches.
 
 
 ## When Invoked After Receiving Code Review
@@ -216,14 +263,21 @@ Stop and revise when:
 - you are expanding the work into redesign beyond what the change needs
 - you cannot explain how the implementation supports both current intent and future maintainability
 - you are implementing accepted review feedback by copying the reviewer's suggestion literally without applying structural judgment to how it should land
+- you are introducing an abstraction, interface, or generic pattern without a second concrete caller that demonstrates the need
+- you are making assumptions about requirements rather than surfacing ambiguity
+- you are moving code across module boundaries without tracing every piece of shared state the code reads or writes
+- you are modifying a schema, API response shape, or configuration format without considering the migration path for existing consumers
+- you have worked through 5+ judgment dimensions on a small change without reaching a clear decision — pick the simpler option and move on
 
 
 ## Self-Check Before Exiting
 
-- [ ] Did I work through the relevant judgment dimensions for this change?
+- [ ] Did I work through the relevant judgment dimensions for this change (without over-analyzing irrelevant ones)?
 - [ ] Did I follow all invariants (usage evidence over theoretical justification, question existing shapes)?
 - [ ] Did I catch any self-correction signals?
 - [ ] Does the implementation keep responsibilities clear and future changes easier?
+- [ ] If the change touches shared state: did I trace what is read and written across all affected boundaries?
+- [ ] If the change requires migration (schema, API, config): is the migration path safe for production?
 - [ ] If invoked after `receiving-code-review`: did I implement the reviewer's intent (not just their literal words) while preserving design integrity?
 - [ ] Am I exiting because the implementation is genuinely sound, or rationalizing?
 

@@ -60,7 +60,28 @@ The judgment calls for each phase live in Decision Signals below.
 
 Wait for the user's response before continuing. If they decline, proceed with text-only brainstorming. If they accept, read the detailed guide before proceeding: `skills/brainstorming/references/visual-companion.md`.
 
+**Technical feasibility spike:** Sometimes a design question cannot be answered by discussion alone — it requires writing exploratory code. Recognize when to pause design and spike:
+- An approach depends on a third-party library or API whose behavior is undocumented or ambiguous — write a minimal test to verify the capability before committing the design to it
+- The performance characteristics of an approach are central to the design decision and cannot be estimated from first principles — measure with a prototype
+- The integration between two systems is poorly understood — build the thinnest possible end-to-end connection to validate the seam
+
+A spike is not implementation — it is design validation through code. Set a strict timebox (30 minutes to 2 hours). The spike answers one question. If the spike invalidates the approach, that's a success — you avoided building the wrong thing.
+
+**External research integration:** Design decisions often depend on the capabilities and limitations of third-party libraries, services, or APIs. When evaluating approaches that rely on external dependencies:
+- Verify the dependency actually supports the required capability — do not assume from the name or README alone
+- Check for known limitations, breaking changes, or deprecation signals
+- Consider the maintenance health of the dependency (last release, issue activity, bus factor)
+- If the evaluation requires sustained research across multiple sources, that research work belongs to a separate phase — pause design, gather evidence, then return with facts
+
 **Approach recommendation:** Prefer approaches that meet constraints with minimal dependencies. When options are equivalent in outcome, prefer the simpler one. Lead with your recommendation and reasoning — don't just list options and make the user choose without guidance.
+
+**Structured approach comparison:** When presenting 2-3 approaches, compare them against consistent dimensions so the user can evaluate tradeoffs — not just pick a favorite. The judgment is in choosing which dimensions matter for this specific decision:
+- If the approaches differ primarily in implementation effort, compare complexity and maintenance burden
+- If the approaches differ in risk profile, compare what can go wrong, how likely, and how recoverable
+- If the approaches have different dependency footprints, compare the external coordination and supply-chain implications
+- If reversibility varies between approaches, make that explicit — a decision that is cheap to undo deserves less analysis than one that is permanent
+
+Present as a table when comparing 3+ approaches across 3+ dimensions — the structure prevents approaches from being described in incompatible frames. But a two-sentence comparison of two approaches that differ in one dimension does not need a table.
 
 **Enough questions:** Move to approach proposals when you can answer: what is it for, who uses it, what are the constraints, and what does success look like? If you cannot answer all four after 5–6 questions, move to proposals anyway — missing information is better surfaced through option trade-offs than through more questions.
 
@@ -95,12 +116,17 @@ Stop and reassess if:
 - You have asked more than 5–6 questions without reaching approach proposals (see the "Enough questions" decision signal)
 - The spec review loop has run 3 times without clearing medium/high-risk issues — surface to human, do not loop again
 - The user pushes back on doing a design and wants to go straight to code — hold the HARD-GATE; do not compromise, explain why the design step matters
+- You committed to an approach that depends on unverified third-party behavior — spike first
+- You are comparing approaches but each is described in a different frame, making comparison impossible — use consistent dimensions
+- You are designing around an external dependency without checking whether it actually supports the required capability
 
 ## Self-Check Before Exiting
 
 - [ ] Did I follow all invariants (one question per message, 2-3 approaches, spec committed)?
 - [ ] Did I catch any failure signals?
 - [ ] Did the user approve the committed spec (not just verbal approval)?
+- [ ] Were approaches compared against dimensions chosen for this specific decision (not a generic checklist)?
+- [ ] If the design depends on external libraries/APIs: was feasibility verified (through research or spike)?
 - [ ] Am I exiting because the design is genuinely complete and approved, or rationalizing?
 
 **If any check fails, return to the relevant section before exiting.**

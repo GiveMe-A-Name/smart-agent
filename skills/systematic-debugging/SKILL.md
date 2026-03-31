@@ -136,6 +136,11 @@ This is the hard part — knowing which tool to reach for. Here's how experience
 | Each fix exposes a new failure elsewhere | Structural/design problem, not a single bug | **Architecture escalation** — surface to human partner |
 | Error deep in a call stack, unclear origin | Need to trace backward to the original trigger | **Causal chain depth** + `root-cause-tracing.md` |
 | Fix worked but you want it to stay fixed | Need to prevent the bug class, not just this instance | **Causal chain depth** + `defense-in-depth.md` |
+| Build fails after dependency update | Version conflict or breaking change in dep | **Build debugging** — read changelog between versions, check lock file diff |
+| "Works on my machine" but fails in CI/staging | Environment difference | **Config/environment debugging** — diff runtime versions, env vars, config sources |
+| Code looks correct but behavior is wrong | Configuration, feature flag, or stale artifact | **Config debugging** — print actual resolved config, clean caches, check feature flags |
+| Error message references internal tooling, not your code | Build tool, bundler, or compiler issue | **Build debugging** — read the FIRST error (not last), check toolchain versions |
+| Same code behaves differently for different users | Feature flag, A/B test, permissions, or data-dependent | **Data/state debugging** — check user-specific state, flags, permissions |
 
 **The meta-skill**: after each action, ask *"Did this shrink my search space?"* If not, change approach. Don't repeat the same type of action hoping for a different result.
 
@@ -205,6 +210,47 @@ When the system produces wrong results but doesn't crash, the problem is usually
 - **Schema drift.** When code and database schema evolve independently (especially during migrations), fields can be misinterpreted, default values can change meaning, and null handling can break.
 - **Time-dependent data.** Data that was correct when written may be incorrect now. Timezone handling, expiration logic, and relative-time calculations are common sources of subtle data bugs.
 
+### Build, Dependency, and Tooling Debugging
+
+Build failures and dependency issues are a distinct category — the system doesn't even run, and the error messages often point to tooling internals rather than your code. These require a different mental model than runtime debugging.
+
+**Key heuristics:**
+- **Read the full error, not just the last line.** Build tools often produce cascading errors. The real cause is usually the first error, not the last. Scroll up.
+- **Distinguish between your code errors and toolchain errors.** A type error in your code is fundamentally different from a compilation error in a dependency or a misconfigured build tool. The fix path is completely different for each.
+- **Version conflicts are combinatorial.** When dependency A requires library X v2 and dependency B requires library X v3, the resolution depends on the package manager's strategy. Understand whether your package manager deduplicates, hoists, or isolates. Check lock files — the resolved version may not be what the version range suggests.
+- **"Works on my machine"** almost always means environment difference. Systematically diff: OS version, runtime version, package manager version, installed global tools, environment variables, and lock file state. The difference is the bug.
+- **Stale artifacts cause phantom bugs.** Cached build outputs, stale compiled files, outdated lock files, and docker layer caches all cause situations where the source code is correct but the running artifact is wrong. When debugging makes no sense, clean all caches and rebuild from scratch before investing more time.
+- **Monorepo-specific**: if a build fails after a seemingly unrelated change in another package, check for shared dependencies, build order, and workspace hoisting. The coupling is real even if the packages look independent.
+
+### Configuration and Environment Debugging
+
+When the code is correct but the system behaves wrong, the problem often lives outside the code — in configuration, environment variables, infrastructure, or external service state.
+
+**Key heuristics:**
+- **Print the actual config.** Don't assume the config file you're reading is the one the application loaded. Log the resolved configuration at startup. Environment variables may override file config. Multiple config sources may merge in unexpected order.
+- **Environment variable precedence.** `.env` files, shell exports, Docker Compose env, Kubernetes ConfigMaps, CI/CD variables — these stack and override in platform-specific order. If a variable has the wrong value, trace the entire precedence chain.
+- **Feature flags and A/B tests.** If behavior differs between environments or users, check whether a feature flag or experiment is active. These are invisible to code reading — the same code path executes different behavior based on runtime configuration.
+- **External service state.** If your system integrates with external services, the external service may have changed (API version, rate limits, authentication requirements, data format) without your code changing. Check external service changelogs and status pages before blaming your code.
+- **DNS, SSL, and network.** "Connection refused" and "timeout" often point to infrastructure (DNS resolution, certificate expiry, firewall rules, proxy configuration) rather than code. Check these before debugging application-level networking code.
+
+
+## Knowing When to Escalate or Ask for Help
+
+Debugging has diminishing returns. A key judgment is recognizing when you've exhausted what you can productively do alone and need to escalate.
+
+**Escalate when:**
+- **3+ fix attempts have failed.** If three different fixes based on three different hypotheses have all not resolved the problem, your mental model of the system is likely wrong. You need someone who understands the system better, not more time with the same wrong model.
+- **Each fix exposes a new failure.** This is a structural/coupling problem, not a bug. It requires architectural thinking, not more debugging.
+- **The bug is in someone else's domain.** If the root cause is in a service, library, or subsystem you don't own and don't fully understand, the person who owns it will find the fix faster than you will through exploration.
+- **You can't reproduce it.** After reasonable effort, if you cannot trigger the bug on demand, you need either better observability (logs, traces, metrics from the environment where it does reproduce) or help from someone who has seen it happen.
+- **The blast radius is high.** If the bug is in production and affecting users, the priority shifts from "find the perfect root cause" to "mitigate impact." Rollback, feature flag, or degrade gracefully first. Root cause analysis continues after mitigation.
+
+**How to escalate effectively:**
+- State what you know: the symptom, the evidence gathered, the hypotheses tested, and the results.
+- State what you don't know: which layers you haven't investigated, what you couldn't verify.
+- State what you think the next step is, even if you can't do it yourself.
+- Do not hand off the problem without context. "It's broken" is not an escalation — it's an abdication.
+
 ---
 
 ## Failure Signals
@@ -219,9 +265,12 @@ Stop and reassess if you catch yourself doing any of these:
 | Multiple changes at once | Can't isolate what fixed it | Revert. One variable at a time. |
 | Weakening assertions or increasing timeouts | Hiding the symptom, not finding the cause | Keep the assertion; find the cause |
 | "It's probably X, let me try that" | Hypothesis without evidence | State the evidence first |
-| Fix attempt 3+ without questioning architecture | Fix loop masking a design problem | Escalate |
+| Fix attempt 3+ without questioning architecture | Fix loop masking a design problem | Escalate (see "Knowing When to Escalate") |
 | "I don't know why it works now, but it does" | Accidental fix, not understood | Find out why. If you didn't fix it deliberately, it will regress |
 | Adapting a reference pattern without reading it fully | Copying without understanding | Read the working example completely first |
+| Debugging code when the error points to tooling | Wrong layer — it's a build/config problem | Switch to build/dependency debugging approach |
+| Assuming the config is what you think it is | Config/env assumption | Print/log the actual resolved configuration |
+| Debugging alone for 1+ hour without progress | Diminishing returns | Escalate with what you know, what you tried, and what you think the next step is |
 
 ## Supporting Techniques
 
@@ -245,6 +294,8 @@ See `examples/fixture-bypass-detection.md` — how bypass information can appear
 - [ ] Could I predict the fix outcome before running it?
 - [ ] Did I verify the fix resolves the original failure?
 - [ ] Did I check for the bug's relatives (same pattern elsewhere)?
+- [ ] Did I rule out environment/config/build issues before debugging code logic?
+- [ ] If I spent significant time without progress: did I escalate with context rather than continuing to spin?
 - [ ] Am I exiting because the bug is genuinely fixed, or rationalizing?
 
 **If any check fails, return to the relevant mental model before exiting.**

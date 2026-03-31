@@ -44,6 +44,23 @@ If you cannot write a self-contained prompt, the task is not scoped correctly.
 
 **Verification judgment:** After agents return, do not assume fixes are compatible. Check: did any agents edit the same files? If yes, review those changes for conflicts before running the full suite. Spot-check at least one agent's work — agents can make systematic errors that look correct in isolation.
 
+**Partial failure handling:** When one agent succeeds and another fails, do not treat them as a batch that either all succeeds or all fails. Instead:
+- Assess whether the successful agent's changes are independently valid — can they be committed and verified on their own?
+- If the successful change is independent and correct: keep it. Don't discard good work because a sibling failed.
+- If the successful change depends on the failed agent's work (despite passing the independence test): hold it until the failed task is resolved. The independence test has a false-positive — the tasks were not truly independent.
+- If the failed agent's task invalidates assumptions the successful agent made (e.g., discovered a shared root cause): evaluate whether the successful agent's changes are still correct given the new information.
+- Default to caution: when unsure whether to keep a partial result, hold it and verify before committing.
+
+**Discovery-based cancellation:** Sometimes one agent discovers information that invalidates the premise of another agent's task. When reviewing agent results, check:
+- Did any agent discover a shared root cause that affects other tasks? If one agent found that the config file is corrupt and another is trying to fix symptoms of that corruption, the second agent's work is likely wasted.
+- Did any agent's findings change the understanding of the problem in a way that makes other agents' scopes wrong? If so, the correct response is to stop, reassess, and potentially re-dispatch with updated context.
+- If agents are still running and you receive early results that invalidate other agents' premises, cancel the invalidated agents rather than letting them complete wasted work.
+
+**Budget and timeout awareness:** Parallel agents consume resources. Apply judgment about scale:
+- Dispatch the minimum number of agents needed — 3-4 agents for truly independent tasks is reasonable; 10+ agents suggests the problem hasn't been decomposed properly.
+- For exploratory tasks where scope is uncertain, prefer sequential agents over parallel — the first agent's findings inform the second agent's scope.
+- If an agent is taking significantly longer than expected, that is a signal — the task may be more complex than scoped, or the agent may be stuck. Don't wait indefinitely; check on long-running agents.
+
 ## Invariants
 
 - Each agent gets its own isolated context — never pass session history or "you know what we discussed"
@@ -57,6 +74,9 @@ Stop and reassess if:
 - You are dispatching because the problem is confusing, not because tasks are independent — diagnose first
 - Agent scope is "fix all the tests" or "investigate the system" — too broad; split into one domain per agent
 - You have no plan for integrating results — know how you will verify compatibility before dispatching
+- One agent discovered a root cause that invalidates other agents' tasks, but you are still waiting for them to complete
+- You are dispatching 5+ agents — reassess whether the decomposition is right
+- A partial failure occurred and you are discarding the successful agent's valid work along with the failure
 
 ## Agent Prompt Structure
 
@@ -86,6 +106,8 @@ Return: summary of root cause and what you changed.
 
 - [ ] Did I follow all invariants (isolated context, one agent per domain, passed independence test)?
 - [ ] Did I verify compatibility of results (check for file conflicts)?
+- [ ] If partial failure occurred: did I assess whether successful changes are independently valid?
+- [ ] Did I check whether any agent's findings invalidate other agents' premises?
 - [ ] Did I catch any failure signals?
 - [ ] Am I exiting because parallel dispatch was appropriate and results are integrated, or rationalizing?
 

@@ -23,7 +23,6 @@ Use when:
 
 Do not use when:
 - writing code comments (that is part of implementation judgment)
-- writing commit messages (that is part of the git workflow)
 - the communication is informal and ephemeral (Slack message, verbal discussion)
 
 ## Capability Boundary
@@ -66,6 +65,12 @@ When facing a communication task, use this table to identify which dimensions ne
 | Writing docs that keep going stale | Longevity | Audience Awareness |
 | Document exists but nobody reads it | Structure for Impact | Audience Awareness, Precision |
 | Feedback that document is "too vague" | Precision and Conciseness | Audience Awareness |
+| Writing a PR description | Everyday Technical Writing | Audience Awareness, Precision |
+| Writing commit messages | Everyday Technical Writing | Precision |
+| Writing a README for a module or project | Code Documentation | Audience Awareness, Longevity |
+| Writing API documentation | Code Documentation | Precision, Longevity |
+| Explaining tech debt to non-technical stakeholders | Audience Awareness | Structure for Impact, Precision |
+| Choosing between text and a diagram | Visual Communication | Structure for Impact |
 
 ---
 
@@ -118,7 +123,7 @@ When writing or reviewing a technical document, work through these dimensions. N
 - If a sentence does not help the reader understand, decide, or act, delete it. Context is valuable only when the reader needs it. Background sections that exist because "the reader should know this" rather than "the reader needs this to understand the next section" are padding.
 - If the document is long, ask: is it long because the topic is complex, or because the writing is not tight? Complex topics justify length. Repetition, throat-clearing, and unnecessary context do not.
 
-### 5. Longevity
+### 5. Longevity (for formal documents)
 
 **Question**: Will this document still be useful in 6 months? Should it be?
 
@@ -128,6 +133,40 @@ When writing or reviewing a technical document, work through these dimensions. N
 - If the document references specific versions, dates, people, or system states, mark it as point-in-time or ensure those references will be maintained. "The current architecture" becomes meaningless in 6 months without a date or version.
 - If the document is a proposal (RFC), state its expected lifecycle: does it become an ADR when accepted? Does it become obsolete once implemented? Documents with unclear lifecycles accumulate and confuse.
 - If you're unsure whether the document should be updated or replaced, default to immutable with supersession. It is easier to write a new document with current context than to correctly update an old document without introducing contradictions.
+
+### 6. Code Documentation
+
+**Question**: Does this code documentation help the next developer (or future you) work with this code effectively?
+
+**Key signals**:
+- **README files answer "how do I get started?"** A module or project README must cover: what this is, how to install/set up, how to run/use it, and where to find more. If a developer clones the repo and the README doesn't get them to a running state, it failed its primary job.
+- **API documentation describes the contract, not the implementation.** Document what the function/endpoint does, what inputs it accepts, what outputs it returns, and what errors it can produce. Do not document how it works internally — that changes, and stale internal documentation is worse than none.
+- **CHANGELOG entries are for consumers, not authors.** "Refactored auth module" tells a consumer nothing. "Fixed: OAuth token refresh now correctly handles expired refresh tokens" tells them whether to upgrade. Group by impact (Breaking, Added, Fixed, Deprecated), not by date or commit.
+- **Inline documentation explains why, not what.** The code already says what it does. Comments that restate the code add noise. Comments that explain why a non-obvious approach was chosen, why a seemingly simpler alternative doesn't work, or what business rule drives a condition — those prevent future developers from "fixing" things that aren't broken.
+- **Type signatures and function names are documentation.** A function named `processData` with parameters `a`, `b`, `c` requires documentation. A function named `calculateShippingCost` with parameters `weight_kg`, `destination_zone`, `is_express` documents itself. Prefer self-documenting code; add comments only when the code cannot explain itself.
+
+### 7. Everyday Technical Writing
+
+**Question**: Are my PR descriptions, commit messages, and inline communications helping others understand intent — or creating noise that will be ignored?
+
+**Key signals**:
+- **PR descriptions succeed when they prevent the reviewer from asking "why?"** The diff already shows what changed. The description's job is to provide what the diff cannot: the motivation, the alternatives considered, the risks, and where the reviewer should focus. A PR with no description is not "self-explanatory" — it forces the reviewer to reconstruct intent, which means they review syntax instead of design.
+- **The judgment in PR descriptions is deciding what context the reviewer needs.** A one-line bug fix may need a paragraph explaining the root cause and why this fix is correct. A 500-line feature may need only a summary if it implements an already-approved design doc. Match the description to the reviewer's knowledge gap, not to the diff size.
+- **Commit messages serve two audiences at different times.** Right now, they help reviewers understand the change sequence. In six months, they are the primary artifact `git blame` and `git log` deliver to someone debugging. A commit message that serves neither audience ("fix", "WIP", "address comments") has negative value — it occupies space where useful information should be.
+- **The judgment in commit messages is deciding when one line is enough.** A commit that renames a variable needs only a subject line. A commit that changes retry behavior needs a body explaining why the old behavior was wrong and what the new behavior guarantees. The signal: if someone reading the subject would ask "but why?", add a body.
+- **Linking to context is not bookkeeping — it is knowledge preservation.** Reference the issue/ticket number, the design doc, or the incident that motivated the change. The link costs seconds to add and saves hours when someone needs to understand the decision six months later. A commit with no context trail is a dead end in the investigation chain.
+
+### 8. Visual Communication
+
+**Question**: Would a diagram, table, or visual aid communicate this more effectively than text?
+
+**Key signals**:
+- **Use diagrams for relationships and flows.** System architecture (what connects to what), data flows (how a request traverses services), state machines (valid transitions), and dependency graphs are all cases where a diagram communicates in seconds what paragraphs of text cannot. If you find yourself writing "A calls B, which then calls C, which returns to B, which updates D..." — draw it.
+- **Use tables for comparisons and structured data.** Comparing three approaches across five dimensions? A table is processed in 10 seconds; five paragraphs take 3 minutes. Any time you are comparing options with multiple attributes, default to a table.
+- **Use code examples for behavior.** When explaining how an API works or what a data structure looks like, a concrete example is worth more than an abstract description. Show the input and the output — the reader can generalize.
+- **Keep diagrams simple and purposeful.** A diagram that tries to show everything shows nothing. Each diagram should have one purpose: the architecture overview shows components and connections (not data schemas); the sequence diagram shows interaction order (not error handling). Create multiple focused diagrams rather than one comprehensive one.
+- **Diagrams must be maintainable.** Prefer text-based diagram formats (Mermaid, PlantUML, ASCII) over image files when possible. An image diagram becomes stale because nobody can edit it. A text-based diagram lives next to the code and can be updated with the change. If an image is necessary, document where the source file lives.
+- **Not everything needs a visual.** Simple, linear explanations work fine as text. If the relationship is sequential with no branching or parallelism, a list or paragraph is clearer than a forced diagram. The test: would a reader understand this faster with or without the visual?
 
 ---
 
@@ -144,6 +183,12 @@ Stop and reassess if:
 - you are writing a document that duplicates information already documented elsewhere
 - the document has no update owner and describes a living system
 - you chose a document type out of habit rather than by matching it to the communication need
+- a PR description has no "why" — the reviewer must reconstruct intent from the diff alone
+- commit messages are context-free ("fix", "WIP", "address comments") — git history becomes a dead end
+- a README doesn't get a new developer to a running state
+- API documentation describes implementation internals instead of the contract
+- you are writing paragraphs where a table or diagram would communicate faster
+- an inline comment restates what the code does instead of explaining why
 
 ## Self-Check Before Exiting
 
@@ -152,6 +197,9 @@ Stop and reassess if:
 - [ ] Does the document state its conclusion in the first paragraph and structure for scanning? (Dimension 3)
 - [ ] Is the writing specific and concise — numbers over adjectives, evidence over assertions? (Dimension 4)
 - [ ] Have I addressed whether this document should be updated or treated as immutable? (Dimension 5)
+- [ ] If writing code documentation: does the README enable getting started, do API docs describe the contract, do comments explain why? (Dimension 6)
+- [ ] If writing PR descriptions or commits: is the "why" clear, are issues linked, is the commit history readable? (Dimension 7)
+- [ ] Did I use diagrams or tables where they communicate more effectively than text? (Dimension 8)
 - [ ] Am I exiting because the document is genuinely clear and useful, or rationalizing?
 
 **If any check fails, return to the relevant dimension before exiting.**

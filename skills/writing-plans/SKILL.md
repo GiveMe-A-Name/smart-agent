@@ -118,6 +118,24 @@ The unknowns are the valuable part of the estimate — they tell you what to inv
 
 **Don't estimate what you can measure.** If the question is "how long does the migration take?" and you can run it on a test dataset, measure it. If the question is "will this approach work?" and you can build a 30-minute spike, spike it. Estimation is for when measurement is too expensive — prefer measurement when it's cheap.
 
+### Plan for What Could Go Wrong
+
+Experienced engineers don't just plan the happy path — they think about what happens when their assumptions are wrong.
+
+**Contingency planning ("if approach A fails").** For medium/large work, identify the 1-2 riskiest assumptions in your plan. For each, ask: "If this turns out to be wrong, what do I do?" You don't need a detailed backup plan — just a named alternative and a rough sense of the cost of switching. This prevents the panic-driven pivots that happen when Plan A hits a wall and there's no Plan B.
+
+**Plan revision triggers.** A plan is not a contract — it's a hypothesis about how the work will go. Name the conditions under which the plan should be revised rather than pushed through:
+- A task takes more than 2x its estimate — the remaining estimates are probably wrong too
+- An assumption is disproven (the API doesn't support what you expected, the data shape is different)
+- A new requirement or constraint emerges mid-implementation
+- The first 2-3 tasks reveal the decomposition was wrong — the boundaries are in the wrong places
+
+When a trigger fires, pause execution and revise the plan. Pushing through a plan that no longer matches reality is not discipline — it's stubbornness.
+
+**Cross-boundary coordination.** When the plan touches code owned by others (different modules, different teams, shared interfaces), the plan must identify the coordination points:
+- **Interface agreements before parallel work.** If the plan involves building two sides of an interface (API provider and consumer, library and caller), define the contract first. Building both sides against an unspoken assumption creates rework.
+- **Explicit handoff points.** Where does one piece of work end and another begin? What does "done" look like for the piece you own? If the boundary is ambiguous, name it in the plan — ambiguous boundaries cause duplicate work or gaps.
+
 ## Quality Principles (all tiers)
 
 Regardless of size, a usable plan is concrete:
@@ -150,6 +168,9 @@ After saving to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, offer to execute 
 - No concrete verification step for a complex change
 - Planning a bug fix without knowing the root cause
 - No dependency analysis for work crossing multiple modules
+- No contingency for the riskiest assumption in a medium/large plan
+- No plan revision triggers — the plan assumes everything will go as expected
+- Cross-boundary work with no agreed interfaces or handoff points
 
 **Horizontal slicing** — stop if you catch yourself:
 - All tasks in one layer (e.g., "create all models", "create all endpoints")
@@ -171,6 +192,8 @@ See `examples.md` in this directory for Tiny / Small / Medium / Large plan examp
 - [ ] Did I complete the situation assessment (size, nature, current state) and state a decomposition strategy?
 - [ ] Is each task a vertical slice (delivers verifiable value, leaves codebase working), ordered risk-first?
 - [ ] Are file paths exact and changes concrete (not vague)?
+- [ ] For medium/large work: did I identify contingencies for the riskiest assumptions and define plan revision triggers?
+- [ ] For cross-boundary work: are interfaces agreed and handoffs explicit?
 - [ ] Did I catch any failure signals (over-planning, under-planning, horizontal slicing)?
 - [ ] Am I exiting because the plan is genuinely complete, or rationalizing?
 

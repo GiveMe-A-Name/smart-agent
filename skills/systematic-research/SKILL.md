@@ -102,6 +102,36 @@ Common biases that degrade research quality:
 
 You do not need to formally audit for each bias on every lookup. But when you notice your research feels suspiciously smooth — everything confirming, no contradictions, no surprises — pause and consider whether you are genuinely finding truth or falling into a trap.
 
+### Evaluate AI-Generated Content
+
+AI-generated content (blog posts, StackOverflow answers, documentation, summaries) is now pervasive in search results. It requires specific skepticism beyond general source evaluation.
+
+**Recognition signals:**
+- Confident, fluent prose with no hedging, no "I'm not sure," no acknowledged limitations. Real experts hedge; AI-generated text often doesn't.
+- Correct-sounding but unverifiable claims. The answer reads well but you can't find the primary source it's implicitly citing.
+- Plausible code examples that use incorrect or nonexistent APIs. AI-generated code often looks syntactically valid but references functions, parameters, or behaviors that don't exist in the actual library.
+- Generic advice that could apply to any similar question but doesn't address the specific version, configuration, or context you're asking about.
+
+**Handling:**
+- Never accept an AI-generated code snippet as correct without testing it or verifying against official documentation. Plausible-looking code is the most dangerous form of misinformation because it compiles in your head.
+- When a StackOverflow or blog post answer appears AI-generated, downgrade it to the lowest source tier. It may contain useful keywords or point you toward the right documentation, but treat it as a search hint, not an answer.
+- AI-generated summaries of documentation often lose critical nuance — edge cases, version-specific behavior, caveats. Always check the original documentation when the claim matters.
+
+### When to Stop Researching and Build Instead
+
+Research has diminishing returns. Some questions are better answered by building a small experiment than by reading more.
+
+**Switch from research to prototyping when:**
+- The question is "does this work in practice?" and the documentation says it should but you've found conflicting reports. A 30-minute proof-of-concept answers this faster than another hour of reading.
+- You have two plausible approaches and the tradeoffs are unclear from documentation alone. Build the simplest version of each and measure.
+- The documentation is sparse, outdated, or contradictory, and the library is available locally. Reading the source code or running experiments against it is more reliable than searching for someone else's interpretation.
+- You've found 3+ sources that agree on the general approach but disagree on implementation details (exact API calls, configuration keys, parameter values). The details are best verified by running them.
+
+**Stay in research when:**
+- The question is about design direction, architecture, or tradeoff evaluation. You can't prototype "should we use a message queue vs direct API calls" in 30 minutes — you need to understand the tradeoffs first.
+- The risk of getting it wrong is high (security, data integrity, compliance). Prototyping in these domains without sufficient background research is dangerous.
+- You haven't yet formed a hypothesis. Prototyping without a thesis is just random experimentation.
+
 ## Invariants
 
 - Decompose the question before searching — a vague question produces vague results
@@ -131,6 +161,34 @@ You do not need to formally audit for each bias on every lookup. But when you no
 
 **When to distrust your own knowledge:** Always, for factual claims about versions, APIs, configuration, compatibility, or anything that changes over time. Internal knowledge is useful for framing questions and generating hypotheses, but external verification is required before presenting such claims as facts.
 
+## Common Research Patterns
+
+These are recurring research scenarios in software engineering. Each has a distinct completeness standard and common pitfalls.
+
+### "Which library/tool should we use?"
+
+**Decompose into:** What problem are we solving? What are the top 3-5 options? For each: maintenance health, community size, security history, API quality, performance characteristics, license. What are the known failure modes or limitations?
+
+**Completeness standard:** Major options covered with sourced tradeoffs. At least one authoritative source per option (official docs, maintainer posts). At least one critical/negative review per top candidate (guard against survivorship bias).
+
+**Common pitfall:** Evaluating libraries by their README quality or GitHub stars. Stars measure popularity, not quality. README quality measures marketing, not reliability.
+
+### "How do I implement X with library Y?"
+
+**Decompose into:** What does the official documentation say? What version am I using? Are there known issues or breaking changes in recent versions? What do working examples in the library's own test suite or examples folder show?
+
+**Completeness standard:** Verified against official docs for the specific version. If the official docs are insufficient, check the library's GitHub issues and discussions for the specific use case.
+
+**Common pitfall:** Following a blog tutorial written for version 2.x when you're on version 4.x. Always check the publication date and target version of any tutorial or guide.
+
+### "What's the best practice for X?"
+
+**Decompose into:** Best practice according to whom? In what context? What tradeoffs does this "best practice" make, and are those tradeoffs appropriate for our situation?
+
+**Completeness standard:** At least two independent sources that agree, with at least one explaining the reasoning behind the practice (not just stating it). If the "best practice" involves a tradeoff, both sides of the tradeoff should be represented.
+
+**Common pitfall:** Treating a practice as universal when it's context-dependent. "Always use an ORM" is not a best practice — it's a recommendation for certain contexts with specific tradeoffs.
+
 ## Failure Signals
 
 Stop and revise when:
@@ -145,6 +203,9 @@ Stop and revise when:
 - You stopped at the first plausible answer without checking for alternatives or edge cases
 - You kept searching after all sub-questions had evidence-backed answers (over-research wastes context)
 - You are presenting your internal knowledge as researched fact without external verification
+- You accepted an AI-generated code snippet or API example without testing or verifying against official documentation
+- You have been researching an implementation question for 30+ minutes when a 10-minute prototype would answer it definitively
+- You are evaluating a library by its GitHub stars, README aesthetics, or a single glowing blog post instead of maintenance health, issue response time, and security history
 
 ## Self-Check Before Exiting
 
@@ -152,6 +213,8 @@ Stop and revise when:
 - [ ] Did I cross-validate critical claims across independent sources?
 - [ ] Did I actively search for disconfirming evidence, not just confirming evidence?
 - [ ] Does each conclusion's confidence match the quality and independence of its supporting evidence?
+- [ ] Did I evaluate AI-generated content with appropriate skepticism (verified code examples, checked original docs)?
+- [ ] If an implementation question: did I consider whether a prototype would be faster than more research?
 - [ ] Am I stopping because the question is genuinely answered, or rationalizing early closure?
 
 **If any check fails, return to the relevant section before exiting.**

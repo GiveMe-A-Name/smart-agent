@@ -57,6 +57,8 @@ Before working through judgment dimensions, identify what you're looking at. Thi
 | Code that will be owned by a different team or on-call rotation | Dimension 4 (Production Readiness) | If someone else debugs it, everything must be externally visible. |
 | Log statements being added or modified | Dimension 1 (Observability) | Structured? Sufficient context? Right level? Not leaking sensitive data? |
 | Performance-sensitive path (hot loop, high-QPS endpoint) | Dimension 1 (Observability), Dimension 2 (Resilience) | Metrics for load, backpressure for overload. |
+| Service startup/shutdown logic, signal handlers | Dimension 5 (Graceful Lifecycle) | Connections must drain, in-flight work must complete. |
+| New cloud resource provisioning, usage-based service integration | Dimension 6 (Cost Awareness) | New resources need cost tagging and projected-scale estimation from the start. |
 
 ---
 
@@ -73,7 +75,8 @@ Work through the relevant dimensions for the code change. Not every dimension ap
 - **Log levels that mean something.** ERROR for things that need human attention. WARN for degraded-but-functioning. INFO for significant business events. DEBUG for development only. If everything is ERROR, nothing is — alert fatigue kills operability.
 - **Context propagation through the call chain.** Request IDs, trace IDs, and business identifiers must flow through every layer and appear in every related log entry. If a request touches 3 services and you can't correlate the logs, you can't debug it.
 - **Metrics on request rate, error rate, and latency distribution.** For request-driven code, instrument rate, errors, and duration (histograms, not averages — a P50 of 100ms with a P99 of 10s hides behind a 200ms average). For resource-intensive code, instrument utilization and saturation.
-- **Trace instrumentation at service boundaries.** Incoming requests, outgoing calls, database queries, queue operations. If a request traverses multiple services, the trace must follow it. Sample intelligently — always trace errors and slow requests.
+- **Trace instrumentation at service boundaries.** Incoming requests, outgoing calls, database queries, queue operations. If a request traverses multiple services, the trace must follow it. Sample intelligently — always trace errors and slow requests. In distributed systems, traces are not optional supplementary data — they are the primary tool for understanding request latency and failure. Ensure: trace context propagates across service boundaries (HTTP headers, message metadata), spans are created for each meaningful operation (not just service entry/exit), and span attributes carry enough context (operation name, key parameters, status) to diagnose issues without correlating with logs.
+- **The three pillars work together.** Logs tell you what happened at a specific point. Metrics tell you how the system is behaving in aggregate. Traces tell you how a single request flowed through the system. A trace ID in every log entry connects the three — without this link, you have three isolated data sources instead of a coherent observability system.
 - **Sensitive data never in logs.** Passwords, tokens, PII, API keys, credit card numbers. If you see these in log statements, stop.
 - **Cardinality safety in metric labels.** A metric label with unbounded values (user ID, request path with embedded IDs) will overwhelm the metrics system. Labels must have bounded cardinality.
 
@@ -90,6 +93,8 @@ Work through the relevant dimensions for the code change. Not every dimension ap
 - **Backpressure under overload.** When the system receives more load than it can handle, does it shed load deliberately (429/503) or accept everything and fail randomly? Queues must be bounded — an unbounded queue is a memory leak. Backpressure should be applied close to the edge.
 
 ### 3. Deployment Safety — "Can this be deployed and rolled back safely?"
+
+**Perspective**: This dimension evaluates deployment safety from the **operator's perspective** — can the person deploying and operating this system do so safely? The question is whether production will survive the deployment, not whether the migration logic is correct (that is implementation judgment) or whether the reviewer should have caught it (that is code review).
 
 **Question**: If this deployment causes a problem in production, can you revert to the previous version within minutes? What irreversible changes does this deployment make, and how are they protected?
 
@@ -112,6 +117,28 @@ Work through the relevant dimensions for the code change. Not every dimension ap
 - **Runbook or operational documentation exists for complex paths.** Not every code path needs a runbook. But if diagnosis requires specific knowledge (which database to check, which queue to drain, which config to toggle), that knowledge must be written down somewhere the on-call engineer can find it.
 - **Dashboards show the right things.** If this code changes what "healthy" looks like (new traffic patterns, new latency profiles, new resource usage), existing dashboards should be updated or new ones created. A dashboard that doesn't reflect reality is worse than no dashboard — it provides false confidence.
 - **The diff between "working" and "broken" is visible.** An on-call engineer needs to quickly answer: "Is this broken right now?" If the answer requires reading code or running manual queries, the observability is insufficient.
+
+### 5. Graceful Lifecycle — "Can this service start up and shut down without losing work?"
+
+**Question**: When this service is deployed, scaled, or restarted, what happens to in-flight requests, open connections, and queued work?
+
+**Key signals**:
+- **Graceful shutdown on termination signals.** When the process receives SIGTERM (standard in container orchestration), it must: stop accepting new work, finish processing in-flight requests (with a timeout), close connections cleanly (database, message queues, caches), and flush pending writes (logs, metrics, buffers). A process that exits immediately on SIGTERM drops in-flight requests and corrupts buffered state.
+- **Connection draining.** Before shutdown, the service must be removed from the load balancer (readiness check fails) and given time to complete active requests. The drain timeout should exceed the expected longest request duration. If the service serves WebSocket or long-polling connections, those need explicit shutdown notification.
+- **Consumer offset/acknowledgment commitment.** For message queue consumers: ensure that processed-but-unacknowledged messages are committed before shutdown. An unclean shutdown that loses unacknowledged offsets causes message re-processing (at best) or message loss (at worst, depending on the queue semantics).
+- **Startup readiness gates.** A service should not receive traffic until it is genuinely ready: connections to dependencies are established, caches are warm (if cold-start performance is unacceptable), and health checks pass. A service that registers as "ready" before it can actually serve requests causes errors during deployment.
+- **Stateful processes need extra care.** If the service holds in-memory state (session caches, connection pools, leader election locks), shutdown must transfer or release that state. Orphaned locks cause deadlocks; orphaned sessions cause user-visible errors.
+
+### 6. Cost Awareness — "Can the team see and control what this will cost to run?"
+
+**Question**: Does this code or infrastructure change have cost implications that the team can detect, attribute, and act on before the bill arrives?
+
+**Key signals**:
+- **Cost visibility must exist for new resources.** If the team cannot see a breakdown of cloud costs by service, feature, or environment, cost problems will be discovered only when the monthly bill arrives. New resources should be tagged for cost attribution from the start — retrofitting tags is work that rarely happens.
+- **Storage costs are cumulative and need retention policies.** Logs, metrics, traces, database storage, object storage — these grow over time and rarely shrink. When adding new persistent storage or observability data, define retention policies and tiered storage from the start. A system that stores everything forever will eventually have a storage bill larger than its compute bill.
+- **Usage-based scaling needs cost estimation at projected scale.** Serverless functions, managed API gateways, CDN bandwidth, per-request pricing services — all scale cost with traffic. When integrating a usage-based service, estimate cost at projected scale, not at current scale. A design that makes 5 API calls per user request at $0.001/call looks cheap until traffic grows 100x.
+- **Data transfer costs are often invisible.** Cross-region and cross-cloud data transfer often costs more than the compute or storage itself. A chatty service-to-service protocol that sends large payloads may be more expensive than a consolidated one. When adding cross-boundary calls, consider data transfer as a cost factor.
+- **Budget alerts and cost anomaly detection should exist.** If a cost spike can happen (auto-scaling, traffic surge, runaway job), there should be a mechanism to detect it before the billing cycle closes. This is the cost equivalent of alerting — silent cost overruns are the financial version of silent failures.
 
 ---
 
@@ -137,6 +164,9 @@ Stop and reassess if:
 - you are about to ship a feature with no way to disable it without a full rollback
 - error handling consists of swallowing exceptions or logging and continuing without degradation logic
 - you are treating observability as "we'll add it later" — later never comes
+- the service has no graceful shutdown handling — SIGTERM causes immediate exit with in-flight requests dropped
+- you are provisioning cloud resources without estimating cost at projected scale
+- traces exist but don't propagate across service boundaries — you have isolated spans, not distributed traces
 
 ## Self-Correction Signals
 
@@ -154,6 +184,8 @@ Stop and revise when:
 - [ ] Can an on-call engineer diagnose a failure using only logs, metrics, and traces — without reading source code?
 - [ ] Is the deployment reversible (rollback, feature flag, or backward-compatible migration)?
 - [ ] Are new failure modes detectable through existing or new alerts?
+- [ ] Does the service handle shutdown gracefully (drain connections, complete in-flight work, flush buffers)?
+- [ ] Have I considered cost implications at projected scale, not just current scale?
 - [ ] Did I catch any self-correction signals?
 - [ ] Am I exiting because the code is genuinely production-ready, or rationalizing?
 

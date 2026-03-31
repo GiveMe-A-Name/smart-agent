@@ -212,6 +212,64 @@ Apply when the change touches: database queries, API endpoints serving user traf
 - If caching is introduced, what is the eviction strategy? Unbounded caches are memory leaks with latency benefits.
 - Are timeouts set on all external calls? A missing timeout on an HTTP call means one slow dependency can freeze the entire system.
 
+### Migration and Data Safety Lens
+
+**Perspective**: This lens evaluates migration and data safety from the **reviewer's perspective** — will this change break production during or after deployment? The reviewer checks whether the migration plan is safe and whether the author considered backward compatibility. Whether the migration can actually be operated safely is an operability concern; how the migration logic should be implemented is an implementation judgment concern.
+
+Apply when the change includes: database schema changes, data migrations, API response shape changes, configuration format changes, feature flag changes, or anything that requires coordinated deployment across services.
+
+**Schema migrations:**
+- Is the migration backward-compatible with the currently deployed code? A migration that renames or removes a column while old code is still reading it will cause production errors during the deployment window.
+- Safe migration pattern: add new column → deploy code that writes to both → backfill → deploy code that reads from new → remove old column. A single migration that does add+remove is a red flag.
+- Does the migration have a rollback path? If the deployment fails, can the migration be reversed without data loss?
+- For large tables: will the migration lock the table? What's the estimated runtime? Does it need to run in batches?
+
+**API contract changes:**
+- Does this change remove, rename, or change the type of any field in an API response? Even "internal" APIs may have consumers you don't know about — scripts, cron jobs, partner integrations, mobile clients on old versions.
+- If the change modifies error response formats, check whether any caller parses error responses (many do, even when they shouldn't).
+- Versioning: is there a versioning strategy? If a breaking change is unavoidable, is there a deprecation path?
+
+**Configuration and deployment:**
+- Does the change rename environment variables, change default values, or alter config file structure? These break silently — the application starts, but behaves differently.
+- If the change requires "deploy A before B" ordering, is this documented and enforceable?
+- Feature flags: if used, is there a plan to remove the flag after rollout? Permanent feature flags are tech debt.
+
+### Dependency Review Lens
+
+Apply when the change adds, removes, upgrades, or replaces an external dependency — including transitive dependency changes from version bumps.
+
+**Before accepting a new dependency:**
+- Is it actively maintained? Check: last commit date, open issue count, response time on issues, bus factor (single maintainer?).
+- What is its security history? Check: known CVEs, security advisory history, whether the maintainers respond to security reports.
+- What is the blast radius? How much of your codebase will depend on this? A utility used in one file is low-risk; a framework used everywhere is high-risk.
+- What does it pull in transitively? A small library that depends on 50 other packages has a large supply-chain attack surface.
+- Is there a simpler alternative? Could this be achieved with standard library features, an existing dependency, or a small amount of custom code?
+- License compatibility: is the dependency's license compatible with your project's license?
+
+**For dependency upgrades:**
+- Read the changelog between versions. Especially: breaking changes, deprecations, and security fixes.
+- Check if the upgrade changes any transitive dependency that other parts of the system also depend on (version conflicts).
+
+### API Design Review Lens
+
+Apply when the change introduces or modifies public-facing or internal API endpoints, SDK methods, CLI commands, or any interface that other code or users will call.
+
+**Consistency:**
+- Does the new API follow the existing conventions in this codebase? Naming patterns, parameter ordering, response shapes, error formats — inconsistency across similar endpoints creates cognitive load for consumers.
+- Are similar operations (create/read/update/delete) symmetric? If `GET /users/:id` returns `{ user: {...} }`, does `GET /users` return `{ users: [...] }` (not `[...]`)?
+
+**Error contracts:**
+- Are error responses structured and predictable? Consumers need to handle errors programmatically. A bare string error is less useful than `{ error: { code: "NOT_FOUND", message: "..." } }`.
+- Are all error cases documented or at minimum discoverable from the code? Can a consumer tell what errors to expect without reading the implementation?
+
+**Idempotency and safety:**
+- Can this operation be safely retried? For operations that modify state, is there an idempotency mechanism (idempotency key, natural idempotency through PUT semantics)?
+- Does the API distinguish between operations that are safe to retry (GET, PUT, DELETE by ID) and those that are not (POST that creates a resource)?
+
+**Pagination and limits:**
+- If the endpoint returns a collection, is there pagination? An unbounded list endpoint is a production incident at scale.
+- Are there rate limits or request size limits? An endpoint that accepts arbitrary-size payloads is a DoS vector.
+
 ---
 
 ## Failure Signals
@@ -229,6 +287,21 @@ Stop and reassess if:
 - you are giving feedback on code outside the diff — you are responsible for what you reviewed, not what you assumed
 - a finding describes a vague risk without naming what breaks and why ("this could cause issues")
 - you assessed correctness without checking the callers of changed functions — the call site is often where the real problem surfaces
+- the change includes a schema migration, API change, or config change and you did not apply the Migration and Data Safety lens
+- you accepted a new dependency without checking its maintenance status, security history, and license
+
+
+## Reviewing AI-Generated Code
+
+AI-generated code requires the same review rigor as human-written code. The layered review model and all specialized lenses apply unchanged. This section covers reviewer-specific adjustments — what to look for differently when you know or suspect the code was AI-generated.
+
+**Verify external references against source.** AI tools generate plausible-but-nonexistent APIs, incorrect method signatures, and outdated library interfaces. As a reviewer, you cannot trust that imports and API calls were validated by the author. Spot-check external API calls, especially for less common libraries — open the actual docs or source code rather than relying on your own familiarity.
+
+**Increase skepticism of "looks right" code.** AI-generated code passes superficial reading more easily than human code — correct structure, reasonable names, sensible-looking flow — while containing subtle logic errors. Slow down at boundary conditions, off-by-one scenarios, and null/undefined handling. If the code looks too clean for its complexity, trace the edge cases manually.
+
+**Search for duplicated functionality.** AI tools lack full codebase awareness and frequently generate functions that already exist elsewhere. Before accepting a new utility, helper, or abstraction, search the codebase for existing equivalents. This is a reviewer responsibility because the author (especially an AI-assisted one) may not have checked.
+
+**Scrutinize test assertions.** AI-generated tests frequently mock the system under test, assert on implementation details, or pass regardless of behavior changes. Check: would this test fail if the behavior actually broke? Tests that exercise mocks instead of real behavior provide false coverage.
 
 ---
 
@@ -254,6 +327,8 @@ See `templates/review-output.md` for the full output structure.
 - [ ] Did I understand intent and evaluate Layers 0-1 (should this exist? right approach?) before reviewing implementation?
 - [ ] Did I read enough context around each changed function — including callers — not just the diff hunks?
 - [ ] Does every issue have file:line, what is wrong, why it matters — with honest severity calibration?
+- [ ] Did I apply relevant specialized lenses (Security, Performance, Migration, Dependency, API Design)?
+- [ ] If AI-generated code: did I verify external API references against source, search for duplicated functionality, and scrutinize test assertions?
 - [ ] Did I give a clear verdict (Ready / Not ready / Ready with fixes)?
 - [ ] Am I exiting because the review is genuinely complete, or rationalizing?
 
