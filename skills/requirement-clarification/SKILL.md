@@ -69,6 +69,7 @@ This skill does not own:
 - Use external knowledge only when it changes how the request should be interpreted.
 - When you must ask after exploration yields nothing, ask for a pointer to the code or location — something that lets you find the answer yourself. Asking the user to describe the problem shifts diagnosis to them and is a weaker fallback.
 - When stated requirements explicitly conflict, the clarification question is about priority or tradeoff — not about what each requirement means individually. Name the conflict and ask the user to choose.
+- **Phrases like "restore old behavior / keep original logic / revert to before X" are systematically ambiguous** when reachable capability paths exist in the current codebase that were not present at the referenced baseline. They appear to have a clear referent (the old code) but actually carry multiple valid interpretations: (a) strict structural revert that discards those capability paths, (b) preserve existing capability paths and fix only a specific regression, (c) change only a particular scenario's behavior. Check whether reachable capability paths exist in the current codebase that postdate the referenced "old" state — if they do, the request has hidden branch points that must be explicitly resolved before planning. Do not treat the existence of old code as proof that copying it back is the correct action.
 - Stop once the remaining uncertainty is small, explicit, and human-owned.
 
 ## Self-Correction Signals

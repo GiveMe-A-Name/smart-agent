@@ -265,6 +265,7 @@ Stop and revise when:
 - a test is flaky and you are re-running it instead of diagnosing the cause
 - you are modifying legacy code without writing characterization tests first
 - test fixtures are copied and pasted with minor variations instead of using factories/builders
+- review feedback says "the goal is not fully achieved" and you are adding more tests toward that goal without first verifying that the goal itself was explicitly confirmed by the user — a reviewer's articulation of the goal is not the same as the user's confirmed intent; writing more tests to satisfy an unverified goal deepens the implementation of a potentially wrong objective
 
 ## Self-Check Before Exiting
 

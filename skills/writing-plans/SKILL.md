@@ -64,6 +64,10 @@ Before breaking anything down, you need to genuinely understand the situation �
 
 **What exists today?** Which files are involved? What patterns does the codebase already use? What constraints are immovable? If you don't know this, your plan will collide with reality. Go read the code first.
 
+**When the request is "restore old behavior / keep original logic"**: this phrase is ambiguous by construction. Before planning, check whether reachable capability paths exist in the current codebase that were not present at the referenced baseline. If they do, "restore old behavior" has multiple valid interpretations and cannot be planned as a single action — a mechanical code revert that silently closes a reachable capability path is a capability regression, not a restoration. Name the interpretations explicitly and get the user's choice before writing any plan. (The full disambiguation heuristic, including how to classify the interpretations, lives in `requirement-clarification`.)
+
+**For "historical behavior + new capability" conflicts**: before writing a plan, output a behavior matrix — input conditions × old behavior × current behavior × candidate target behavior. If any cell is a "?" — a behavior the user hasn't confirmed — resolve those cells with the user before planning. The matrix makes the conflict visible; planning without it converts a requirement ambiguity into a code decision made silently.
+
 ### Think About Decomposition
 
 This is where real engineering thinking matters. There is no single "correct method" — the right decomposition emerges from reasoning about your specific situation. But there are mental models that experienced engineers rely on. Internalize these, then apply your judgment.

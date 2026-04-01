@@ -221,6 +221,8 @@ These are failure patterns specific to how AI coding agents operate. They are di
 - **Scope creep through "while I'm here" improvements**: When touching a file, the pull to "fix" adjacent issues — rename a variable, restructure a helper, add a missing type annotation. Each is individually harmless; in aggregate, they make the diff unreadable and the change unreviewable. Stay on task. Note improvements for later; don't bundle them.
 - **Confident hallucination of APIs and behaviors**: Generating code that uses plausible-but-nonexistent APIs, incorrect function signatures, or outdated library interfaces. Always verify external API usage against actual documentation or source code — never rely solely on training-data memory.
 - **Losing track of shared state during refactoring**: When splitting or moving functions across modules, losing track of what state was being read or modified. This is the #1 failure mode identified in research on AI coding agent failures. Before any refactor that moves code across boundaries, explicitly trace every piece of state the code touches.
+- **Silently closing an existing capability path**: When a fix, restoration, or simplification makes a currently reachable code path unreachable — a version-specific branch, a fallback mechanism, a native runtime path — the capability loss is not visible in the diff. Before implementing any change that eliminates a working path, explicitly identify what capability is being removed and surface it to the user before writing code.
+- **Implementing toward an unverified goal**: A reviewer's statement that "the goal hasn't been achieved" contains two claims — that the current code doesn't do X, and that X is the correct goal. The first is verifiable from code. The second must trace to the user's confirmed intent, not only the reviewer's articulation. If X was never explicitly confirmed by the user, implementing further toward it deepens the wrong objective. (The full evaluation of reviewer goal premises belongs to `receiving-code-review`; this skill applies structural judgment once a goal is confirmed.)
 
 
 ## When Invoked After Receiving Code Review
@@ -268,6 +270,9 @@ Stop and revise when:
 - you are moving code across module boundaries without tracing every piece of shared state the code reads or writes
 - you are modifying a schema, API response shape, or configuration format without considering the migration path for existing consumers
 - you have worked through 5+ judgment dimensions on a small change without reaching a clear decision — pick the simpler option and move on
+- you are restoring "old behavior" by copying old code or gate conditions without checking whether new capabilities added since then conflict with a mechanical restoration
+- you are about to make an existing capability path unreachable (a version branch, fallback, native loader, etc.) without having surfaced this to the user
+- you are implementing toward a goal named by a reviewer — not explicitly confirmed by the user — especially when that goal would change global strategy or remove capabilities
 
 
 ## Self-Check Before Exiting
@@ -279,6 +284,8 @@ Stop and revise when:
 - [ ] If the change touches shared state: did I trace what is read and written across all affected boundaries?
 - [ ] If the change requires migration (schema, API, config): is the migration path safe for production?
 - [ ] If invoked after `receiving-code-review`: did I implement the reviewer's intent (not just their literal words) while preserving design integrity?
+- [ ] If the change makes an existing capability path unreachable: did I surface this explicitly before implementing?
+- [ ] If implementing toward a goal identified by a reviewer: was that goal confirmed by the user, or only inferred by the reviewer?
 - [ ] Am I exiting because the implementation is genuinely sound, or rationalizing?
 
 **If any check fails, return to the relevant section before exiting.**

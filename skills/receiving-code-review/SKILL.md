@@ -66,6 +66,8 @@ Does the reviewer understand the problem being solved, or only the solution they
 
 Source calibration: a human partner carries architectural and intent context by default — implement after understanding. A dispatched reviewer sub-agent has codebase access but may miss intent and history — verify before implementing. An external reviewer may not know platform constraints or why current code exists — requires more explicit verification. But a technically wrong suggestion is wrong regardless of source, and a reviewer with limited context may still be right about a bug while wrong about design direction.
 
+**Distinguish: reviewer questions the implementation vs. reviewer questions the goal.** A reviewer saying "this doesn't achieve X" contains two claims: (1) the current code doesn't do X, and (2) X was the correct goal. Claim 1 can be verified from the code. Claim 2 must be verified against the user's original confirmed intent — not against what the reviewer says the goal is. If X was never explicitly confirmed by the user, treat it as an unverified goal before accepting feedback that builds toward it. This is particularly critical when X would alter global strategy, close existing capability paths, or conflict with capabilities added since the last explicit agreement.
+
 When a reviewer's confusion is genuine, that confusion is itself a signal. Ask: is the code unclear enough to confuse a competent reader? If yes, improve the code's clarity regardless of whether the specific suggestion is correct. The reviewer may have the wrong fix for a real problem — the problem being that the code doesn't communicate its intent.
 
 ### Technical correctness is necessary but not sufficient
@@ -163,6 +165,7 @@ Stop and reorient if:
 - Two reviewers gave contradictory suggestions and you silently picked one without surfacing the conflict
 - You are processing 20+ comments linearly instead of triaging by severity and layer first
 - You are fixing style issues in code that design-level feedback may require rewriting
+- A reviewer said "the goal hasn't been achieved" and you accepted their articulation of the goal without tracing it to user-confirmed intent — the reviewer's premise about what the goal is may be wrong even when their observation about the current code is correct
 
 
 ## Self-Check Before Exiting
