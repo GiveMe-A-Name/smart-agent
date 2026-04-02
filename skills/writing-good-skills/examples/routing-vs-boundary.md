@@ -49,7 +49,7 @@ even when it already has the relevant context.
 "Run after X and before Y" tells the agent where it sits in a graph,
 not when the capability is needed.
 
-**Self-check fails.** Delete all named skill references:
+**Boundary test fails.** Delete all named skill references:
 > *Use when fixing a GitHub issue. [...] Read the issue. Implement the fix.*
 
 What remains is too thin to guide any real decision.
@@ -115,7 +115,7 @@ and calling a fix done without verifying.
 reading the issue (where ambiguity is easy to skip) and locating the code
 (where the obvious candidate is often wrong).
 
-**Self-check passes.** Delete all named skill references — there are none.
+**Boundary test passes.** Delete all named skill references — there are none.
 The file still teaches a complete, usable capability.
 
 ---

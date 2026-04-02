@@ -40,7 +40,7 @@ When designing skills for thinking-mode agents:
 1. **Trigger conditions should be evaluable** — the agent needs clear criteria to assess in the thinking phase
 2. **Cost asymmetry should be explicit** — helps the agent make the right default choice during assessment
 3. **Observable conditions are critical** — the agent needs facts it can verify, not impressions
-4. **Self-Check sections remain important** — they guide the exit decision, which also benefits from structured reasoning
+4. **Completion Criteria and Anti-Rationalization Check remain important** — they guide both the completion decision and the final challenge against premature exit, which benefit from structured reasoning
 
 ## Example Flow
 
@@ -72,6 +72,6 @@ To support both thinking and non-thinking modes:
 1. **Make trigger conditions explicit and observable** — works for both modes
 2. **State cost asymmetry clearly** — helps both modes make the right default choice
 3. **Keep invariants clear** — guides behavior regardless of reasoning style
-4. **Design Self-Checks as structured questions** — can be answered in thinking block or explicitly
+4. **Design Anti-Rationalization prompts as structured questions, and Completion Criteria as explicit exit conditions** — both can be applied in a thinking block or explicitly
 
 The core skill design principles (observable conditions, cost asymmetry, state-based triggers) work well for both modes. Thinking mode simply allows the assessment to happen more efficiently.

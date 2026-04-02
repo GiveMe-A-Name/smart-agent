@@ -36,7 +36,8 @@ This skill does not own:
 
 ## Invariants
 
-- A capability skill must have five elements: trigger logic, capability boundary, invariants, decision signals, failure signals. Missing any one makes the skill weak.
+- A capability skill must have five core elements: trigger logic, capability boundary, invariants, decision signals, failure signals. Missing any one makes the skill weak.
+- Completion definition and anti-rationalization prompts must be separate. Do not collapse `Completion Criteria` and `Anti-Rationalization Check` into a single self-check section or checklist.
 - Skills teach judgment; they do not encode orchestration or hide routing graphs.
 - The main `SKILL.md` must stay lean but must not become hollow. Core law stays inline; expanded support material moves to support folders.
 
@@ -44,7 +45,8 @@ This skill does not own:
 
 - [ ] The skill has all five core elements (trigger logic, boundary, invariants, decision signals, failure signals).
 - [ ] The trigger is state-based (not scenario-based), with uncertainty defaulting to invoke.
-- [ ] The skill has an explicit completion definition that tells the agent when the work is done, not just a post-hoc verification.
+- [ ] The skill defines completion explicitly through `Completion Criteria`, so the agent can tell when the work is done without relying on a mixed self-check section.
+- [ ] Anti-self-deception prompts are kept separate from completion conditions in `Anti-Rationalization Check` rather than mixed into `Completion Criteria`.
 - [ ] The boundary is authentic — no routing language, no named-skill handoffs disguised as scope.
 - [ ] The main file is lean but not hollow — core law inline, support material in folders.
 
@@ -84,7 +86,7 @@ See `examples/notes-to-skill.md` for a before/after showing what goes wrong when
 **Key signals**:
 - Routing language answers: *what runs next?* Boundary language answers: *what does this skill own, and what is missing when it cannot proceed?*
 - A genuine boundary names what the skill owns and does not own, without pointing to other skills by name as the next action.
-- Self-check: delete all named-skill references from the draft. If the capability description collapses, the boundary was fake — it was doing routing work dressed as scope definition.
+- Boundary test: delete all named-skill references from the draft. If the capability description collapses, the boundary was fake — it was doing routing work dressed as scope definition.
 - `Relationship to...` sections are acceptable only when they clarify scope — stating what this skill does not cover. They must not prescribe what to invoke next.
 - When a section names another specific skill as something to invoke in a given scenario, the named skill's trigger conditions are too weak to fire on their own. The fix belongs in the named skill's trigger logic — not here.
 

@@ -9,7 +9,7 @@ Review in this order:
 2. capability boundary
 3. invariants
 4. decision signals and applied guidance
-5. Self-Check design
+5. completion criteria and anti-rationalization design
 6. packaging and redundancy
 
 This order matters. A polished file that triggers badly or repeats itself is still weak.
@@ -88,26 +88,21 @@ Common failures:
 - examples folder added without assessing whether the judgment gap actually requires it
 - examples that restate rules already clear in the prose, rather than revealing a subtle distinction
 
-### 5. Self-Check Design
+### 5. Completion Criteria And Anti-Rationalization Design
 
 Check:
-- does the skill have a Self-Check section at the end?
-- is it declared in the Invariants section ("Before exiting this skill, you MUST complete the Self-Check section at the end")?
-- does it contain 3-5 core items (not 7-9)?
-- does it follow the recommended structure:
-  - invariants check ("Did I follow all invariants?")
-  - failure signals check ("Did I catch any failure/self-correction signals?")
-  - 1-2 skill-specific critical checks
-  - rationalization check ("Am I exiting because work is genuinely complete, or rationalizing?")
-- are the checks phrased as questions that can be answered yes/no or with brief reflection?
+- does the skill define `Completion Criteria` explicitly rather than relying on a mixed self-check section?
+- does it keep `Anti-Rationalization Check` separate from completion conditions?
+- do the completion criteria stay focused on exit conditions, not reflective or anti-self-deception prompts?
+- does the anti-rationalization section stay short and pointed, challenging premature exit rather than repeating the completion criteria?
+- are the anti-rationalization prompts phrased as structured questions that can be answered briefly but meaningfully?
 
 Common failures:
-- no Self-Check section at all
-- Self-Check not declared in Invariants
-- too many items (7-9+) creating overhead without improving exit quality
-- checks that are too vague or philosophical
-- missing the rationalization check
-- checks that duplicate what's already in invariants without adding exit-specific judgment
+- no explicit `Completion Criteria`
+- no `Anti-Rationalization Check` where the skill clearly needs one
+- completion conditions mixed with rationalization prompts in one checklist
+- completion criteria that drift into reflective or philosophical questions
+- anti-rationalization prompts that duplicate completion conditions instead of challenging false completion
 
 ### 6. Packaging And Redundancy
 

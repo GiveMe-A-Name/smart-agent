@@ -63,7 +63,7 @@ The structure maps one-to-one onto the original bullet points. Nothing was gener
 
 **No invariants as invariants.** Step 5 ("never swallow the exception") is a hard rule, not a step. Encoding it as step 5 buries it — it will be treated as optional, reached only if steps 1–4 complete.
 
-**Self-check:** Remove the step numbers. What remains is still the same bullet list the user gave, reformatted. The skill added no judgment.
+**Quick test:** Remove the step numbers. What remains is still the same bullet list the user gave, reformatted. The skill added no judgment.
 
 ---
 
@@ -135,7 +135,7 @@ Stop and re-evaluate if:
 
 **The error classification is a judgment table, not a sequence.** An agent that already knows the status code can go directly to the retry section. Nothing forces a fixed order.
 
-**Self-check:** Remove named-skill references — there are none. The skill still teaches a complete, usable capability.
+**Boundary test:** Remove named-skill references — there are none. The skill still teaches a complete, usable capability.
 
 ---
 
@@ -145,3 +145,4 @@ A procedure manual answers: *what do I do next?*
 A capability guide answers: *what do I own, what must not happen, and what should I notice?*
 
 Notes from a user are almost always a procedure. Turning them into a skill means extracting the judgment — the invariants, the boundary, the decision signals — and making that judgment reusable, not the sequence.
+e.
