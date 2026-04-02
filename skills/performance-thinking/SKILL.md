@@ -47,20 +47,29 @@ This skill does not own:
 - Every optimization has a cost (complexity, readability, maintainability). The benefit must outweigh the cost.
 - "Premature optimization is the root of all evil" does not mean "ignore performance until production is on fire." It means don't optimize without evidence.
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Have I identified whether this code is on a performance-sensitive path? (Dimension 1)
-- [ ] If it is on a hot path, have I checked the relevant dimensions (algorithmic fitness, I/O, resources)?
-- [ ] Have I checked for structural anti-patterns that are always worth fixing (N+1, unbounded collections, missing timeouts)?
-- [ ] If frontend code: have I considered bundle size, render performance, and Core Web Vitals impact? (Dimension 6)
-- [ ] If database code: have I verified index support and checked the query execution plan? (Dimension 7)
-- [ ] If async/concurrent code: is the event loop unblocked, are pools sized appropriately, is backpressure in place? (Dimension 8)
-- [ ] If I recommended or applied an optimization, do I have evidence it targets the actual bottleneck? (Dimension 5)
-- [ ] If I decided NOT to optimize, is that because I confirmed the code is off the hot path or the concern is hypothetical — not because I skipped the analysis?
-- [ ] Does any optimization I've applied justify its complexity cost?
-- [ ] Am I exiting because performance is genuinely addressed, or rationalizing?
+- [ ] It was identified whether this code is on a performance-sensitive path.
+- [ ] If the code is on a hot path, the relevant dimensions (algorithmic fitness, I/O, resources) were checked.
+- [ ] Structural anti-patterns that are always worth fixing (N+1, unbounded collections, missing timeouts) were checked.
+- [ ] If frontend code, bundle size, render performance, and Core Web Vitals impact were considered.
+- [ ] If database code, index support was verified and the query execution plan was checked.
+- [ ] If async or concurrent code, event-loop blocking, pool sizing, and backpressure were considered.
+- [ ] Any recommended or applied optimization is backed by evidence that it targets the actual bottleneck.
+- [ ] If no optimization was made, that decision rests on confirmed path characteristics or hypothetical concern — not skipped analysis.
+- [ ] Any applied optimization justifies its complexity cost.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether performance was genuinely addressed.
+
+Am I treating the absence of immediate slowness as evidence that no performance work was needed?
+
+Am I exiting because performance is genuinely addressed, or because the current code looks acceptable under light mental simulation?
 
 ---
 

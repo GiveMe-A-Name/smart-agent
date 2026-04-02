@@ -56,18 +56,26 @@ A well-applied TDD session answers: what should this thing do, from the perspect
 - Bugs must never be fixed without a test that first reproduces the bug
 - If skipping TDD, name a specific no-behavior criterion explicitly (not "it's simple")
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I follow all invariants (test before code, watched it fail, watched it pass)?
-- [ ] If I skipped TDD, did I name a specific no-behavior criterion?
-- [ ] Did each test name a behavior the caller cares about — not an implementation detail?
-- [ ] Did TDD surface any design pressure? Did I act on it or rationalize past it?
-- [ ] If modifying legacy code: did I write characterization tests before changing behavior?
-- [ ] If testing async/concurrent code: am I using explicit synchronization instead of sleeps?
-- [ ] Did I catch any self-correction signals?
-- [ ] Am I exiting because tests are genuinely in place, or rationalizing?
+- [ ] All invariants were followed (test before code, watched it fail, watched it pass).
+- [ ] If TDD was skipped, a specific no-behavior criterion was named.
+- [ ] Each test names a behavior the caller cares about, not an implementation detail.
+- [ ] If TDD surfaced design pressure, that pressure was acted on rather than rationalized away.
+- [ ] If modifying legacy code, characterization tests were written before changing behavior.
+- [ ] If testing async or concurrent code, explicit synchronization is used instead of sleeps.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the test discipline was genuinely applied.
+
+Did I ignore any applicable self-correction signals because the tests are green now?
+
+Am I exiting because tests are genuinely in place, or because the current test suite looks reassuring enough?
 
 ### No-Behavior Signals (TDD optional)
 

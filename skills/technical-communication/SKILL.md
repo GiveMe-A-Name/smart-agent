@@ -47,19 +47,28 @@ This skill does not own:
 - Shorter is better, until it becomes unclear. Then it's too short.
 - A document that is never updated is a document that will eventually lie. Build in update expectations or mark documents as point-in-time.
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I identify the audience and what they need? (Dimension 1)
-- [ ] Did I choose the right vehicle for this communication need? (Dimension 2)
-- [ ] Does the document state its conclusion in the first paragraph and structure for scanning? (Dimension 3)
-- [ ] Is the writing specific and concise — numbers over adjectives, evidence over assertions? (Dimension 4)
-- [ ] Have I addressed whether this document should be updated or treated as immutable? (Dimension 5)
-- [ ] If writing code documentation: does the README enable getting started, do API docs describe the contract, do comments explain why? (Dimension 6)
-- [ ] If writing PR descriptions or commits: is the "why" clear, are issues linked, is the commit history readable? (Dimension 7)
-- [ ] Did I use diagrams or tables where they communicate more effectively than text? (Dimension 8)
-- [ ] Am I exiting because the document is genuinely clear and useful, or rationalizing?
+- [ ] The audience and what they need were identified.
+- [ ] The right vehicle was chosen for this communication need.
+- [ ] The document states its conclusion in the first paragraph and is structured for scanning.
+- [ ] The writing is specific and concise — numbers over adjectives, evidence over assertions.
+- [ ] It is clear whether this document should be updated over time or treated as immutable.
+- [ ] If writing code documentation, the README enables getting started, API docs describe the contract, and comments explain why.
+- [ ] If writing PR descriptions or commits, the "why" is clear, issues are linked, and the history is readable.
+- [ ] Diagrams or tables were used where they communicate more effectively than text.
 
-**If any check fails, return to the relevant dimension before exiting.**
+**If any criterion is not met, return to the relevant dimension before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the document is genuinely useful.
+
+Am I confusing polished prose with reader usefulness?
+
+Am I exiting because the document is genuinely clear and useful, or because it now reads smoothly enough to me?
 
 ---
 

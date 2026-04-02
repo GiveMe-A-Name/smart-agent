@@ -61,14 +61,22 @@ This skill does not own:
 - Separate confirmed requirements from inferred context and unresolved decisions
 - Stop once remaining uncertainty is small, explicit, and human-owned
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I follow all invariants (resolve from evidence first, separate confirmed from inferred)?
-- [ ] Did I catch any self-correction signals?
-- [ ] Does the result restate the request with a small set of real human decisions?
-- [ ] Am I exiting because requirements are genuinely clarified, or rationalizing?
+- [ ] All invariants were followed, including resolving from evidence first and separating confirmed from inferred.
+- [ ] The result restates the request with a small set of real human decisions.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the requirements are genuinely clarified.
+
+Did I ignore any applicable self-correction signals because the ambiguity now feels compressed enough?
+
+Am I exiting because requirements are genuinely clarified, or because the current restatement feels neat enough?
 
 ## Clarification Heuristics
 

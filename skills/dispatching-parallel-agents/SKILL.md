@@ -67,16 +67,24 @@ If you cannot write a self-contained prompt, the task is not scoped correctly.
 - One agent per independent problem domain — do not bundle unrelated problems into one agent
 - Dispatch only after the independence test passes — not speculatively
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I follow all invariants (isolated context, one agent per domain, passed independence test)?
-- [ ] Did I verify compatibility of results (check for file conflicts)?
-- [ ] If partial failure occurred: did I assess whether successful changes are independently valid?
-- [ ] Did I check whether any agent's findings invalidate other agents' premises?
-- [ ] Did I catch any failure signals?
-- [ ] Am I exiting because parallel dispatch was appropriate and results are integrated, or rationalizing?
+- [ ] All invariants were followed (isolated context, one agent per domain, passed independence test).
+- [ ] Result compatibility was verified, including file conflicts where relevant.
+- [ ] If partial failure occurred, successful changes were assessed for independent validity.
+- [ ] Any agent findings that invalidate other agents' premises were checked and handled.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the parallelization and integration really hold.
+
+Did I ignore any failure signals because enough agents returned plausible results?
+
+Am I exiting because parallel dispatch was appropriate and results are integrated, or because the current outputs feel close enough to done?
 
 ## Failure Signals
 

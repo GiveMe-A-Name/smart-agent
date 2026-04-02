@@ -40,17 +40,25 @@ This skill does not own:
 - Skills teach judgment; they do not encode orchestration or hide routing graphs.
 - The main `SKILL.md` must stay lean but must not become hollow. Core law stays inline; expanded support material moves to support folders.
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Does the skill have all five core elements (trigger logic, boundary, invariants, decision signals, failure signals)?
-- [ ] Is the trigger state-based (not scenario-based), with uncertainty defaulting to invoke?
-- [ ] Does the skill have an explicit completion definition — a checklist that tells the agent when the work is done, not just a post-hoc verification?
-- [ ] Is the boundary authentic — no routing language, no named-skill handoffs disguised as scope?
-- [ ] Is the main file lean but not hollow — core law inline, support material in folders?
-- [ ] Did I catch any self-correction signals?
-- [ ] Am I exiting because the skill is genuinely well-designed, or rationalizing?
+- [ ] The skill has all five core elements (trigger logic, boundary, invariants, decision signals, failure signals).
+- [ ] The trigger is state-based (not scenario-based), with uncertainty defaulting to invoke.
+- [ ] The skill has an explicit completion definition that tells the agent when the work is done, not just a post-hoc verification.
+- [ ] The boundary is authentic — no routing language, no named-skill handoffs disguised as scope.
+- [ ] The main file is lean but not hollow — core law inline, support material in folders.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the apparent completeness of the draft is real.
+
+Did I ignore any applicable self-correction signals because the draft already looked good?
+
+Am I exiting because the skill is genuinely well-designed, or because the structure now looks complete enough?
 
 ## Judgment Dimensions
 

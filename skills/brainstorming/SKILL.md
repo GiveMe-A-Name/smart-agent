@@ -105,16 +105,24 @@ Stop the loop once no medium/high-risk issues remain, even if minor issues persi
 - Verbal approval of a design in conversation is not the same as approval of the written spec
 - No unrelated refactoring — only improvements that directly serve the current goal
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I follow all invariants (one question per message, 2-3 approaches, spec committed)?
-- [ ] Did I catch any failure signals?
-- [ ] Did the user approve the committed spec (not just verbal approval)?
-- [ ] Were approaches compared against dimensions chosen for this specific decision (not a generic checklist)?
-- [ ] If the design depends on external libraries/APIs: was feasibility verified (through research or spike)?
-- [ ] Am I exiting because the design is genuinely complete and approved, or rationalizing?
+- [ ] All invariants were followed (one question per message, 2-3 approaches, spec committed).
+- [ ] The user approved the committed spec, not just the verbal design discussed in conversation.
+- [ ] Approaches were compared against dimensions chosen for this specific decision, not a generic checklist.
+- [ ] If the design depends on external libraries or APIs, feasibility was verified through research or a spike.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the apparent completeness of the design is real.
+
+Did I ignore any failure signals because the design now feels settled?
+
+Am I exiting because the design is genuinely complete and approved, or because the structure now looks finished enough?
 
 ## Failure Signals
 

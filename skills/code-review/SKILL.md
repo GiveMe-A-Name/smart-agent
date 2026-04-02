@@ -44,17 +44,26 @@ It does NOT:
 **Give a clear verdict.** Every review ends with: Ready / Not ready / Ready with fixes. An ambiguous conclusion defers the merge decision to the author, which is the reviewer's job.
 
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I understand intent and evaluate Layers 0-1 (should this exist? right approach?) before reviewing implementation?
-- [ ] Did I read enough context around each changed function — including callers — not just the diff hunks?
-- [ ] Does every issue have file:line, what is wrong, why it matters — with honest severity calibration?
-- [ ] Did I apply relevant specialized lenses (Security, Performance, Migration, Dependency, API Design)?
-- [ ] If AI-generated code: did I verify external API references against source, search for duplicated functionality, and scrutinize test assertions?
-- [ ] Did I give a clear verdict (Ready / Not ready / Ready with fixes)?
-- [ ] Am I exiting because the review is genuinely complete, or rationalizing?
+- [ ] The review covers justification (should this change exist?), approach (right solution?), and implementation — not just implementation details.
+- [ ] Enough context was read around each changed function — including callers — not just the diff hunks.
+- [ ] Every issue includes file:line, what is wrong, and why it matters, with honest severity calibration.
+- [ ] Relevant specialized lenses (Security, Performance, Migration, Dependency, API Design) were applied where applicable.
+- [ ] If the code appears AI-generated, external API references were verified against source, duplicated functionality was checked, and test assertions were scrutinized.
+- [ ] A clear verdict is present (Ready to merge / Not ready / Ready with fixes).
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the apparent completeness of the review is real.
+
+Did I mistake superficial diff reading for sufficient context?
+
+Am I exiting because the review is genuinely complete, or because the current findings list looks complete enough?
 
 ---
 

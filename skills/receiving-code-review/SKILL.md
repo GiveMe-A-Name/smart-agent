@@ -38,17 +38,25 @@ It does NOT:
 **Clarify all before implementing any.** If any item in multi-item feedback is unclear, stop and ask before touching anything. Items may be related; partial understanding leads to wrong implementation.
 
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I evaluate each comment with the design intent in mind — not in a vacuum?
-- [ ] Did I distinguish between comments that challenge correctness versus comments that challenge design?
-- [ ] Did I apply evidence (not just arguments) to support my decisions?
-- [ ] Did I follow all invariants (verify before implementing, no performative agreement, clarify all first)?
-- [ ] If multi-reviewer feedback: did I surface contradictions instead of silently resolving them? Did I triage by severity before processing linearly?
-- [ ] Did I catch any failure signals?
-- [ ] Am I exiting because feedback is genuinely evaluated and addressed, or rationalizing?
+- [ ] Each comment was evaluated with the design intent in mind, not in isolation.
+- [ ] Comments that challenge correctness were distinguished from comments that challenge design.
+- [ ] Decisions were supported by evidence, not just arguments.
+- [ ] All invariants were followed (verify before implementing, no performative agreement, clarify all first).
+- [ ] If feedback came from multiple reviewers, contradictions were surfaced instead of being silently resolved, and severity was triaged before processing linearly.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the feedback was genuinely evaluated.
+
+Did I ignore any failure signals because a convenient resolution path already existed?
+
+Am I exiting because feedback is genuinely evaluated and addressed, or because the current responses look coherent enough?
 
 ## Core Mental Models
 

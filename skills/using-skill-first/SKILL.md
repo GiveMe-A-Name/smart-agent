@@ -89,13 +89,23 @@ These thoughts indicate a skill check is being skipped. Stop and check if you re
 - The 1% rule has no exceptions for urgency, simplicity, or familiarity
 - The check is against the available skill list, not memory of what skills exist
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I scan the actual skill list (not from memory) for the action I am about to take?
-- [ ] For every skill with >1% applicability: did I either invoke it or state observable reasoning for skipping?
-- [ ] Am I proceeding to the action now — not deferring skill checks to "when needed"?
+- [ ] The actual skill list was scanned for the action about to be taken, not recalled from memory.
+- [ ] For every skill with more than 1% applicability, it was either invoked or skipped with observable reasoning.
+- [ ] The action is proceeding now rather than deferring skill checks to "when needed".
 
-**If any check fails, return to the Skill Assessment Framework before exiting.**
+**If any criterion is not met, return to the Skill Assessment Framework before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before proceeding to the action.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the skill check that just happened was real.
+
+Did I check the actual skill list, or did I rely on memory of which skills exist and what they cover?
+
+Am I proceeding because the check was genuinely performed, or because checking now feels like unnecessary overhead given how obvious the next step seems?
 
 ## Failure Signals
 

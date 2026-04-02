@@ -143,17 +143,26 @@ Research has diminishing returns. Some questions are better answered by building
 - Use web search tools actively — do not rely solely on internal knowledge for factual claims about external systems, libraries, APIs, or current state of the world
 - Stop when sub-questions are answered with appropriate evidence, not when curiosity is satisfied or a time limit is hit
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I decompose before searching, with a hypothesis or purpose per lookup?
-- [ ] Did I cross-validate critical claims across independent sources?
-- [ ] Did I actively search for disconfirming evidence, not just confirming evidence?
-- [ ] Does each conclusion's confidence match the quality and independence of its supporting evidence?
-- [ ] Did I evaluate AI-generated content with appropriate skepticism (verified code examples, checked original docs)?
-- [ ] If an implementation question: did I consider whether a prototype would be faster than more research?
-- [ ] Am I stopping because the question is genuinely answered, or rationalizing early closure?
+- [ ] Research was decomposed before searching, with a hypothesis or purpose per lookup.
+- [ ] Critical claims were cross-validated across independent sources.
+- [ ] Disconfirming evidence was actively sought, not just confirming evidence.
+- [ ] Each conclusion's confidence matches the quality and independence of its supporting evidence.
+- [ ] AI-generated content was evaluated with appropriate skepticism, including verified code examples and original docs.
+- [ ] For implementation questions, it was considered whether a prototype would be faster than more research.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the question is genuinely answered.
+
+Am I treating a plausible synthesis as if it were well-supported evidence?
+
+Am I stopping because the question is genuinely answered, or because the current evidence looks sufficient enough to move on?
 
 ## Decision Signals
 

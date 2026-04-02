@@ -45,17 +45,25 @@ You cannot start writing until you can state: *"This is a [size] [nature] task. 
 If you can't name the files involved, you haven't assessed enough.
 
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I complete the situation assessment (size, nature, current state) and state a decomposition strategy?
-- [ ] Is each task a vertical slice (delivers verifiable value, leaves codebase working), ordered risk-first?
-- [ ] Are file paths exact and changes concrete (not vague)?
-- [ ] For medium/large work: did I identify contingencies for the riskiest assumptions and define plan revision triggers?
-- [ ] For cross-boundary work: are interfaces agreed and handoffs explicit?
-- [ ] Did I catch any failure signals (over-planning, under-planning, horizontal slicing)?
-- [ ] Am I exiting because the plan is genuinely complete, or rationalizing?
+- [ ] The plan states task size, nature, current state, and decomposition strategy.
+- [ ] Each task is a vertical slice that delivers verifiable value, leaves the codebase working, and is ordered risk-first.
+- [ ] File paths are exact and planned changes are concrete rather than vague.
+- [ ] For medium or large work, contingencies for the riskiest assumptions and plan revision triggers were identified.
+- [ ] For cross-boundary work, interfaces and handoffs are explicit.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the plan is genuinely complete.
+
+Did I ignore any failure signals such as over-planning, under-planning, or horizontal slicing because the plan already looks orderly?
+
+Am I exiting because the plan is genuinely complete, or because the outline now looks structured enough?
 
 ---
 

@@ -34,18 +34,27 @@ Root cause means you can state: *"The bug is at [specific location] because [mec
 The test: can you predict what will happen if you make a specific change? If yes, you have a root cause. If no, you have a hypothesis — keep investigating.
 
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I establish root cause with evidence (not just a hypothesis)?
-- [ ] Can I state: "The bug is at [location] because [mechanism], which produces [symptom]"?
-- [ ] Could I predict the fix outcome before running it?
-- [ ] Did I verify the fix resolves the original failure?
-- [ ] Did I check for the bug's relatives (same pattern elsewhere)?
-- [ ] Did I rule out environment/config/build issues before debugging code logic?
-- [ ] If I spent significant time without progress: did I escalate with context rather than continuing to spin?
-- [ ] Am I exiting because the bug is genuinely fixed, or rationalizing?
+- [ ] Root cause was established with evidence, not just a hypothesis.
+- [ ] The bug can be stated as: "The bug is at [location] because [mechanism], which produces [symptom]."
+- [ ] The fix outcome could be predicted before running it.
+- [ ] The fix was verified against the original failure.
+- [ ] Related bugs following the same pattern were checked.
+- [ ] Environment, configuration, and build issues were ruled out before focusing on code logic.
+- [ ] If significant time passed without progress, escalation happened with context instead of continued spinning.
 
-**If any check fails, return to the relevant mental model before exiting.**
+**If any criterion is not met, return to the relevant mental model before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the bug is genuinely fixed.
+
+Am I treating a symptom disappearance as proof of root-cause resolution?
+
+Am I exiting because the bug is genuinely fixed, or because the latest run happened to look good enough?
 
 ---
 

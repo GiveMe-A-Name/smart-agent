@@ -50,20 +50,26 @@ This skill does not own:
 - Do not treat theoretical justification as a substitute for usage evidence. "This supports testability", "this could be useful", "this is clean design" are arguments, not evidence. Evidence is: who calls this, who depends on this, what breaks if this is removed.
 - Do not treat duplication removal as inherently good. Duplication is far cheaper than the wrong abstraction.
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I work through the relevant judgment dimensions for this change (without over-analyzing irrelevant ones)?
-- [ ] Did I follow all invariants (usage evidence over theoretical justification, question existing shapes)?
-- [ ] Did I catch any self-correction signals?
-- [ ] Does the implementation keep responsibilities clear and future changes easier?
-- [ ] If the change touches shared state: did I trace what is read and written across all affected boundaries?
-- [ ] If the change requires migration (schema, API, config): is the migration path safe for production?
-- [ ] If invoked after `receiving-code-review`: did I implement the reviewer's intent (not just their literal words) while preserving design integrity?
-- [ ] If the change makes an existing capability path unreachable: did I surface this explicitly before implementing?
-- [ ] If implementing toward a goal identified by a reviewer: was that goal confirmed by the user, or only inferred by the reviewer?
-- [ ] Am I exiting because the implementation is genuinely sound, or rationalizing?
+- [ ] The diff is scoped to what the task requires — no files, functions, or abstractions added beyond the change's direct necessity.
+- [ ] If the change touches shared state, reads and writes were traced across all affected boundaries.
+- [ ] If the change requires migration (schema, API, config), the migration path is safe for production.
+- [ ] If invoked after `receiving-code-review`, the reviewer's intent was implemented without damaging design integrity.
+- [ ] If the change makes an existing capability path unreachable, that impact was surfaced explicitly before implementation.
+- [ ] If implementing toward a goal identified by a reviewer, that goal was confirmed by the user rather than only inferred.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the implementation is genuinely sound.
+
+Did I add anything justified only by "this supports testability", "this could be useful", or "this is clean design" — without a concrete caller or usage evidence in the existing code?
+
+Am I exiting because the implementation is genuinely sound, or because the patch looks tidy enough?
 
 ## Judgment Dimensions
 

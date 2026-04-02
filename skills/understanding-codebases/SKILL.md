@@ -48,16 +48,25 @@ This skill does not own:
 - Every search or file read must test a stated hypothesis — not satisfy curiosity
 - Stop once the answer is grounded well enough to avoid intuition
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I ground conclusions in code evidence, not assumptions or prior knowledge?
-- [ ] Did I separate what is proven, hypothesized, and still unknown?
-- [ ] Did I check how the codebase handles similar cases (pattern discovery)?
-- [ ] For large codebases: did I scope exploration to the task-relevant slice, not attempt exhaustive understanding?
-- [ ] Did I check infrastructure/config files when deployment constraints or implicit dependencies are relevant?
-- [ ] Am I exiting because understanding is genuinely grounded, or rationalizing?
+- [ ] Conclusions are grounded in code evidence, not assumptions or prior knowledge.
+- [ ] What is proven, hypothesized, and still unknown is separated explicitly.
+- [ ] Similar cases in the codebase were checked for pattern discovery.
+- [ ] For large codebases, exploration was scoped to the task-relevant slice rather than attempting exhaustive understanding.
+- [ ] Infrastructure and config files were checked when deployment constraints or implicit dependencies are relevant.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether understanding is genuinely grounded.
+
+Am I treating a plausible mental model as if it were code-backed evidence?
+
+Am I exiting because understanding is genuinely grounded, or because the current explanation feels coherent enough?
 
 ## Investigation Techniques
 

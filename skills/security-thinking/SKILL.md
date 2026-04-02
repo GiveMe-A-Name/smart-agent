@@ -47,16 +47,25 @@ This skill does not own:
 - The principle of least privilege applies to every layer: code, APIs, database users, service accounts, deployment permissions.
 - Sensitive data must be protected at rest, in transit, and in logs.
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Have I identified the trust boundaries in this change and verified input is validated at each one?
-- [ ] Can I state who can reach each new code path and confirm authorization is enforced at the right layer?
-- [ ] Is sensitive data protected in transit, at rest, and in logs — with explicit filtering, not discipline?
-- [ ] For new dependencies: have I checked maintenance status, known vulnerabilities, and the transitive dependency tree?
-- [ ] Have I considered whether STRIDE threat modeling is warranted for this change?
-- [ ] Am I exiting because security is genuinely addressed, or rationalizing?
+- [ ] Trust boundaries in this change were identified and input validation was verified at each one.
+- [ ] It is clear who can reach each new code path, and authorization is enforced at the right layer.
+- [ ] Sensitive data is protected in transit, at rest, and in logs through explicit filtering rather than discipline.
+- [ ] For new dependencies, maintenance status, known vulnerabilities, and the transitive dependency tree were checked.
+- [ ] It was considered whether STRIDE threat modeling is warranted for this change.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether security was genuinely addressed.
+
+Am I treating the absence of an obvious exploit in my head as evidence that the trust model is sound?
+
+Am I exiting because security is genuinely addressed, or because the current change looks disciplined enough?
 
 ---
 

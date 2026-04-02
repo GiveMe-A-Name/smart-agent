@@ -40,19 +40,27 @@ This skill does not own:
 - Every external dependency must have a timeout and a degradation strategy — dependencies WILL fail.
 - Deployment must be reversible — if you can't roll back, you can't deploy safely.
 
-## Completion Checklist
+## Completion Criteria
 
-- [ ] Did I work through the relevant judgment dimensions for this change?
-- [ ] Does every external dependency have a timeout and a failure handling strategy?
-- [ ] Can an on-call engineer diagnose a failure using only logs, metrics, and traces — without reading source code?
-- [ ] Is the deployment reversible (rollback, feature flag, or backward-compatible migration)?
-- [ ] Are new failure modes detectable through existing or new alerts?
-- [ ] Does the service handle shutdown gracefully (drain connections, complete in-flight work, flush buffers)?
-- [ ] Have I considered cost implications at projected scale, not just current scale?
-- [ ] Did I catch any self-correction signals?
-- [ ] Am I exiting because the code is genuinely production-ready, or rationalizing?
+- [ ] The relevant judgment dimensions for this change were worked through.
+- [ ] Every external dependency has a timeout and a failure handling strategy.
+- [ ] An on-call engineer can diagnose a failure using logs, metrics, and traces without reading source code.
+- [ ] The deployment is reversible through rollback, a feature flag, or a backward-compatible migration.
+- [ ] New failure modes are detectable through existing or new alerts.
+- [ ] The service handles shutdown gracefully, including draining connections, completing in-flight work, and flushing buffers where applicable.
+- [ ] Cost implications were considered at projected scale, not just current scale.
 
-**If any check fails, return to the relevant section before exiting.**
+**If any criterion is not met, return to the relevant section before exiting.**
+
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the code is genuinely production-ready.
+
+Did I ignore any applicable self-correction signals because the happy path appears instrumented or deployable?
+
+Am I exiting because the code is genuinely production-ready, or because the current safeguards look close enough?
 
 ---
 
