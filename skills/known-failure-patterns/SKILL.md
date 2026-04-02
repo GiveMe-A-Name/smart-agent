@@ -11,6 +11,8 @@ Core principle from Harness Engineering:
 
 The key word is **engineer** — not remind, not annotate, not re-explain. The goal is to make the mistake structurally impossible or mechanically detectable, not to document that it happened.
 
+**Enforcement Fidelity Law**: A higher enforcement layer is only an upgrade if it enforces *the constraint as stated* — not a mechanically convenient proxy for it. A check that is easier to implement than the real constraint is not Level 2 enforcement; it is a weaker constraint dressed as a stronger one, creating false confidence while the actual failure mode remains unguarded. Every escalation decision must pass this test before it counts as valid.
+
 ## Trigger Logic
 
 Invoke when the current task is to decide how an observed agent mistake should be prevented from recurring.
@@ -65,11 +67,11 @@ A good rule is specific enough that an agent could act on it immediately after r
 
 ### Level 2 — Automated test
 
-**Use when**: the mistake is structural and can be mechanically verified — wrong imports, missing interface contract, forbidden patterns in code, violated schema invariants. Choose the smallest test or static check that would reliably catch the mistake class.
+**Use when**: the mistake is structural and can be mechanically verified. Apply the Enforcement Fidelity Law before escalating: the check must enforce the constraint as stated, not a proxy. Choose the smallest test or static check that would reliably catch the mistake class.
 
 Good for: module boundary violations, missing CLI flags on new scripts, disallowed dependencies, non-idempotent writes.
 
-**Ask**: *could a script definitively check whether this mistake has occurred?* If yes, a test enforces more reliably than a rule. Tests run on every commit; rules require the agent to recall them.
+**Ask**: *could a script definitively check whether this mistake has occurred, as described?* If yes, a test enforces more reliably than a rule. Tests run on every commit; rules require the agent to recall them.
 
 Common patterns:
 - Cross-layer imports → AST-based boundary test (e.g., `test_module_boundaries.py`)
@@ -93,7 +95,7 @@ Good for: scaffolding new modules, initializing DB schema, generating strategy s
 
 Work through these in order before writing an entry:
 
-1. **Is this structurally verifiable?** If a script could mechanically detect the mistake in CI, escalate to Level 2 before writing a Level 1 rule.
+1. **Is this structurally verifiable?** If a script could mechanically detect the mistake in CI, consider Level 2 — but apply the Enforcement Fidelity Law first. If the problem framing indicates the constraint depends on context or intent, that is strong evidence no faithful mechanical check exists, and Level 1 is the correct layer.
 
 2. **Is the operation's error-prone nature the root cause, not a misunderstanding?** If the agent understood correctly but the task structure invited the mistake, consider Level 3.
 
@@ -107,7 +109,8 @@ Work through these in order before writing an entry:
 
 ## Invariants
 
-- Always escalate to the highest feasible level. Stopping at Level 1 when Level 2 was possible is the most common failure.
+- Escalate to the highest level where enforcement passes the Enforcement Fidelity Law. Both failure directions are real: under-escalation wastes leverage; escalation with a proxy check creates false confidence.
+
 - One mistake class → one entry. Do not batch unrelated mistakes into a vague rule.
 - Text rules must be actionable without forward references or additional context the agent won't have at read time.
 - After writing an entry, verify it against the original mistake: would it have prevented it?
@@ -126,6 +129,7 @@ Stop and revise when:
 - A one-off environment issue, flaky external dependency, or operator error is being recorded as if it were an agent capability failure.
 - The proposed entry would not actually have caught the original mistake if it had existed beforehand.
 - A tool-worthy failure mode is being treated as documentation debt instead of eliminating the error-prone operation itself.
+- The escalation to Level 2 fails the Enforcement Fidelity Law: the check enforces a proxy, not the constraint as stated.
 
 ---
 
@@ -144,7 +148,7 @@ Stop and revise when:
 
 Before exiting, pause on these:
 
-- Did I stop at Level 1 because it was easier, when Level 2 was actually feasible?
+- Does my level choice pass the Enforcement Fidelity Law — in both directions?
 - Is the rule I wrote specific enough to act on without extra context — or does it assume knowledge the agent won't have?
 - Am I recording a genuine recurring risk, or a one-off that is unlikely to recur?
 - Would the entry, as written, have prevented the original mistake? Or does it only gesture at the problem?
