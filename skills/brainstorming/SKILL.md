@@ -104,7 +104,17 @@ Stop the loop once no medium/high-risk issues remain, even if minor issues persi
 - Spec is committed to git before the user reviews it
 - Verbal approval of a design in conversation is not the same as approval of the written spec
 - No unrelated refactoring — only improvements that directly serve the current goal
-- **Before exiting this skill, you MUST complete the Self-Check section at the end**
+
+## Completion Checklist
+
+- [ ] Did I follow all invariants (one question per message, 2-3 approaches, spec committed)?
+- [ ] Did I catch any failure signals?
+- [ ] Did the user approve the committed spec (not just verbal approval)?
+- [ ] Were approaches compared against dimensions chosen for this specific decision (not a generic checklist)?
+- [ ] If the design depends on external libraries/APIs: was feasibility verified (through research or spike)?
+- [ ] Am I exiting because the design is genuinely complete and approved, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**
 
 ## Failure Signals
 
@@ -120,13 +130,3 @@ Stop and reassess if:
 - You are comparing approaches but each is described in a different frame, making comparison impossible — use consistent dimensions
 - You are designing around an external dependency without checking whether it actually supports the required capability
 
-## Self-Check Before Exiting
-
-- [ ] Did I follow all invariants (one question per message, 2-3 approaches, spec committed)?
-- [ ] Did I catch any failure signals?
-- [ ] Did the user approve the committed spec (not just verbal approval)?
-- [ ] Were approaches compared against dimensions chosen for this specific decision (not a generic checklist)?
-- [ ] If the design depends on external libraries/APIs: was feasibility verified (through research or spike)?
-- [ ] Am I exiting because the design is genuinely complete and approved, or rationalizing?
-
-**If any check fails, return to the relevant section before exiting.**

@@ -66,7 +66,17 @@ If you cannot write a self-contained prompt, the task is not scoped correctly.
 - Each agent gets its own isolated context — never pass session history or "you know what we discussed"
 - One agent per independent problem domain — do not bundle unrelated problems into one agent
 - Dispatch only after the independence test passes — not speculatively
-- **Before exiting this skill, you MUST complete the Self-Check section at the end**
+
+## Completion Checklist
+
+- [ ] Did I follow all invariants (isolated context, one agent per domain, passed independence test)?
+- [ ] Did I verify compatibility of results (check for file conflicts)?
+- [ ] If partial failure occurred: did I assess whether successful changes are independently valid?
+- [ ] Did I check whether any agent's findings invalidate other agents' premises?
+- [ ] Did I catch any failure signals?
+- [ ] Am I exiting because parallel dispatch was appropriate and results are integrated, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**
 
 ## Failure Signals
 
@@ -102,13 +112,3 @@ Do NOT just increase timeouts — find the real issue.
 Return: summary of root cause and what you changed.
 ```
 
-## Self-Check Before Exiting
-
-- [ ] Did I follow all invariants (isolated context, one agent per domain, passed independence test)?
-- [ ] Did I verify compatibility of results (check for file conflicts)?
-- [ ] If partial failure occurred: did I assess whether successful changes are independently valid?
-- [ ] Did I check whether any agent's findings invalidate other agents' premises?
-- [ ] Did I catch any failure signals?
-- [ ] Am I exiting because parallel dispatch was appropriate and results are integrated, or rationalizing?
-
-**If any check fails, return to the relevant section before exiting.**

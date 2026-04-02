@@ -89,9 +89,18 @@ These thoughts indicate a skill check is being skipped. Stop and check if you re
 - The 1% rule has no exceptions for urgency, simplicity, or familiarity
 - The check is against the available skill list, not memory of what skills exist
 
+## Completion Checklist
+
+- [ ] Did I scan the actual skill list (not from memory) for the action I am about to take?
+- [ ] For every skill with >1% applicability: did I either invoke it or state observable reasoning for skipping?
+- [ ] Am I proceeding to the action now — not deferring skill checks to "when needed"?
+
+**If any check fails, return to the Skill Assessment Framework before exiting.**
+
 ## Failure Signals
 
 Stop and reassess if:
 - You are about to write code without having checked for relevant skills for that step
 - You are executing a todo item without having checked for relevant skills for that item
 - You last performed a skill check before the first action and have since taken multiple distinct actions without re-checking
+

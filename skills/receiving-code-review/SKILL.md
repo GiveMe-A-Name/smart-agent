@@ -37,8 +37,18 @@ It does NOT:
 
 **Clarify all before implementing any.** If any item in multi-item feedback is unclear, stop and ask before touching anything. Items may be related; partial understanding leads to wrong implementation.
 
-**Before exiting this skill, you MUST complete the Self-Check section at the end.**
 
+## Completion Checklist
+
+- [ ] Did I evaluate each comment with the design intent in mind — not in a vacuum?
+- [ ] Did I distinguish between comments that challenge correctness versus comments that challenge design?
+- [ ] Did I apply evidence (not just arguments) to support my decisions?
+- [ ] Did I follow all invariants (verify before implementing, no performative agreement, clarify all first)?
+- [ ] If multi-reviewer feedback: did I surface contradictions instead of silently resolving them? Did I triage by severity before processing linearly?
+- [ ] Did I catch any failure signals?
+- [ ] Am I exiting because feedback is genuinely evaluated and addressed, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**
 
 ## Core Mental Models
 
@@ -168,14 +178,3 @@ Stop and reorient if:
 - A reviewer said "the goal hasn't been achieved" and you accepted their articulation of the goal without tracing it to user-confirmed intent — the reviewer's premise about what the goal is may be wrong even when their observation about the current code is correct
 
 
-## Self-Check Before Exiting
-
-- [ ] Did I evaluate each comment with the design intent in mind — not in a vacuum?
-- [ ] Did I distinguish between comments that challenge correctness versus comments that challenge design?
-- [ ] Did I apply evidence (not just arguments) to support my decisions?
-- [ ] Did I follow all invariants (verify before implementing, no performative agreement, clarify all first)?
-- [ ] If multi-reviewer feedback: did I surface contradictions instead of silently resolving them? Did I triage by severity before processing linearly?
-- [ ] Did I catch any failure signals?
-- [ ] Am I exiting because feedback is genuinely evaluated and addressed, or rationalizing?
-
-**If any check fails, return to the relevant section before exiting.**

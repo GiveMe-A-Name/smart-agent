@@ -46,7 +46,21 @@ This skill does not own:
 - Performance is a feature — it has requirements, it can regress, and it must be tested.
 - Every optimization has a cost (complexity, readability, maintainability). The benefit must outweigh the cost.
 - "Premature optimization is the root of all evil" does not mean "ignore performance until production is on fire." It means don't optimize without evidence.
-- **Before exiting this skill, you MUST complete the Self-Check section at the end.**
+
+## Completion Checklist
+
+- [ ] Have I identified whether this code is on a performance-sensitive path? (Dimension 1)
+- [ ] If it is on a hot path, have I checked the relevant dimensions (algorithmic fitness, I/O, resources)?
+- [ ] Have I checked for structural anti-patterns that are always worth fixing (N+1, unbounded collections, missing timeouts)?
+- [ ] If frontend code: have I considered bundle size, render performance, and Core Web Vitals impact? (Dimension 6)
+- [ ] If database code: have I verified index support and checked the query execution plan? (Dimension 7)
+- [ ] If async/concurrent code: is the event loop unblocked, are pools sized appropriately, is backpressure in place? (Dimension 8)
+- [ ] If I recommended or applied an optimization, do I have evidence it targets the actual bottleneck? (Dimension 5)
+- [ ] If I decided NOT to optimize, is that because I confirmed the code is off the hot path or the concern is hypothetical — not because I skipped the analysis?
+- [ ] Does any optimization I've applied justify its complexity cost?
+- [ ] Am I exiting because performance is genuinely addressed, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**
 
 ---
 
@@ -255,17 +269,3 @@ Stop and reassess if:
 - Async: you are running CPU-intensive work on the event loop / main thread
 - You are sizing a thread/connection pool based on intuition rather than workload characteristics
 
-## Self-Check Before Exiting
-
-- [ ] Have I identified whether this code is on a performance-sensitive path? (Dimension 1)
-- [ ] If it is on a hot path, have I checked the relevant dimensions (algorithmic fitness, I/O, resources)?
-- [ ] Have I checked for structural anti-patterns that are always worth fixing (N+1, unbounded collections, missing timeouts)?
-- [ ] If frontend code: have I considered bundle size, render performance, and Core Web Vitals impact? (Dimension 6)
-- [ ] If database code: have I verified index support and checked the query execution plan? (Dimension 7)
-- [ ] If async/concurrent code: is the event loop unblocked, are pools sized appropriately, is backpressure in place? (Dimension 8)
-- [ ] If I recommended or applied an optimization, do I have evidence it targets the actual bottleneck? (Dimension 5)
-- [ ] If I decided NOT to optimize, is that because I confirmed the code is off the hot path or the concern is hypothetical — not because I skipped the analysis?
-- [ ] Does any optimization I've applied justify its complexity cost?
-- [ ] Am I exiting because performance is genuinely addressed, or rationalizing?
-
-**If any check fails, return to the relevant section before exiting.**

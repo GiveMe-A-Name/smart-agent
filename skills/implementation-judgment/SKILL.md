@@ -49,8 +49,21 @@ This skill does not own:
 - Prefer the least invasive change that keeps responsibilities clear and future changes easier — but recognize that sometimes the "least invasive" change deepens a structural problem.
 - Do not treat theoretical justification as a substitute for usage evidence. "This supports testability", "this could be useful", "this is clean design" are arguments, not evidence. Evidence is: who calls this, who depends on this, what breaks if this is removed.
 - Do not treat duplication removal as inherently good. Duplication is far cheaper than the wrong abstraction.
-- **Before exiting this skill, you MUST complete the Self-Check section at the end.**
 
+## Completion Checklist
+
+- [ ] Did I work through the relevant judgment dimensions for this change (without over-analyzing irrelevant ones)?
+- [ ] Did I follow all invariants (usage evidence over theoretical justification, question existing shapes)?
+- [ ] Did I catch any self-correction signals?
+- [ ] Does the implementation keep responsibilities clear and future changes easier?
+- [ ] If the change touches shared state: did I trace what is read and written across all affected boundaries?
+- [ ] If the change requires migration (schema, API, config): is the migration path safe for production?
+- [ ] If invoked after `receiving-code-review`: did I implement the reviewer's intent (not just their literal words) while preserving design integrity?
+- [ ] If the change makes an existing capability path unreachable: did I surface this explicitly before implementing?
+- [ ] If implementing toward a goal identified by a reviewer: was that goal confirmed by the user, or only inferred by the reviewer?
+- [ ] Am I exiting because the implementation is genuinely sound, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**
 
 ## Judgment Dimensions
 
@@ -275,17 +288,3 @@ Stop and revise when:
 - you are implementing toward a goal named by a reviewer — not explicitly confirmed by the user — especially when that goal would change global strategy or remove capabilities
 
 
-## Self-Check Before Exiting
-
-- [ ] Did I work through the relevant judgment dimensions for this change (without over-analyzing irrelevant ones)?
-- [ ] Did I follow all invariants (usage evidence over theoretical justification, question existing shapes)?
-- [ ] Did I catch any self-correction signals?
-- [ ] Does the implementation keep responsibilities clear and future changes easier?
-- [ ] If the change touches shared state: did I trace what is read and written across all affected boundaries?
-- [ ] If the change requires migration (schema, API, config): is the migration path safe for production?
-- [ ] If invoked after `receiving-code-review`: did I implement the reviewer's intent (not just their literal words) while preserving design integrity?
-- [ ] If the change makes an existing capability path unreachable: did I surface this explicitly before implementing?
-- [ ] If implementing toward a goal identified by a reviewer: was that goal confirmed by the user, or only inferred by the reviewer?
-- [ ] Am I exiting because the implementation is genuinely sound, or rationalizing?
-
-**If any check fails, return to the relevant section before exiting.**

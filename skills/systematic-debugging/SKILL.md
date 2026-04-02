@@ -33,7 +33,19 @@ Root cause means you can state: *"The bug is at [specific location] because [mec
 
 The test: can you predict what will happen if you make a specific change? If yes, you have a root cause. If no, you have a hypothesis — keep investigating.
 
-**Before exiting this skill, you MUST complete the Self-Check at the end.**
+
+## Completion Checklist
+
+- [ ] Did I establish root cause with evidence (not just a hypothesis)?
+- [ ] Can I state: "The bug is at [location] because [mechanism], which produces [symptom]"?
+- [ ] Could I predict the fix outcome before running it?
+- [ ] Did I verify the fix resolves the original failure?
+- [ ] Did I check for the bug's relatives (same pattern elsewhere)?
+- [ ] Did I rule out environment/config/build issues before debugging code logic?
+- [ ] If I spent significant time without progress: did I escalate with context rather than continuing to spin?
+- [ ] Am I exiting because the bug is genuinely fixed, or rationalizing?
+
+**If any check fails, return to the relevant mental model before exiting.**
 
 ---
 
@@ -287,15 +299,3 @@ See `examples/symptom-vs-owning-layer.md` — how a stack-trace line can be the 
 
 See `examples/fixture-bypass-detection.md` — how bypass information can appear acknowledged while being set aside.
 
-## Self-Check Before Exiting
-
-- [ ] Did I establish root cause with evidence (not just a hypothesis)?
-- [ ] Can I state: "The bug is at [location] because [mechanism], which produces [symptom]"?
-- [ ] Could I predict the fix outcome before running it?
-- [ ] Did I verify the fix resolves the original failure?
-- [ ] Did I check for the bug's relatives (same pattern elsewhere)?
-- [ ] Did I rule out environment/config/build issues before debugging code logic?
-- [ ] If I spent significant time without progress: did I escalate with context rather than continuing to spin?
-- [ ] Am I exiting because the bug is genuinely fixed, or rationalizing?
-
-**If any check fails, return to the relevant mental model before exiting.**

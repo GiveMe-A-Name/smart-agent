@@ -142,7 +142,18 @@ Research has diminishing returns. Some questions are better answered by building
 - Distinguish between "I found evidence that X is true" and "I found no evidence that X is false" — absence of evidence is not evidence of absence
 - Use web search tools actively — do not rely solely on internal knowledge for factual claims about external systems, libraries, APIs, or current state of the world
 - Stop when sub-questions are answered with appropriate evidence, not when curiosity is satisfied or a time limit is hit
-- **Before exiting, complete the Self-Check section**
+
+## Completion Checklist
+
+- [ ] Did I decompose before searching, with a hypothesis or purpose per lookup?
+- [ ] Did I cross-validate critical claims across independent sources?
+- [ ] Did I actively search for disconfirming evidence, not just confirming evidence?
+- [ ] Does each conclusion's confidence match the quality and independence of its supporting evidence?
+- [ ] Did I evaluate AI-generated content with appropriate skepticism (verified code examples, checked original docs)?
+- [ ] If an implementation question: did I consider whether a prototype would be faster than more research?
+- [ ] Am I stopping because the question is genuinely answered, or rationalizing early closure?
+
+**If any check fails, return to the relevant section before exiting.**
 
 ## Decision Signals
 
@@ -207,14 +218,3 @@ Stop and revise when:
 - You have been researching an implementation question for 30+ minutes when a 10-minute prototype would answer it definitively
 - You are evaluating a library by its GitHub stars, README aesthetics, or a single glowing blog post instead of maintenance health, issue response time, and security history
 
-## Self-Check Before Exiting
-
-- [ ] Did I decompose before searching, with a hypothesis or purpose per lookup?
-- [ ] Did I cross-validate critical claims across independent sources?
-- [ ] Did I actively search for disconfirming evidence, not just confirming evidence?
-- [ ] Does each conclusion's confidence match the quality and independence of its supporting evidence?
-- [ ] Did I evaluate AI-generated content with appropriate skepticism (verified code examples, checked original docs)?
-- [ ] If an implementation question: did I consider whether a prototype would be faster than more research?
-- [ ] Am I stopping because the question is genuinely answered, or rationalizing early closure?
-
-**If any check fails, return to the relevant section before exiting.**

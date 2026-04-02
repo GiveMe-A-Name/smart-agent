@@ -55,7 +55,19 @@ A well-applied TDD session answers: what should this thing do, from the perspect
 - Refactoring happens only after green — never add behavior during refactor
 - Bugs must never be fixed without a test that first reproduces the bug
 - If skipping TDD, name a specific no-behavior criterion explicitly (not "it's simple")
-- **Before exiting this skill, complete the Self-Check section**
+
+## Completion Checklist
+
+- [ ] Did I follow all invariants (test before code, watched it fail, watched it pass)?
+- [ ] If I skipped TDD, did I name a specific no-behavior criterion?
+- [ ] Did each test name a behavior the caller cares about — not an implementation detail?
+- [ ] Did TDD surface any design pressure? Did I act on it or rationalize past it?
+- [ ] If modifying legacy code: did I write characterization tests before changing behavior?
+- [ ] If testing async/concurrent code: am I using explicit synchronization instead of sleeps?
+- [ ] Did I catch any self-correction signals?
+- [ ] Am I exiting because tests are genuinely in place, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**
 
 ### No-Behavior Signals (TDD optional)
 
@@ -267,15 +279,3 @@ Stop and revise when:
 - test fixtures are copied and pasted with minor variations instead of using factories/builders
 - review feedback says "the goal is not fully achieved" and you are adding more tests toward that goal without first verifying that the goal itself was explicitly confirmed by the user — a reviewer's articulation of the goal is not the same as the user's confirmed intent; writing more tests to satisfy an unverified goal deepens the implementation of a potentially wrong objective
 
-## Self-Check Before Exiting
-
-- [ ] Did I follow all invariants (test before code, watched it fail, watched it pass)?
-- [ ] If I skipped TDD, did I name a specific no-behavior criterion?
-- [ ] Did each test name a behavior the caller cares about — not an implementation detail?
-- [ ] Did TDD surface any design pressure? Did I act on it or rationalize past it?
-- [ ] If modifying legacy code: did I write characterization tests before changing behavior?
-- [ ] If testing async/concurrent code: am I using explicit synchronization instead of sleeps?
-- [ ] Did I catch any self-correction signals?
-- [ ] Am I exiting because tests are genuinely in place, or rationalizing?
-
-**If any check fails, return to the relevant section before exiting.**

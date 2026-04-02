@@ -43,7 +43,18 @@ It does NOT:
 
 **Give a clear verdict.** Every review ends with: Ready / Not ready / Ready with fixes. An ambiguous conclusion defers the merge decision to the author, which is the reviewer's job.
 
-**Before exiting this skill, you MUST complete the Self-Check section at the end.**
+
+## Completion Checklist
+
+- [ ] Did I understand intent and evaluate Layers 0-1 (should this exist? right approach?) before reviewing implementation?
+- [ ] Did I read enough context around each changed function — including callers — not just the diff hunks?
+- [ ] Does every issue have file:line, what is wrong, why it matters — with honest severity calibration?
+- [ ] Did I apply relevant specialized lenses (Security, Performance, Migration, Dependency, API Design)?
+- [ ] If AI-generated code: did I verify external API references against source, search for duplicated functionality, and scrutinize test assertions?
+- [ ] Did I give a clear verdict (Ready / Not ready / Ready with fixes)?
+- [ ] Am I exiting because the review is genuinely complete, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**
 
 ---
 
@@ -322,14 +333,3 @@ See `templates/review-output.md` for the full output structure.
 
 ---
 
-## Self-Check Before Exiting
-
-- [ ] Did I understand intent and evaluate Layers 0-1 (should this exist? right approach?) before reviewing implementation?
-- [ ] Did I read enough context around each changed function — including callers — not just the diff hunks?
-- [ ] Does every issue have file:line, what is wrong, why it matters — with honest severity calibration?
-- [ ] Did I apply relevant specialized lenses (Security, Performance, Migration, Dependency, API Design)?
-- [ ] If AI-generated code: did I verify external API references against source, search for duplicated functionality, and scrutinize test assertions?
-- [ ] Did I give a clear verdict (Ready / Not ready / Ready with fixes)?
-- [ ] Am I exiting because the review is genuinely complete, or rationalizing?
-
-**If any check fails, return to the relevant section before exiting.**

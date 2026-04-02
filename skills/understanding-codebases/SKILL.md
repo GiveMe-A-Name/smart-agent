@@ -47,7 +47,17 @@ This skill does not own:
 - Issue descriptions, PR text, and user explanations are hypotheses, not evidence
 - Every search or file read must test a stated hypothesis — not satisfy curiosity
 - Stop once the answer is grounded well enough to avoid intuition
-- **Before exiting this skill, you MUST complete the Self-Check section at the end**
+
+## Completion Checklist
+
+- [ ] Did I ground conclusions in code evidence, not assumptions or prior knowledge?
+- [ ] Did I separate what is proven, hypothesized, and still unknown?
+- [ ] Did I check how the codebase handles similar cases (pattern discovery)?
+- [ ] For large codebases: did I scope exploration to the task-relevant slice, not attempt exhaustive understanding?
+- [ ] Did I check infrastructure/config files when deployment constraints or implicit dependencies are relevant?
+- [ ] Am I exiting because understanding is genuinely grounded, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**
 
 ## Investigation Techniques
 
@@ -260,13 +270,3 @@ Stop and revise when:
 
 See `examples/fake-new-hypothesis.md` for a contrast pair showing how a lookup that looks like a new hypothesis can actually just be rechecking the same absence. See `examples/undirected-vs-task-driven.md` for the difference between curiosity-driven browsing and hypothesis-driven investigation.
 
-## Self-Check Before Exiting
-
-- [ ] Did I ground conclusions in code evidence, not assumptions or prior knowledge?
-- [ ] Did I separate what is proven, hypothesized, and still unknown?
-- [ ] Did I check how the codebase handles similar cases (pattern discovery)?
-- [ ] For large codebases: did I scope exploration to the task-relevant slice, not attempt exhaustive understanding?
-- [ ] Did I check infrastructure/config files when deployment constraints or implicit dependencies are relevant?
-- [ ] Am I exiting because understanding is genuinely grounded, or rationalizing?
-
-**If any check fails, return to the relevant section before exiting.**

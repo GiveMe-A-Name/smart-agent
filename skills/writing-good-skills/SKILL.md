@@ -39,8 +39,18 @@ This skill does not own:
 - A capability skill must have five elements: trigger logic, capability boundary, invariants, decision signals, failure signals. Missing any one makes the skill weak.
 - Skills teach judgment; they do not encode orchestration or hide routing graphs.
 - The main `SKILL.md` must stay lean but must not become hollow. Core law stays inline; expanded support material moves to support folders.
-- **Before exiting this skill, you MUST complete the Self-Check section at the end.**
 
+## Completion Checklist
+
+- [ ] Does the skill have all five core elements (trigger logic, boundary, invariants, decision signals, failure signals)?
+- [ ] Is the trigger state-based (not scenario-based), with uncertainty defaulting to invoke?
+- [ ] Does the skill have an explicit completion definition — a checklist that tells the agent when the work is done, not just a post-hoc verification?
+- [ ] Is the boundary authentic — no routing language, no named-skill handoffs disguised as scope?
+- [ ] Is the main file lean but not hollow — core law inline, support material in folders?
+- [ ] Did I catch any self-correction signals?
+- [ ] Am I exiting because the skill is genuinely well-designed, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**
 
 ## Judgment Dimensions
 
@@ -142,11 +152,3 @@ Stop and revise when:
 - two sections teach the same judgment in slightly different words
 
 
-## Self-Check Before Exiting
-
-- [ ] Does the skill have all five core elements (trigger logic, boundary, invariants, decision signals, failure signals)?
-- [ ] Is the trigger state-based (not scenario-based), with uncertainty defaulting to invoke?
-- [ ] Did I catch any self-correction signals?
-- [ ] Am I exiting because the skill is genuinely well-designed, or rationalizing?
-
-**If any check fails, return to the relevant section before exiting.**

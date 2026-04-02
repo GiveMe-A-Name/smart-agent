@@ -44,7 +44,18 @@ You cannot start writing until you can state: *"This is a [size] [nature] task. 
 
 If you can't name the files involved, you haven't assessed enough.
 
-**Before exiting this skill, you MUST complete the Self-Check section at the end.**
+
+## Completion Checklist
+
+- [ ] Did I complete the situation assessment (size, nature, current state) and state a decomposition strategy?
+- [ ] Is each task a vertical slice (delivers verifiable value, leaves codebase working), ordered risk-first?
+- [ ] Are file paths exact and changes concrete (not vague)?
+- [ ] For medium/large work: did I identify contingencies for the riskiest assumptions and define plan revision triggers?
+- [ ] For cross-boundary work: are interfaces agreed and handoffs explicit?
+- [ ] Did I catch any failure signals (over-planning, under-planning, horizontal slicing)?
+- [ ] Am I exiting because the plan is genuinely complete, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**
 
 ---
 
@@ -191,14 +202,3 @@ After saving to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, offer to execute 
 
 See `examples.md` in this directory for Tiny / Small / Medium / Large plan examples showing decomposition strategies in action.
 
-## Self-Check Before Exiting
-
-- [ ] Did I complete the situation assessment (size, nature, current state) and state a decomposition strategy?
-- [ ] Is each task a vertical slice (delivers verifiable value, leaves codebase working), ordered risk-first?
-- [ ] Are file paths exact and changes concrete (not vague)?
-- [ ] For medium/large work: did I identify contingencies for the riskiest assumptions and define plan revision triggers?
-- [ ] For cross-boundary work: are interfaces agreed and handoffs explicit?
-- [ ] Did I catch any failure signals (over-planning, under-planning, horizontal slicing)?
-- [ ] Am I exiting because the plan is genuinely complete, or rationalizing?
-
-**If any check fails, return to the relevant section before exiting.**

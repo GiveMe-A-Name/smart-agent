@@ -46,7 +46,20 @@ This skill does not own:
 - Every document must answer: what is this, why does it matter, what do I need to do?
 - Shorter is better, until it becomes unclear. Then it's too short.
 - A document that is never updated is a document that will eventually lie. Build in update expectations or mark documents as point-in-time.
-- **Before exiting this skill, you MUST complete the Self-Check section at the end.**
+
+## Completion Checklist
+
+- [ ] Did I identify the audience and what they need? (Dimension 1)
+- [ ] Did I choose the right vehicle for this communication need? (Dimension 2)
+- [ ] Does the document state its conclusion in the first paragraph and structure for scanning? (Dimension 3)
+- [ ] Is the writing specific and concise — numbers over adjectives, evidence over assertions? (Dimension 4)
+- [ ] Have I addressed whether this document should be updated or treated as immutable? (Dimension 5)
+- [ ] If writing code documentation: does the README enable getting started, do API docs describe the contract, do comments explain why? (Dimension 6)
+- [ ] If writing PR descriptions or commits: is the "why" clear, are issues linked, is the commit history readable? (Dimension 7)
+- [ ] Did I use diagrams or tables where they communicate more effectively than text? (Dimension 8)
+- [ ] Am I exiting because the document is genuinely clear and useful, or rationalizing?
+
+**If any check fails, return to the relevant dimension before exiting.**
 
 ---
 
@@ -190,16 +203,3 @@ Stop and reassess if:
 - you are writing paragraphs where a table or diagram would communicate faster
 - an inline comment restates what the code does instead of explaining why
 
-## Self-Check Before Exiting
-
-- [ ] Did I identify the audience and what they need? (Dimension 1)
-- [ ] Did I choose the right vehicle for this communication need? (Dimension 2)
-- [ ] Does the document state its conclusion in the first paragraph and structure for scanning? (Dimension 3)
-- [ ] Is the writing specific and concise — numbers over adjectives, evidence over assertions? (Dimension 4)
-- [ ] Have I addressed whether this document should be updated or treated as immutable? (Dimension 5)
-- [ ] If writing code documentation: does the README enable getting started, do API docs describe the contract, do comments explain why? (Dimension 6)
-- [ ] If writing PR descriptions or commits: is the "why" clear, are issues linked, is the commit history readable? (Dimension 7)
-- [ ] Did I use diagrams or tables where they communicate more effectively than text? (Dimension 8)
-- [ ] Am I exiting because the document is genuinely clear and useful, or rationalizing?
-
-**If any check fails, return to the relevant dimension before exiting.**

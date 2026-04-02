@@ -46,7 +46,17 @@ This skill does not own:
 - Security through obscurity is not security — assume attackers have the source code.
 - The principle of least privilege applies to every layer: code, APIs, database users, service accounts, deployment permissions.
 - Sensitive data must be protected at rest, in transit, and in logs.
-- **Before exiting this skill, you MUST complete the Self-Check section at the end.**
+
+## Completion Checklist
+
+- [ ] Have I identified the trust boundaries in this change and verified input is validated at each one?
+- [ ] Can I state who can reach each new code path and confirm authorization is enforced at the right layer?
+- [ ] Is sensitive data protected in transit, at rest, and in logs — with explicit filtering, not discipline?
+- [ ] For new dependencies: have I checked maintenance status, known vulnerabilities, and the transitive dependency tree?
+- [ ] Have I considered whether STRIDE threat modeling is warranted for this change?
+- [ ] Am I exiting because security is genuinely addressed, or rationalizing?
+
+**If any check fails, return to the relevant section before exiting.**
 
 ---
 
@@ -168,13 +178,3 @@ Stop and reassess if:
 - you are hardcoding secrets or committing them to source control
 - you cannot answer "who can reach this code path?" for a new endpoint
 
-## Self-Check Before Exiting
-
-- [ ] Have I identified the trust boundaries in this change and verified input is validated at each one?
-- [ ] Can I state who can reach each new code path and confirm authorization is enforced at the right layer?
-- [ ] Is sensitive data protected in transit, at rest, and in logs — with explicit filtering, not discipline?
-- [ ] For new dependencies: have I checked maintenance status, known vulnerabilities, and the transitive dependency tree?
-- [ ] Have I considered whether STRIDE threat modeling is warranted for this change?
-- [ ] Am I exiting because security is genuinely addressed, or rationalizing?
-
-**If any check fails, return to the relevant section before exiting.**
