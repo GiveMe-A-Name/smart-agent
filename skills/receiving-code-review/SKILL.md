@@ -88,9 +88,9 @@ These questions shape judgment for each feedback item. They are not sequential s
 
 A technically wrong suggestion is wrong regardless of source. A reviewer with limited context may still be right about a bug while wrong about design direction.
 
-**Technical correctness is necessary but not sufficient.** A suggestion can be technically valid and still wrong for this code if it sacrifices a tradeoff the design intentionally made. The harder question is always: does this suggestion serve the original design goals, or does it optimize a different dimension at the cost of what was prioritized?
+**Does this serve the original design goals, or a different set of goals?** A suggestion can be technically valid and still wrong for this code if it sacrifices a tradeoff the design intentionally made. Before accepting: name what dimension this suggestion optimizes, and whether that dimension was more important than what it costs.
 
-**Evidence, not arguments.** "This supports testability," "this is cleaner" are arguments. Who calls this, what breaks if removed, what usage patterns exist — these are evidence. Apply the same evidence standard to suggested changes that you apply to your own implementation choices. Grep before accepting claims about usage.
+**Verify usage claims with evidence, not arguments.** "Supports testability," "cleaner," "more extensible" are arguments. Grep before accepting claims about what depends on something, what would benefit from an abstraction, or what actual usage patterns exist. If nothing calls the suggested abstraction, flag removal rather than implementing it.
 
 
 ## Decision Heuristics
@@ -112,19 +112,19 @@ Ask a specific question. "Can you clarify?" is useless. "Are you suggesting we m
 
 ## Handling Multi-Reviewer Feedback
 
-When feedback comes from multiple reviewers, additional failure modes emerge.
+When feedback comes from multiple reviewers, triage before processing linearly.
 
-**Contradictory suggestions**: Identify what each reviewer is optimizing for — contradictions often arise from different implicit priorities (performance vs. readability, consistency with area X vs. area Y). When the contradiction is genuine: state both positions, explain which aligns with design intent and why, and ask for resolution. Do not silently pick one side. Never implement contradictory suggestions in different parts of the same change — inconsistency within a single PR is worse than either option.
+**Triage order:**
+1. **Blocking / critical** — bugs, security, correctness. Start here.
+2. **Design-level (Layer 0–1)** — evaluate before lower-layer fixes; acceptance may invalidate downstream feedback.
+3. **Implementation (Layer 2–3)** — group related comments; multiple related issues may resolve with one structural fix.
+4. **Style / preference** — batch for a final pass; author's call unless style guide mandates.
 
-**Overlapping feedback**: Convergence signals the problem is real. Evaluate each proposed fix on its merits — the first reviewer's fix is not automatically better. Respond to all threads even if the fix is the same.
+If design-level feedback requires significant rework, state that lower-layer feedback will be addressed in the reworked code. Don't fix typos in code that's about to be rewritten.
 
-**Volume management (20+ comments) — triage order:**
-1. **Blocking / critical**: bugs, security, correctness. Must be fixed. Start here.
-2. **Design-level (Layer 0–1)**: questions whether the change should exist or whether the approach is right. These may invalidate downstream feedback if accepted — evaluate before implementing lower-layer fixes.
-3. **Implementation (Layer 2–3)**: correctness, error handling, test quality. Group related comments — multiple error-handling issues may resolve with one structural fix rather than point-by-point patching.
-4. **Style / preference**: author's call unless style guide mandates. Batch for a final pass.
+**Contradictions**: Surface them — do not silently pick one side. **Overlap**: Convergence signals the problem is real; evaluate each proposed fix independently.
 
-If design-level feedback requires significant rework, state explicitly that lower-layer feedback will be addressed in the reworked code. Don't fix typos in code that's about to be rewritten.
+See `references/multi-reviewer.md` for detailed handling of contradictions, overlapping feedback, and volume management.
 
 
 ## Response Language
@@ -155,3 +155,5 @@ Stop and reorient if:
 - Two reviewers gave contradictory suggestions and you silently picked one without surfacing the conflict
 - You are processing 20+ comments linearly instead of triaging by severity and layer first
 - You are fixing style issues in code that design-level feedback may require rewriting
+
+**When a failure signal fires, reorient on local context — not the whole review:** (1) re-read the design intent source — commit messages, PR description, prior conversation; (2) trace the specific claim against your own implementation intent; (3) grep for actual usage if the signal involves patterns, abstractions, or dependencies.
