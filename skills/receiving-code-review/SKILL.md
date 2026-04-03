@@ -5,9 +5,7 @@ description: "Invoke when review feedback exists — PR comments, inline annotat
 
 # Receiving Code Review
 
-Evaluate feedback as a principal engineer would: against design intent, technical evidence, and architectural direction — not by social compliance.
-
-The coding agent is often the entity with the most complete context about why a change was made and what it is supposed to achieve. A reviewer sees the diff; the agent holds the implementation intent, the constraints that shaped the approach, and the tradeoffs that were consciously accepted. This asymmetry is the foundation of every evaluation decision. Collaboration does not mean compliance.
+Evaluate feedback as a principal engineer would: against design intent, technical evidence, and architectural direction — not by social compliance. A reviewer sees the diff; you hold the implementation intent, the constraints that shaped the approach, and the tradeoffs that were consciously accepted. This asymmetry is the foundation of every decision. Collaboration does not mean compliance.
 
 ## Trigger Logic
 
@@ -81,12 +79,7 @@ These questions shape judgment for each feedback item. They are not sequential s
 
 **Reviewer's premise vs. reviewer's observation**: A comment like "this doesn't achieve X" contains two claims: (1) the current code doesn't do X, and (2) X was the correct goal. Verify claim 1 against the code. Verify claim 2 against *your* implementation intent — not against what the reviewer says the goal is. If X was never explicitly confirmed, treat it as an unverified goal before building toward it. This is critical when X would alter global strategy, close existing capability paths, or conflict with capabilities added since the last explicit agreement.
 
-**Source calibration:**
-- Human partner: carries architectural and intent context by default — implement after understanding
-- Dispatched reviewer sub-agent: has codebase access but may miss intent and history — verify before implementing
-- External reviewer: may not know platform constraints or why current code exists — requires more explicit verification
-
-A technically wrong suggestion is wrong regardless of source. A reviewer with limited context may still be right about a bug while wrong about design direction.
+**Source calibration:** Human partner carries architectural and intent context by default; dispatched reviewer sub-agent may miss intent and history — verify before implementing; external reviewer may lack platform constraints — verify more explicitly. A technically wrong suggestion is wrong regardless of source.
 
 **Does this serve the original design goals, or a different set of goals?** A suggestion can be technically valid and still wrong for this code if it sacrifices a tradeoff the design intentionally made. Before accepting: name what dimension this suggestion optimizes, and whether that dimension was more important than what it costs.
 
@@ -112,32 +105,20 @@ Ask a specific question. "Can you clarify?" is useless. "Are you suggesting we m
 
 ## Handling Multi-Reviewer Feedback
 
-When feedback comes from multiple reviewers, triage before processing linearly.
+Triage before processing linearly. Priority order:
+1. **Blocking / critical** — bugs, security, correctness
+2. **Design-level (Layer 0–1)** — evaluate before lower-layer fixes; acceptance may invalidate downstream feedback
+3. **Implementation (Layer 2–3)** — group related comments; multiple related issues may resolve with one structural fix
+4. **Style / preference** — batch last; author's call unless mandated
 
-**Triage order:**
-1. **Blocking / critical** — bugs, security, correctness. Start here.
-2. **Design-level (Layer 0–1)** — evaluate before lower-layer fixes; acceptance may invalidate downstream feedback.
-3. **Implementation (Layer 2–3)** — group related comments; multiple related issues may resolve with one structural fix.
-4. **Style / preference** — batch for a final pass; author's call unless style guide mandates.
+Surface contradictions — do not silently pick one side. If design-level rework is accepted, state that lower-layer feedback will be addressed in the reworked code.
 
-If design-level feedback requires significant rework, state that lower-layer feedback will be addressed in the reworked code. Don't fix typos in code that's about to be rewritten.
-
-**Contradictions**: Surface them — do not silently pick one side. **Overlap**: Convergence signals the problem is real; evaluate each proposed fix independently.
-
-See `references/multi-reviewer.md` for detailed handling of contradictions, overlapping feedback, and volume management.
+See `references/multi-reviewer.md` for extended handling of contradictions, overlapping feedback, and volume management.
 
 
 ## Response Language
 
-**Correct feedback:** `"Fixed. [what changed]"` — or just fix it in code without comment.
-
-**Pushback:** State the technical finding, reference the evidence, ask a specific question. Example: `"The current approach co-locates validation with the handler because callers depend on receiving domain-specific errors (see tests in X). Extracting to middleware would genericize the errors. Was that the intent, or were you aiming for something else?"`
-
-**If you pushed back and were wrong:** `"You were right — I checked [X] and it does [Y]. Fixing."` No apology, no defense. State the correction and move on.
-
-**If the reviewer misunderstood:** Don't say "you misunderstood." Instead: `"I think the disconnect is [X]. The code does [Y] because [Z]. I'll add a comment to make this clearer."` Fix the code clarity even when the suggestion is wrong — the confusion is real and will affect future readers.
-
-**GitHub inline comments:** Reply in the comment thread, not as a top-level PR comment — `gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`
+See `references/response-language.md` for phrasing: correct feedback, pushback, if you were wrong, if the reviewer misunderstood, GitHub inline comment replies.
 
 
 ## Failure Signals

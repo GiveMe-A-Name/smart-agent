@@ -17,8 +17,7 @@ The key word is **engineer** — not remind, not annotate, not re-explain. The g
 
 Invoke when the current task is to decide how an observed agent mistake should be prevented from recurring.
 
-Common trigger states:
-- A failure pattern has been identified and needs to be converted into a durable constraint.
+- A failure pattern has been identified and needs a durable constraint.
 - The same class of mistake has appeared more than once and should be sedimented at the right enforcement layer.
 - Recent agent behavior is being reviewed to determine which recurring mistakes should become project rules, tests, or tools.
 
@@ -38,15 +37,11 @@ This skill does not own:
 - Diagnosing failures that have no agent-side root cause.
 - Recording one-off imperfections that do not justify a durable harness change.
 
----
-
 ## The Three Sedimentation Levels
 
 The central judgment has two steps: **choose the highest feasible enforcement layer, then choose the minimum sufficient mechanism within that layer.**
 
 A text rule where a test was possible is wasted leverage — it requires the agent to remember, whereas a test enforces silently on every run.
-
----
 
 ### Level 1 — Text rule (`Known failure patterns` in CLAUDE.md)
 
@@ -63,15 +58,11 @@ Good for: tech stack preferences, idiomatic patterns, domain rules, naming or ou
 
 A good rule is specific enough that an agent could act on it immediately after reading it. "Use Polars, not pandas, for all DataFrame operations in backtest/" is actionable. "Use the right library" is not.
 
----
-
 ### Level 2 — Automated test
 
 **Use when**: the mistake is structural and can be mechanically verified. Apply the Enforcement Fidelity Law before escalating: the check must enforce the constraint as stated, not a proxy. Choose the smallest test or static check that would reliably catch the mistake class.
 
 Good for: module boundary violations, missing CLI flags on new scripts, disallowed dependencies, non-idempotent writes.
-
-**Ask**: *could a script definitively check whether this mistake has occurred, as described?* If yes, a test enforces more reliably than a rule. Tests run on every commit; rules require the agent to recall them.
 
 Common patterns:
 - Cross-layer imports → AST-based boundary test (e.g., `test_module_boundaries.py`)
@@ -79,21 +70,13 @@ Common patterns:
 - Write without `ON CONFLICT DO UPDATE` → idempotency integration test
 - Missing type annotations → static analysis rule in ruff config
 
----
-
 ### Level 3 — Tool or script
 
 **Use when**: a recurring mistake happens because an operation is *inherently error-prone* for agents — boilerplate that gets wrong in the same ways, multi-step sequences that should be a single command, schema operations that should not be hand-written. Choose the smallest tool or script that removes the error-prone surface by construction.
 
 Good for: scaffolding new modules, initializing DB schema, generating strategy stubs with the correct contract pre-filled.
 
-**Ask**: *would a well-designed tool make this class of mistake impossible by construction, rather than just documented?* If yes, build the tool instead of writing more rules. A script that generates the correct scaffold eliminates the entire error surface rather than just documenting it.
-
----
-
 ## Decision Signals
-
-Work through these in order before writing an entry:
 
 1. **Is this structurally verifiable?** If a script could mechanically detect the mistake in CI, consider Level 2 — but apply the Enforcement Fidelity Law first. If the problem framing indicates the constraint depends on context or intent, that is strong evidence no faithful mechanical check exists, and Level 1 is the correct layer.
 
@@ -105,18 +88,12 @@ Work through these in order before writing an entry:
 
 5. **Would this entry have caught the original mistake if it had existed beforehand?** If not, the entry is not precise enough yet.
 
----
-
 ## Invariants
 
 - Escalate to the highest level where enforcement passes the Enforcement Fidelity Law. Both failure directions are real: under-escalation wastes leverage; escalation with a proxy check creates false confidence.
-
 - One mistake class → one entry. Do not batch unrelated mistakes into a vague rule.
 - Text rules must be actionable without forward references or additional context the agent won't have at read time.
-- After writing an entry, verify it against the original mistake: would it have prevented it?
 - Never write an entry for something already covered — adds noise, not signal.
-
----
 
 ## Failure Signals
 
@@ -131,8 +108,6 @@ Stop and revise when:
 - A tool-worthy failure mode is being treated as documentation debt instead of eliminating the error-prone operation itself.
 - The escalation to Level 2 fails the Enforcement Fidelity Law: the check enforces a proxy, not the constraint as stated.
 
----
-
 ## Completion Criteria
 
 - [ ] The mistake has been assigned to the correct sedimentation level (highest feasible)
@@ -141,8 +116,6 @@ Stop and revise when:
 - [ ] **If Level 3**: a tool or script exists or is planned that eliminates the error-prone surface
 - [ ] New entry does not duplicate an existing one
 - [ ] Entry would have caught the original mistake if it had existed beforehand
-
----
 
 ## Anti-Rationalization Check
 

@@ -14,10 +14,9 @@ A review that catches nothing is worse than no review — it creates false confi
 Use when:
 - code changes exist (local diff, staged changes, or remote PR) and the task is to evaluate them
 - completing a task in subagent-driven development and review is the gate before the next step
-- user asks to "review", "check", or "audit" code changes
 
 Do not use when:
-- review feedback already exists and the next step is deciding what to implement, challenge, or clarify — that is `receiving-code-review`, not a code review
+- the task is to respond to review feedback that already exists, not to evaluate new changes
 - no diff or changed code exists to evaluate yet — if you are writing code, invoke this skill after the code exists
 
 ## Capability Boundary
@@ -41,14 +40,30 @@ It does NOT:
 
 **Severity must reflect actual risk.** Critical means data loss, security vulnerability, broken functionality, or blocking regression — not style, not preference. Inflating severity makes all feedback less trustworthy.
 
+**Run the project's automated checks before approving.** A passing review with failing lint/tests is not a passing review. If checks were skipped, say so explicitly.
+
 **Give a clear verdict.** Every review ends with: Ready / Not ready / Ready with fixes. An ambiguous conclusion defers the merge decision to the author, which is the reviewer's job.
+
+## Failure Signals
+
+Stop and reassess if:
+
+- you are reviewing implementation before establishing what the change is supposed to do — "should this change exist?" and "is this the right approach?" must be answered before line-level review
+- you are reviewing diff hunks without having read the surrounding context for each changed function
+- you assessed correctness without checking the callers of changed functions — the call site is often where the real problem surfaces
+- you are about to write "looks good" or approve without having read the code
+- every finding is labeled Critical — severity inflation makes all feedback untrustworthy
+- all your findings are Layer 3 and you found nothing at Layers 0-2 — either the change is genuinely excellent, or you didn't look hard enough at the higher layers
+- findings lack file:line, what is wrong, and why it matters — vague references and vague risks ("this could cause issues") are both non-actionable
+- the review ends without a verdict — an open-ended summary is not a review
+- you are giving feedback on code outside the diff — you are responsible for what you reviewed, not what you assumed
 
 ## Completion Criteria
 
 - [ ] The review covers justification (should this change exist?), approach (right solution?), and implementation — not just implementation details.
 - [ ] Enough context was read around each changed function — including callers — not just the diff hunks.
 - [ ] Every issue includes file:line, what is wrong, and why it matters, with honest severity calibration.
-- [ ] Relevant specialized lenses (Security, Performance, Migration, Dependency, API Design) were applied where applicable.
+- [ ] Relevant specialized lenses (Security, Performance, Migration, Dependency, API Design) were applied where applicable — see `references/specialized-lenses.md`.
 - [ ] If the code appears AI-generated, reviewer-specific checks were applied — see `references/ai-generated-code.md`.
 - [ ] A clear verdict is present (Ready to merge / Not ready / Ready with fixes).
 
@@ -77,11 +92,7 @@ Work from the most consequential question down. **A problem at a higher layer is
 | **2: Implementation Correctness** | Does the code do what it claims? | Caller impact traced for every changed signature. Error handling present. Security and concurrency considered. |
 | **3: Maintainability and Tests** | Will this hold up? | Tests exercise real behavior (not mocks) and fail when code breaks. Complexity allows future modification. |
 
-**Layer 0/1 problems are almost always Critical or Important.** If the change should not exist, stop and say so. Do not review implementation details of a misguided change.
-
-**Review navigation**: Start at Layer 0 — read the PR description, commit messages, linked spec. Restate the goal in your own words; if you can't, ask for clarification before reviewing code. Find the files representing the "main" change and read them first. If major design problems exist, surface them immediately — don't wait to finish the rest. For remote PRs, read existing review comments before starting. For local changes: `git diff` for unstaged, `git diff --staged` for staged.
-
-For deep guidance on each layer's key questions, see `references/layered-review-depth.md`.
+For deep guidance on each layer's key questions and review navigation, see `references/layered-review-depth.md`.
 
 **Depth calibration by risk:**
 
@@ -100,30 +111,6 @@ For deep guidance on each layer's key questions, see `references/layered-review-
 | Critical | Data loss, security hole, broken functionality, blocking regression, Layer 0/1 problems that invalidate the change | Must fix before merge |
 | Important | Missing error handling, test gaps, unmet requirements, design concerns, unaddressed caller impact | Should fix; defer only with written justification |
 | Minor | Style, naming, optimization, documentation | Author decides |
-
-**Specialized lenses**: Apply for high-risk domains. See `references/specialized-lenses.md` for Security, Performance, Migration and Data Safety, Dependencies, and API Design lenses.
-
-**Automated checks**: Run the project's preflight/lint/test suite for substantial changes. A passing review with failing automated checks is not a passing review. If skipped, say so explicitly.
-
----
-
-## Failure Signals
-
-Stop and reassess if:
-
-- you are reviewing implementation details before understanding what the change is supposed to do — go back to Layer 0
-- you have not asked "should this change exist?" and "is this the right approach?" — you skipped the highest-value layers
-- you are reviewing diff hunks without having read the surrounding context for each changed function
-- you are about to write "looks good" or approve without having read the code
-- every finding is labeled Critical — severity inflation makes all feedback untrustworthy
-- all your findings are Layer 3 and you found nothing at Layers 0-2 — either the change is genuinely excellent, or you didn't look hard enough at the higher layers
-- findings lack file:line references — specificity is the baseline for actionable feedback
-- the review ends without a verdict — an open-ended summary is not a review
-- you are giving feedback on code outside the diff — you are responsible for what you reviewed, not what you assumed
-- a finding describes a vague risk without naming what breaks and why ("this could cause issues")
-- you assessed correctness without checking the callers of changed functions — the call site is often where the real problem surfaces
-- the change includes a schema migration, API change, or config change and you did not apply the Migration and Data Safety lens
-- you accepted a new dependency without checking its maintenance status, security history, and license
 
 ---
 

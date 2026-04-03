@@ -5,18 +5,13 @@ description: "Invoke when the request leaves intent, constraints, or tradeoffs u
 
 # Requirement Clarification
 
-Clarify the task before planning or implementation.
-
-Use this skill to turn a vague request into a clearer working understanding by
-combining three inputs:
+Clarify the task before planning or implementation by combining three inputs:
 
 - the user's stated request
 - repository evidence
 - external knowledge when stable domain context matters
 
-This skill is about better clarification behavior, not about filling out a
-template. Its main job is to reduce ambiguity and compress the remaining
-questions down to the few decisions that actually require the human.
+This skill turns a vague request into a clearer working understanding. Its main job is to reduce ambiguity and compress the remaining questions down to the few decisions that actually require the human.
 
 ## Trigger Logic
 
@@ -30,7 +25,6 @@ When the request is still ambiguous, identify what kind of unknown is actually b
 
 Use this skill when:
 - the request leaves intent, constraints, or tradeoffs unresolved in ways that would change the approach
-- the request is ambiguous, underspecified, or internally conflicting and proceeding risks working toward the wrong goal
 - some unknowns may be answered from evidence, but the remaining ambiguity is still about what the user actually wants
 - the request mentions implementation ideas or code locations, but those details do not resolve the underlying goal question
 
@@ -57,14 +51,39 @@ This skill does not own:
 ## Invariants
 
 - For each unknown, decide before asking: can evidence resolve this, or does it require human decision?
-- Only escalate what cannot be answered from repository evidence or stable external knowledge
-- Separate confirmed requirements from inferred context and unresolved decisions
-- Stop once remaining uncertainty is small, explicit, and human-owned
+- Only escalate what cannot be answered from repository evidence or stable external knowledge.
+- Separate confirmed requirements from inferred context and unresolved decisions.
+- Do not proceed if key intent is still being guessed silently.
+- Stop once remaining uncertainty is small, explicit, and human-owned.
+
+## Decision Signals
+
+- Resolve local repository unknowns directly when one or two targeted lookups are enough; if deeper repository analysis is needed, build that understanding first and fold its findings into clarified intent — do not attempt deep code tracing inside this skill.
+- Use external knowledge only when it changes how the request should be interpreted.
+- When you must ask after exploration yields nothing, ask for a pointer to the code or location — something that lets you find the answer yourself. Asking the user to describe the problem shifts diagnosis to them and is a weaker fallback.
+- When stated requirements explicitly conflict, the clarification question is about priority or tradeoff — not about what each requirement means individually. Name the conflict and ask the user to choose.
+- Phrases like "restore old behavior / revert to before X" are systematically ambiguous when capability paths exist in the current codebase that postdate the referenced baseline. See `examples/ambiguous-revert-requests.md`.
+
+## Failure Signals
+
+Stop and revise when:
+
+| Signal | What it means | What to do |
+|---|---|---|
+| You are asking the human a question that repository evidence or stable external knowledge could likely answer | You are offloading avoidable ambiguity | Do the lookup or targeted research first; keep it shallow unless deeper analysis is truly required |
+| You are tracing behavior across several files, trying to prove ownership, or producing a codebase analysis report while still calling it clarification | The ambiguity is no longer local, or the work has crossed the skill boundary | Pause, build the codebase understanding needed, and fold its findings back into clarified intent |
+| You are treating current repository behavior or external best practice as a confirmed requirement without proof | Facts or guidance are being mistaken for intent | Separate repository evidence, outside guidance, and user goals |
+| You are escalating too many low-value questions, or you keep exploring after the remaining human decisions are already clear | Clarification has become open-ended exploration | Synthesize, narrow the decision surface, and stop |
+| You are stating inferred constraints as confirmed facts, or acting certain even though intent was never confirmed | Evidence labels are missing, or certainty is overstated | Relabel claims as confirmed, inferred, or unknown, and re-examine what still needs human intent |
+| You are jumping to implementation planning, change points, or verification strategy | Clarification has drifted into another skill boundary | Return to ambiguity classification and stop at clarified understanding |
 
 ## Completion Criteria
 
-- [ ] All invariants were followed, including resolving from evidence first and separating confirmed from inferred.
-- [ ] The result restates the request with a small set of real human decisions.
+A good result restates the request in clearer working terms and ends with a small set of real human decisions — not a broad list of exploratory questions.
+
+- [ ] All invariants were followed: unknowns classified first, resolved from evidence where possible, confirmed requirements separated from inferred.
+- [ ] Remaining human decisions are named explicitly — not guessed, not deferred.
+- [ ] The result does not ask questions the agent could have answered from evidence.
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
@@ -78,37 +97,7 @@ Did I ignore any applicable self-correction signals because the ambiguity now fe
 
 Am I exiting because requirements are genuinely clarified, or because the current restatement feels neat enough?
 
-## Clarification Heuristics
-
-- For each unknown, decide before asking: can a targeted lookup or stable external knowledge resolve this, or does it require a human decision? Only escalate what cannot be answered from evidence.
-- Resolve local repository unknowns directly when one or two targeted lookups are enough; if deeper repository analysis is needed, build that understanding first and fold its findings into clarified intent — do not attempt deep code tracing inside this skill.
-- Use external knowledge only when it changes how the request should be interpreted.
-- When you must ask after exploration yields nothing, ask for a pointer to the code or location — something that lets you find the answer yourself. Asking the user to describe the problem shifts diagnosis to them and is a weaker fallback.
-- When stated requirements explicitly conflict, the clarification question is about priority or tradeoff — not about what each requirement means individually. Name the conflict and ask the user to choose.
-- **Phrases like "restore old behavior / keep original logic / revert to before X" are systematically ambiguous** when reachable capability paths exist in the current codebase that were not present at the referenced baseline. They appear to have a clear referent (the old code) but actually carry multiple valid interpretations: (a) strict structural revert that discards those capability paths, (b) preserve existing capability paths and fix only a specific regression, (c) change only a particular scenario's behavior. Check whether reachable capability paths exist in the current codebase that postdate the referenced "old" state — if they do, the request has hidden branch points that must be explicitly resolved before planning. Do not treat the existence of old code as proof that copying it back is the correct action.
-- Stop once the remaining uncertainty is small, explicit, and human-owned.
-
-## Self-Correction Signals
-
-Stop and revise when:
-
-| Signal | What it means | What to do |
-|---|---|---|
-| You are asking the human a question that repository evidence or stable external knowledge could likely answer | You are offloading avoidable ambiguity | Do the lookup or targeted research first; keep it shallow unless deeper analysis is truly required |
-| You are tracing behavior across several files, trying to prove ownership, or producing a codebase analysis report while still calling it clarification | The ambiguity is no longer local, or the work has crossed the skill boundary | Pause, build the codebase understanding needed, and fold its findings back into clarified intent |
-| You are treating current repository behavior or external best practice as a confirmed requirement without proof | Facts or guidance are being mistaken for intent | Separate repository evidence, outside guidance, and user goals |
-| You are escalating too many low-value questions, or you keep exploring after the remaining human decisions are already clear | Clarification has become open-ended exploration | Synthesize, narrow the decision surface, and stop |
-| You are stating inferred constraints as confirmed facts, or acting certain even though intent was never confirmed | Evidence labels are missing, or certainty is overstated | Relabel claims as confirmed, inferred, or unknown, and re-examine what still needs human intent |
-| You are jumping to implementation planning, change points, or verification strategy | Clarification has drifted into another skill boundary | Return to ambiguity classification and stop at clarified understanding |
-
-## Verification Expectation
-
-A good result restates the request in clearer working terms and ends with a small set of real human decisions, not a long list of exploratory questions.
-
-Stop when these conditions are met; do not continue clarifying to gather more context.
-Do not proceed if key intent is still being guessed silently.
-
-If the result mainly asks broad questions the agent could have answered itself, or if it confuses evidence with intent, the clarification is weak.
+---
 
 See `examples/resolve-vs-escalate.md` for a contrast pair showing when a question should be answered from evidence versus escalated to the user.
 
@@ -116,3 +105,4 @@ See `examples/compress-to-root-question.md` for a contrast pair showing how to i
 
 See `examples/conflicting-requirements.md` for a contrast pair showing how to handle requirements that explicitly contradict each other.
 
+See `examples/ambiguous-revert-requests.md` for a contrast pair showing how "restore old behavior" requests carry hidden branch points.

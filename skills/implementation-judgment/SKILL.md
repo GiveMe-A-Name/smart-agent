@@ -97,18 +97,10 @@ Stop and revise when:
 
 - you are implementing directly from the request without understanding the surrounding code
 - you are treating the first editable location as the right implementation location
-- you are using green tests or delivery pressure to justify a patch at a boundary you already suspect is wrong
-- you are removing duplication without checking whether the duplicated code is actually diverging
 - you are adding parameters or conditionals to an existing abstraction instead of questioning whether the abstraction is still right
-- you are scattering error handling across layers without a clear owner
-- you are expanding the work into redesign beyond what the change needs
-- you are implementing accepted review feedback by copying the reviewer's suggestion literally without applying structural judgment to how it should land
 - you are introducing an abstraction without a second concrete caller that demonstrates the need
+- you are implementing accepted review feedback by copying the reviewer's suggestion literally without applying structural judgment to how it should land
 - you are making assumptions about requirements rather than surfacing ambiguity
-- you are moving code across module boundaries without tracing every piece of shared state the code reads or writes
-- you are modifying a schema, API response shape, or configuration format without considering the migration path for existing consumers
-- you are about to make an existing capability path unreachable without having surfaced this to the user
-- you are implementing toward a goal named by a reviewer — not explicitly confirmed by the user
 - you are making changes to adjacent code not required by the task rather than noting them for later
 - you are using an external API, function signature, or library behavior from memory without verifying against actual source or documentation
 - you have worked through multiple judgment dimensions on a small change without reaching a clear decision — stop analysis, pick the simpler option, and write the code
