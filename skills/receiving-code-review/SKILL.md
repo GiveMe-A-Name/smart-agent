@@ -7,7 +7,7 @@ description: "Invoke when review feedback exists — PR comments, inline annotat
 
 Evaluate feedback as a principal engineer would: against design intent, technical evidence, and architectural direction — not by social compliance.
 
-A world-class engineer treats every review comment as a hypothesis to be verified, not an instruction to be followed. The goal is better code, not reviewer satisfaction. Collaboration does not mean compliance.
+The coding agent is often the entity with the most complete context about why a change was made and what it is supposed to achieve. A reviewer sees the diff; the agent holds the implementation intent, the constraints that shaped the approach, and the tradeoffs that were consciously accepted. This asymmetry is the foundation of every evaluation decision. Collaboration does not mean compliance.
 
 ## Trigger Logic
 
@@ -27,11 +27,13 @@ It does NOT:
 - Request or dispatch code reviews
 - Verify that implementation is correct after making changes
 - Write the implementation itself
-- Decide how accepted changes should land structurally — that belongs to `implementation-judgment`
+- Decide how accepted changes should land structurally — evaluation ends at whether and what to change, not at how to structure the change once accepted
 
 ## Invariants
 
 **Verify before implementing.** Never implement a suggestion without first checking it is technically sound for this codebase and aligned with the design intent.
+
+**You hold authoritative context.** When you implemented the code being reviewed, you carry the implementation intent. Never accept a reviewer's characterization of what the code should achieve, or what goal it was built toward, without tracing it against the intent you understood when making the change. The reviewer may be right about a bug while wrong about the goal.
 
 **No performative agreement.** Never say "You're absolutely right!", "Great point!", "Thanks for catching that!", or any expression of gratitude. Actions speak — fix it and show the change.
 
@@ -43,7 +45,8 @@ It does NOT:
 - [ ] Each comment was evaluated with the design intent in mind, not in isolation.
 - [ ] Comments that challenge correctness were distinguished from comments that challenge design.
 - [ ] Decisions were supported by evidence, not just arguments.
-- [ ] All invariants were followed (verify before implementing, no performative agreement, clarify all first).
+- [ ] All invariants were followed: verify before implementing, hold authoritative context, no performative agreement, clarify all first.
+- [ ] No reviewer's characterization of the goal was accepted without tracing it to your own implementation intent.
 - [ ] If feedback came from multiple reviewers, contradictions were surfaced instead of being silently resolved, and severity was triaged before processing linearly.
 
 **If any criterion is not met, return to the relevant section before exiting.**
@@ -58,49 +61,36 @@ Did I ignore any failure signals because a convenient resolution path already ex
 
 Am I exiting because feedback is genuinely evaluated and addressed, or because the current responses look coherent enough?
 
-## Core Mental Models
+Did I accept any reviewer's framing of what the code should do without verifying it against my own implementation intent?
 
-These are the ways a principal engineer thinks about review feedback. They are not steps to execute in order — they are lenses that shape judgment. Some comments trigger one lens immediately. Some require several. The engineer's skill is knowing which lenses matter for this particular comment in this particular context.
+## Decision Signals
 
-### Design intent is the anchor
+These questions shape judgment for each feedback item. They are not sequential steps — the signal that matters depends on the comment.
 
-Every piece of code embodies decisions: why this approach and not another, what tradeoffs were made, what constraints were accepted, what the code is protecting. This context is the lens through which feedback is evaluated. Without it, you are reviewing comments in a vacuum — and that is how blind compliance happens.
+**What kind of claim is this?**
+- Bug / logic error / security → verify against the codebase; likely valid regardless of source
+- Design / architecture suggestion → evaluate against design intent; a different approach is not automatically better
+- Style / preference → author's call unless the team style guide mandates otherwise
+- Over-engineering (generality, future-proofing, premature abstraction) → grep for actual usage before accepting; if nothing calls it, consider removal
+- Reviewer confusion → improve code clarity regardless of whether the specific suggestion is right; confusion is a signal about the code, not only about the reviewer
 
-Before engaging with feedback, you should be able to articulate: what problem this code solves, what approach was chosen and why, what constraints shaped it, and what would break if the design direction changed. If you wrote the code, this should be in memory. If evaluating feedback on someone else's code, check commit messages, PR descriptions, design docs, and related issues.
+**Does the reviewer understand the code they are commenting on?**
+- Do they know the constraints that shaped this approach?
+- Are they applying patterns from a different codebase that don't translate here?
+- Are they seeing full change context, or only one diff?
 
-A suggestion that is technically correct but misaligned with design intent is not automatically right. A suggestion that challenges the design intent might be — but that is a conscious decision to change direction, not a side effect of compliance.
+**Reviewer's premise vs. reviewer's observation**: A comment like "this doesn't achieve X" contains two claims: (1) the current code doesn't do X, and (2) X was the correct goal. Verify claim 1 against the code. Verify claim 2 against *your* implementation intent — not against what the reviewer says the goal is. If X was never explicitly confirmed, treat it as an unverified goal before building toward it. This is critical when X would alter global strategy, close existing capability paths, or conflict with capabilities added since the last explicit agreement.
 
-### Not all comments carry the same weight
+**Source calibration:**
+- Human partner: carries architectural and intent context by default — implement after understanding
+- Dispatched reviewer sub-agent: has codebase access but may miss intent and history — verify before implementing
+- External reviewer: may not know platform constraints or why current code exists — requires more explicit verification
 
-A bug report is different from a design opinion is different from a style preference is different from a misunderstanding. The nature of the comment determines how deep the evaluation needs to go.
+A technically wrong suggestion is wrong regardless of source. A reviewer with limited context may still be right about a bug while wrong about design direction.
 
-Correctness issues — bugs, logic errors, security vulnerabilities — are the most likely to be valid regardless of who raised them. Verify against the codebase and fix. Design and architecture suggestions — different structural approaches, abstractions, responsibility placements — require evaluation against design intent. A different design is not necessarily a better design. When a reviewer proposes restructuring, ask: does this serve the design goals, or does it serve a different set of goals the reviewer implicitly holds? Style and preference opinions that aren't backed by team style guides or engineering principles are the author's call. If the style guide doesn't mandate it, the author's preference stands. Over-engineering suggestions — adding generality, future-proofing, premature abstraction — deserve YAGNI scrutiny. Grep for actual usage before accepting. And sometimes the reviewer simply didn't understand the code. The comment is based on a faulty premise, and the right response is to improve code clarity, not implement the suggestion.
+**Technical correctness is necessary but not sufficient.** A suggestion can be technically valid and still wrong for this code if it sacrifices a tradeoff the design intentionally made. The harder question is always: does this suggestion serve the original design goals, or does it optimize a different dimension at the cost of what was prioritized?
 
-### The reviewer's understanding matters
-
-Before evaluating whether a suggestion is right, consider whether the reviewer understood the code they are commenting on. This is not about dismissing people — it is about calibrating judgment.
-
-Does the reviewer understand the problem being solved, or only the solution they're looking at? Do they know the constraints that shaped this approach? Are they seeing the full change context, or just one diff? Are they applying patterns from a different codebase that don't translate here?
-
-Source calibration: a human partner carries architectural and intent context by default — implement after understanding. A dispatched reviewer sub-agent has codebase access but may miss intent and history — verify before implementing. An external reviewer may not know platform constraints or why current code exists — requires more explicit verification. But a technically wrong suggestion is wrong regardless of source, and a reviewer with limited context may still be right about a bug while wrong about design direction.
-
-**Distinguish: reviewer questions the implementation vs. reviewer questions the goal.** A reviewer saying "this doesn't achieve X" contains two claims: (1) the current code doesn't do X, and (2) X was the correct goal. Claim 1 can be verified from the code. Claim 2 must be verified against the user's original confirmed intent — not against what the reviewer says the goal is. If X was never explicitly confirmed by the user, treat it as an unverified goal before accepting feedback that builds toward it. This is particularly critical when X would alter global strategy, close existing capability paths, or conflict with capabilities added since the last explicit agreement.
-
-When a reviewer's confusion is genuine, that confusion is itself a signal. Ask: is the code unclear enough to confuse a competent reader? If yes, improve the code's clarity regardless of whether the specific suggestion is correct. The reviewer may have the wrong fix for a real problem — the problem being that the code doesn't communicate its intent.
-
-### Technical correctness is necessary but not sufficient
-
-A suggestion can be technically correct and still wrong for this code. "Extract this into a service" is technically valid but harmful if the design intentionally keeps logic co-located for simplicity. "Add a cache here" is technically sound but counterproductive if the design prioritizes consistency over latency.
-
-The harder question is always design alignment: does this suggestion serve the original design goals? Does it preserve the intended tradeoffs? Would accepting it make future planned changes harder? Is the reviewer solving the right problem, or treating a symptom that is actually intentional?
-
-Every design embodies tradeoffs. A suggestion that optimizes one dimension — performance, generality, cleanliness — may sacrifice another dimension that was more important to the original design. Recognizing this is the difference between an engineer who makes code "better" in isolation and one who makes code better in context.
-
-### Evidence, not arguments
-
-"This supports testability," "this could be extensible," "this is cleaner" — these are arguments, not evidence. Evidence is: who calls this, who depends on this, what breaks if this is removed, what actual usage patterns exist. Apply the same evidence standard to the reviewer's suggestions that you apply to your own implementation choices.
-
-When a reviewer suggests "implementing properly" — adding a feature, endpoint, or abstraction — grep the codebase for actual usage first. If nothing calls it, the right move is flagging removal, not more complete implementation.
+**Evidence, not arguments.** "This supports testability," "this is cleaner" are arguments. Who calls this, what breaks if removed, what usage patterns exist — these are evidence. Apply the same evidence standard to suggested changes that you apply to your own implementation choices. Grep before accepting claims about usage.
 
 
 ## Decision Heuristics
@@ -109,58 +99,39 @@ For each comment, reach one of three decisions:
 
 **Accept and implement** when: the suggestion is technically correct AND aligned with design intent; it identifies a genuine issue regardless of design (bugs, security); or it improves code clarity without changing behavior.
 
-For accepted changes that are non-trivial — anything involving structural changes, responsibility movement, abstraction introduction, or behavioral modification — invoke `implementation-judgment` before writing code. The reviewer identified what to change; `implementation-judgment` decides how it should land. Skipping this is how accepted review feedback introduces structural damage. For purely mechanical fixes (typos, naming, simple bug fixes, formatting), proceed directly.
+For accepted changes that are non-trivial — structural changes, responsibility movement, abstraction introduction, or behavioral modification — decide how the change should land structurally before writing code. The reviewer identified what to change; structural judgment decides how it should land. Skipping this step is how accepted review feedback introduces architectural damage. For purely mechanical fixes (typos, naming, simple bug fixes, formatting), proceed directly.
 
 **Push back** when: a suggestion breaks existing functionality; violates YAGNI; is technically incorrect for this stack; conflicts with established design intent without proposing why the intent should change; undoes a deliberate tradeoff without offering a better one; has legacy or compatibility justification for the current approach; or conflicts with the human partner's prior architectural decisions.
 
 Use technical evidence — reference tests, code, or platform constraints. Never push back with just "I prefer it this way." State the design intent, the tradeoff, and the evidence. When the disagreement is architectural, involve the human partner. Technical facts and data overrule opinions and personal preferences.
 
-**Clarify** when: you don't understand what the reviewer is suggesting; the suggestion is ambiguous between multiple interpretations; you need more context to evaluate; or implementing the suggestion would require changing the design intent and you want to confirm that's the reviewer's actual position.
+**Clarify** when: you don't understand what the reviewer is suggesting; the suggestion is ambiguous between multiple interpretations; you need more context to evaluate; or implementing it would require changing the design intent and you want to confirm that's the reviewer's actual position.
 
 Ask a specific question. "Can you clarify?" is useless. "Are you suggesting we move validation into the controller layer, or that we add a separate validation middleware? The former changes our error-handling contract with callers." is useful.
 
 
 ## Handling Multi-Reviewer Feedback
 
-When feedback comes from multiple reviewers, new failure modes emerge that don't exist with single-reviewer feedback.
+When feedback comes from multiple reviewers, additional failure modes emerge.
 
-### Contradictory suggestions
+**Contradictory suggestions**: Identify what each reviewer is optimizing for — contradictions often arise from different implicit priorities (performance vs. readability, consistency with area X vs. area Y). When the contradiction is genuine: state both positions, explain which aligns with design intent and why, and ask for resolution. Do not silently pick one side. Never implement contradictory suggestions in different parts of the same change — inconsistency within a single PR is worse than either option.
 
-Reviewer A says "extract this into a service" while Reviewer B says "keep this co-located for simplicity." This is not a vote to be tallied — it is a design disagreement that needs resolution.
+**Overlapping feedback**: Convergence signals the problem is real. Evaluate each proposed fix on its merits — the first reviewer's fix is not automatically better. Respond to all threads even if the fix is the same.
 
-**How to handle:**
-- Identify what each reviewer is optimizing for. Often contradictions arise because reviewers have different implicit priorities (performance vs. readability, flexibility vs. simplicity, consistency with area X vs. area Y).
-- Check whether both suggestions address the same concern from different angles, or whether they address different concerns entirely. If the latter, both may be valid and the "contradiction" is an illusion.
-- When the contradiction is genuine: state both positions clearly, explain which one aligns with the design intent and why, and ask for resolution from the reviewers or escalate to the human partner. Do not silently pick one side.
-- Never implement contradictory suggestions in different parts of the same change. Inconsistency within a single PR is worse than either option alone.
+**Volume management (20+ comments) — triage order:**
+1. **Blocking / critical**: bugs, security, correctness. Must be fixed. Start here.
+2. **Design-level (Layer 0–1)**: questions whether the change should exist or whether the approach is right. These may invalidate downstream feedback if accepted — evaluate before implementing lower-layer fixes.
+3. **Implementation (Layer 2–3)**: correctness, error handling, test quality. Group related comments — multiple error-handling issues may resolve with one structural fix rather than point-by-point patching.
+4. **Style / preference**: author's call unless style guide mandates. Batch for a final pass.
 
-### Overlapping feedback
-
-Multiple reviewers flag the same issue, sometimes with different proposed fixes. This is a signal that the problem is real — but you still need to evaluate the proposed fixes independently.
-
-**How to handle:**
-- Acknowledge the convergence (the problem is likely genuine if independently identified).
-- Evaluate each proposed fix on its merits. The first reviewer's fix is not automatically better than the second's.
-- Respond to all threads, even if the fix is the same. Each reviewer should see that their feedback was evaluated.
-
-### Volume management
-
-A PR with 30+ comments from multiple reviewers requires triage, not linear processing.
-
-**Prioritization order:**
-1. **Blocking/Critical issues** — bugs, security, correctness. These must be fixed regardless. Start here.
-2. **Design-level feedback** (Layer 0-1) — suggestions that question whether the change should exist or whether the approach is right. These may invalidate other feedback if accepted, so evaluate them before implementing lower-layer fixes.
-3. **Implementation feedback** (Layer 2-3) — correctness, error handling, test quality. Group related feedback — multiple comments about error handling may be addressed by a single structural fix rather than point-by-point patching.
-4. **Style/preference feedback** — author's call unless a style guide mandates otherwise. Batch these for a final pass.
-
-If design-level feedback is accepted and requires significant rework, state explicitly that lower-layer feedback will be addressed in the reworked code rather than the current version. Don't fix typos in code that's about to be rewritten.
+If design-level feedback requires significant rework, state explicitly that lower-layer feedback will be addressed in the reworked code. Don't fix typos in code that's about to be rewritten.
 
 
 ## Response Language
 
 **Correct feedback:** `"Fixed. [what changed]"` — or just fix it in code without comment.
 
-**Pushback:** State the technical finding, reference the evidence, and ask a specific question. Example: `"The current approach co-locates validation with the handler because callers depend on receiving domain-specific errors (see tests in X). Extracting to middleware would genericize the errors. Was that the intent, or were you aiming for something else?"`
+**Pushback:** State the technical finding, reference the evidence, ask a specific question. Example: `"The current approach co-locates validation with the handler because callers depend on receiving domain-specific errors (see tests in X). Extracting to middleware would genericize the errors. Was that the intent, or were you aiming for something else?"`
 
 **If you pushed back and were wrong:** `"You were right — I checked [X] and it does [Y]. Fixing."` No apology, no defense. State the correction and move on.
 
@@ -176,13 +147,11 @@ Stop and reorient if:
 - You are implementing any item before understanding all items in the feedback
 - You are implementing a suggestion without having verified it against both the codebase and the design intent
 - You are accepting a design suggestion without being able to articulate how it serves the original design goals
+- You accepted a reviewer's characterization of what the goal is, or what the code should achieve, without tracing it to your own implementation intent — the reviewer's premise about the goal may be wrong even when their observation about the current code is correct
 - You cannot verify a suggestion but are proceeding anyway — state the limitation instead
 - You are implementing feedback that contradicts the design intent without explicitly acknowledging the intent change and getting confirmation
 - A suggestion is technically wrong but social pressure makes direct pushback feel impossible — state the technical finding anyway. If you genuinely cannot raise it in context, flag it to your human partner with "Strange things are afoot at the Circle K." This is a signal to escalate, not permission to defer.
-- You are about to implement non-trivial structural changes from review feedback without invoking `implementation-judgment` first
+- You are about to implement non-trivial structural changes from review feedback without first deciding how they should land structurally
 - Two reviewers gave contradictory suggestions and you silently picked one without surfacing the conflict
 - You are processing 20+ comments linearly instead of triaging by severity and layer first
 - You are fixing style issues in code that design-level feedback may require rewriting
-- A reviewer said "the goal hasn't been achieved" and you accepted their articulation of the goal without tracing it to user-confirmed intent — the reviewer's premise about what the goal is may be wrong even when their observation about the current code is correct
-
-
