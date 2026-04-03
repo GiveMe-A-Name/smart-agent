@@ -39,7 +39,8 @@ This skill does not own:
 - A capability skill must have five core elements: trigger logic, capability boundary, invariants, decision signals, failure signals. Missing any one makes the skill weak.
 - Completion definition and anti-rationalization prompts must be separate. Do not collapse `Completion Criteria` and `Anti-Rationalization Check` into a single self-check section or checklist.
 - Skills teach judgment; they do not encode orchestration or hide routing graphs.
-- The main `SKILL.md` must stay lean but must not become hollow. Core law stays inline; expanded support material moves to support folders.
+- The main `SKILL.md` must stay lean but must not become hollow. Core law stays inline, front-loaded near the top; expanded support material moves to support folders.
+- A file long enough to have a real middle has a correctness problem: content buried mid-file is underweighted during execution. Front-load critical law; do not let invariants or trigger conditions drift toward the middle as the file grows.
 
 ## Completion Criteria
 
@@ -48,7 +49,7 @@ This skill does not own:
 - [ ] The skill defines completion explicitly through `Completion Criteria`, so the agent can tell when the work is done without relying on a mixed self-check section.
 - [ ] Anti-self-deception prompts are kept separate from completion conditions in `Anti-Rationalization Check` rather than mixed into `Completion Criteria`.
 - [ ] The boundary is authentic — no routing language, no named-skill handoffs disguised as scope.
-- [ ] The main file is lean but not hollow — core law inline, support material in folders.
+- [ ] The main file is lean but not hollow — core law inline and front-loaded, no real "middle" where critical law is buried, support material in folders.
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
@@ -109,12 +110,18 @@ See `references/thinking-mode-considerations.md` for how these principles apply 
 
 ### 4. Lean vs. Hollow
 
-**Question**: Is the main file lean because support folders carry what belongs there, or hollow because core law was moved out?
+**Question**: Is the main file calibrated between hollow (core law moved out) and bloated (too long to be reliably attended to)?
 
-**Key signals**:
-- Lean: the main file contains all five core elements; support folders carry expanded examples, lookup tables, and templates.
-- Hollow: trigger logic, invariants, or core decision signals were moved to support files, leaving an agent who must hunt through the package to find the actual law.
+**Hollow direction** — law was removed:
+- Lean means the main file contains all five core elements; support folders carry expanded examples, lookup tables, and templates.
+- Hollow means trigger logic, invariants, or core decision signals were moved to support files, leaving an agent who must hunt for the actual law.
 - Test: can the main file guide a first-pass decision without opening any support file? If not, something core was moved out.
+
+**Ceiling direction** — file became too long or too dense:
+- Instructions buried mid-context are read but underweighted. A file long enough to have a real "middle" has content that will be partially ignored during execution.
+- Constraint density is a distinct risk from file length: a short file can still overload if a single section packs many independent constraints without a unifying principle or priority ordering. When constraints compete for attention without ranking, some will be missed.
+
+**Structure guidance**:
 - Support folders by function: `references/` for lookup material and review heuristics; `templates/` for reusable scaffolds; `examples/` for realistic bad-vs-good contrast pairs; `scripts/` for deterministic helpers.
 - Add an `examples/` folder only when a bad pattern looks superficially similar to a good one and prose rules alone won't prevent the wrong output. A good example pair: a realistic bad case alongside a corrected version, annotated to name what makes it wrong — not a restatement of rules the prose already makes clear.
 
@@ -141,6 +148,27 @@ See `references/lean-skill-patterns.md` for split rules and folder taxonomy.
 - Keep tools, scripts, and assets to the minimum the skill actually needs.
 - Do not normalize unsafe data handling just because it appears in an example.
 
+### 7. Constraint Signal Quality
+
+**Question**: Are the invariants, decision signals, and failure signals written as verifiable conditions — or advisory prose that sounds like law but cannot be checked?
+
+The issue is not whether to include detail, but what form the detail takes. High-signal forms constrain without bloating; low-signal forms add volume without adding checkability.
+
+**High-signal forms** (raise signal):
+- Red lines with explicit "never" / "must not" + the observable condition that triggers them
+- Completion criteria written as verifiable states, not aspirations
+- Failure signals that name specific observable triggers — not vague "re-evaluate if something feels wrong"
+- Decision signals that name what to look for, not what to feel
+
+**Hollow forms** (add volume):
+- Advisory prose: "the skill should be clear", "ensure quality", "be thorough"
+- "You should X" statements that cannot be confirmed without subjective judgment
+- Constraints that describe a desired quality rather than a verifiable condition
+
+**The self-check**: before writing a constraint, ask — does this raise signal or add volume? If it reads like "you should X", transform it: rewrite as an invariant, checklist item, failure signal, or example. If it cannot be transformed into any of those forms, delete it.
+
+**Form transformation test**: "The skill must teach judgment well" → hollow. "Stop and revise if the trigger enumerates scenarios instead of describing a state" → high-signal.
+
 
 ## When Reviewing an Existing Skill
 
@@ -160,5 +188,8 @@ Stop and revise when:
 - a new section was added where strengthening an existing section would have done the same work
 - removing named-skill references leaves the capability description empty or incoherent
 - two sections teach the same judgment in slightly different words
+- critical trigger conditions or invariants are buried mid-file rather than front-loaded near the top
+- a single section lists many independent constraints without a unifying principle or priority ordering
+- an invariant or decision signal reads like advisory prose ("should", "ensure", "be thorough") rather than a verifiable condition or explicit red line — transform it or delete it
 
 

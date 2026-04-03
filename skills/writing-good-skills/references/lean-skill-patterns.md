@@ -8,6 +8,18 @@ The goal is not the shortest possible `SKILL.md`. The goal is a main file that s
 
 Keep the package capability-first: the main file should teach boundary judgment, not hide skill-to-skill routing in support docs.
 
+## Why Lean Matters Mechanically
+
+Two failure modes explain why a long main file reduces skill reliability, even when all the content is correct:
+
+**Attention dilution**: As an agent generates more output tokens, it pays progressively less attention to earlier instructions in the context. A long skill file exacerbates this — the longer the file, the more likely that content from later sections is underweighted when the agent is executing.
+
+**Lost in the middle**: In long-context settings, information placed in the middle of a file is attended to less than information at the beginning or end — even when the agent has demonstrably "read" it. Core law buried mid-file may be correctly parsed yet underweighted at the moment it matters.
+
+These are not aesthetic concerns. A skill file long enough to have a real "middle" has a correctness problem, not just a style problem. This is why front-loading matters: trigger conditions and invariants belong near the top, not after several paragraphs of supporting material.
+
+**Constraint density as a distinct risk**: file length is not the only overload failure. A short file can still underperform if a single section packs many independent constraints without a clear priority ordering. When constraints compete for attention without ranking, agents tend to satisfy some and silently drop others. The fix is restructuring around a unifying principle, not just shortening.
+
 ## Split Rule
 
 Keep inline:
@@ -77,6 +89,7 @@ Split when:
 - one section has turned into a lookup appendix
 - multiple audiences or scenarios need different supporting detail
 - the main file is repeating support material just to stay self-contained
+- a single section lists many independent constraints without a unifying principle — restructure around a common principle before adding more
 
 Do not split when:
 - the content is still core law
@@ -84,6 +97,8 @@ Do not split when:
 - the split only optimizes file length instead of decision quality
 
 ## Bad Move
+
+"Bury trigger conditions or core invariants in the middle of a long main file where they will be read but underweighted."
 
 "Put trigger rules, invariants, and decision cues into support files so the main file stays short."
 

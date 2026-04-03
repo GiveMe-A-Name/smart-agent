@@ -34,15 +34,17 @@ It does NOT own:
 - Root cause investigation
 - Engineering judgment about how each change should land — a plan names targets and sequence; reasoning about approach, tradeoffs, and fit with existing structure belongs to the execution phase, not the planning phase
 
+It DOES define the plan document's full structure — including the Execution Log zone that gets populated during execution. Defining the format at planning time is part of planning, even though the log itself is filled in later.
+
 ## Invariants
 
 ```
 NO PLAN WITHOUT SITUATION ASSESSMENT FIRST
 ```
 
-You cannot start writing until you can state: *"This is a [size] [nature] task. The relevant code is [X]. The constraint is [Y]."*
+You cannot start writing until you can state: *"This is a [size] [nature] task. The relevant code is [X]. The constraint is [Y]. Done means: [exact verification command → expected output]."*
 
-If you can't name the files involved, you haven't assessed enough.
+If you can't name the files involved or state how you'll verify completion, you haven't assessed enough.
 
 
 ## Completion Criteria
@@ -83,6 +85,8 @@ Before breaking anything down, you need to genuinely understand the situation �
 
 **What exists today?** Which files are involved? What patterns does the codebase already use? What constraints are immovable? If you don't know this, your plan will collide with reality. Go read the code first.
 
+**What does done look like?** Before decomposing, state the exact verification command and what passing looks like. This is the overall acceptance criterion — it anchors the entire decomposition. Each task also needs its own verification signal. A task with no independently testable output is a horizontal slice in disguise, even if the final task has a clean integration test.
+
 **When the request is "restore old behavior / keep original logic"**: this phrase is ambiguous by construction. Before planning, check whether reachable capability paths exist in the current codebase that were not present at the referenced baseline. If they do, "restore old behavior" has multiple valid interpretations and cannot be planned as a single action — a mechanical code revert that silently closes a reachable capability path is a capability regression, not a restoration. Name the interpretations explicitly and get the user's choice before writing any plan. (The full disambiguation heuristic, including how to classify the interpretations, lives in `requirement-clarification`.)
 
 **For "historical behavior + new capability" conflicts**: before writing a plan, output a behavior matrix — input conditions × old behavior × current behavior × candidate target behavior. If any cell is a "?" — a behavior the user hasn't confirmed — resolve those cells with the user before planning. The matrix makes the conflict visible; planning without it converts a requirement ambiguity into a code decision made silently.
@@ -117,7 +121,7 @@ The thinking above always applies. What changes is how much you write down.
 
 **Medium work** (new concepts, multiple domains, new test patterns): Think through ordering, risks, and how pieces fit. Write tasks with clear boundaries. Identify what could go wrong and whether your ordering addresses that.
 
-**Large work** (architecture, design decisions, many components): Full decomposition — but detailed only for the near tasks. Identify dependencies, risks, and unknowns. Structure early tasks to resolve the biggest uncertainties. Leave later tasks at goal-level until the early work reveals the real landscape. If the work contains independent subsystems, split into separate plans.
+**Large work** (architecture, design decisions, many components): Full decomposition — but detailed only for the near tasks. Identify dependencies, risks, and unknowns. Structure early tasks to resolve the biggest uncertainties. Leave later tasks at goal-level until the early work reveals the real landscape. If the work contains independent subsystems, split into separate plans. Place cross-cutting constraints (invariants that apply to every task) at the top of the plan document, before the task list — constraints buried mid-document are easy to miss during execution.
 
 ### Think About Estimation and Uncertainty
 
@@ -164,10 +168,11 @@ When a trigger fires, pause execution and revise the plan. Pushing through a pla
 Regardless of size, a usable plan is concrete:
 - **Exact file paths** — not "somewhere in src/", not "the auth module"
 - **Concrete changes** — not "add error handling", but what the code should actually do
-- **Specific verification** — exact command to run and what passing looks like
+- **Specific verification** — the actual executable command and expected output, not a prose description; "run the tests" is not a verification step, `pytest tests/foo.py::test_bar -v → PASS` is
 - **One thing per step** — if a step has an "and", it's two steps
 - **Each task is a vertical slice** — delivers verifiable value, not just a layer
 - **Working state after each task** — the commit point rule applies at every level
+- **Targets, not methods** — describe what file changes and what the resulting behavior is; if a step reads like pseudocode or implementation instructions, it belongs in execution, not the plan
 
 ## Review Loop
 
@@ -177,6 +182,25 @@ For medium/large plans only: dispatch a plan-document-reviewer subagent (see pla
 
 After saving to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, offer to execute the plan. The plan settles scope and targets; execution still requires judgment about how each change lands.
 
+During execution, maintain an `## Execution Log` section appended to the bottom of the plan document — see **Execution Log** below.
+
+## Execution Log
+
+The plan document serves a dual purpose: a spec for what to do, and a recoverable record of what was done. This makes interrupted work resumable across conversations — a new session reads the log and knows exactly where things stand.
+
+During execution, append an `## Execution Log` section at the bottom of the plan document. **Never edit the plan tasks section during execution** — it stays static as the source of truth.
+
+**Append to the log:**
+- Task completions: `[YYYY-MM-DD] Task N: complete`
+- Failed attempts: what was tried, why it failed, how the approach changed
+- Plan revision triggers: which assumption broke, how future tasks were updated
+
+**Omit from the log:**
+- Code snippets
+- Anything already captured in the plan section
+
+**If a plan revision trigger fires:** update the not-yet-started tasks in the plan section and record the reason in the log. Do not rewrite completed or in-progress tasks.
+
 ## Failure Signals
 
 **Over-planning** — stop if you catch yourself:
@@ -185,9 +209,11 @@ After saving to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, offer to execute 
 - Running a review loop on a tiny/small task
 - Spending more time planning than the task would take to just do
 - Planning tasks 6+ in full detail when tasks 1-3 haven't been done yet
+- Describing HOW to implement rather than WHAT changes and WHERE — if a task reads like a code walkthrough, it has crossed into execution territory
 
 **Under-planning** — stop if you catch yourself:
 - Starting medium/large work without a file map
+- Per-task verification written as prose ("run the tests") rather than as an executable command with expected output
 - No concrete verification step for a complex change
 - Planning a bug fix without knowing the root cause
 - No dependency analysis for work crossing multiple modules

@@ -15,20 +15,7 @@ Each example shows: situation assessment → decomposition strategy → plan at 
 
 **Plan:**
 
-Root cause: `auth_middleware.py:47` returns 404 for missing tokens but the same 404 is also returned for expired tokens because expiry is checked after existence. Fix: check expiry on the token before returning 404.
-
-Change `auth_middleware.py:47`:
-```python
-# Before
-if not token:
-    return Response(status=404)
-
-# After
-if not token:
-    return Response(status=404)
-if not token.is_valid():
-    return Response(status=401)
-```
+Root cause: `auth_middleware.py:47` checks token existence before validity — expired tokens fall through the existence check and return 404 instead of 401. Fix: add a validity check at `auth_middleware.py:47` so expired tokens return 401.
 
 Verify: `pytest tests/test_auth.py::test_expired_token_returns_401 -v` → PASS
 
@@ -55,8 +42,8 @@ Files:
 - `tests/cli/test_export.py` — add test for `--dry-run` output
 
 Steps (each leaves tests green):
-1. Add `parser.add_argument('--dry-run', action='store_true')` in `export.py:23`, pass `dry_run=args.dry_run` to `FileWriter` constructor. In `file_writer.py:write()`: if `dry_run`, print path and return without writing.
-2. Add test: mock `FileWriter.write`, assert not called when `--dry-run` passed, assert paths printed to stdout.
+1. Add `--dry-run` flag to `export.py` arg parser; pass flag through to `FileWriter`. In `file_writer.py:write()`: when dry-run is active, print the output path and return without writing.
+2. Add test: assert `FileWriter.write` is not called when `--dry-run` is passed; assert output paths are printed to stdout.
 
 Verify: `python cli/export.py --dry-run output/` prints paths, no files created; `pytest tests/cli/test_export.py -v` PASS
 
@@ -118,6 +105,16 @@ Files: Modify `notifications/webhook.py`, `tests/notifications/test_webhook.py`
 - [ ] Commit point: tests green, retry logic complete
 
 **Final verification:** Run a test job with webhook URL pointed at `localhost` echo server, confirm POST received with correct payload.
+
+---
+
+### Execution Log (example — appended during execution)
+
+[2026-04-02] Task 1: complete. Walking skeleton worked. Discovered `on_complete` passes a `JobResult` object — payload mapping is straightforward.
+
+[2026-04-02] Task 2: complete.
+
+[2026-04-03] Task 3: failed first attempt — `httpx` retry logic conflicts with `asyncio` event loop in test environment. Switched to `tenacity` library for retries. Task 3 complete.
 
 ---
 

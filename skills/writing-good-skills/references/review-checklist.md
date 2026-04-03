@@ -16,6 +16,36 @@ This order matters. A polished file that triggers badly or repeats itself is sti
 
 If the user points at one weak section, do not stay local by default. First check whether the draft already has a better home for the same idea.
 
+## Mandatory Audits
+
+Run both audits on every review, even if the user never mentioned these concerns.
+
+### Mandatory Boundary-Vs-Routing Audit
+
+Check for:
+- routing language being used in place of a clear boundary
+- named skill references doing skill-to-skill routing work instead of adding real workflow clarity or preventing a severe category error
+- scope edges that fail to state what grounding is missing
+
+When found:
+- make the boundary explicit first
+- keep routing language only when it teaches real workflow knowledge without replacing the boundary
+- state what the skill owns and does not own
+- keep the next action for the agent to decide unless a named reference is truly necessary to prevent a severe category error
+
+### Mandatory Redundancy Audit
+
+Check for:
+- the same rule explained in overview, guidance, and checklist
+- examples that merely restate bullets
+- sections that exist only to justify an already-clear rule
+
+When found:
+- keep the clearest version inline
+- merge into the strongest existing section before creating a new one
+- compress or delete the repeats
+- move only the expanded support material to the correct support folder
+
 ## Section Checks
 
 ### 1. Description And Trigger Condition Quality
@@ -122,36 +152,6 @@ Common failures:
 - a local fix appends fresh prose without first integrating overlapping material
 - the skill only works as part of skill-to-skill routing
 - the skill only works when followed as a fixed sequence
-
-## Mandatory Boundary-Vs-Routing Audit
-
-Run this even if the user never mentioned skill relationships.
-
-Check for:
-- routing language being used in place of a clear boundary
-- named skill references doing skill-to-skill routing work instead of adding real workflow clarity or preventing a severe category error
-- scope edges that fail to state what grounding is missing
-
-When found:
-- make the boundary explicit first
-- keep routing language only when it teaches real workflow knowledge without replacing the boundary
-- state what the skill owns and does not own
-- keep the next action for the agent to decide unless a named reference is truly necessary to prevent a severe category error
-
-## Mandatory Redundancy Audit
-
-Run this even if the user never said the skill is too long.
-
-Check for:
-- the same rule explained in overview, guidance, and checklist
-- examples that merely restate bullets
-- sections that exist only to justify an already-clear rule
-
-When found:
-- keep the clearest version inline
-- merge into the strongest existing section before creating a new one
-- compress or delete the repeats
-- move only the expanded support material to the correct support folder
 
 ## Possible Review Deliverables
 

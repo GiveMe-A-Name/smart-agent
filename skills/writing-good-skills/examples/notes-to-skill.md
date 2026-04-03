@@ -145,4 +145,3 @@ A procedure manual answers: *what do I do next?*
 A capability guide answers: *what do I own, what must not happen, and what should I notice?*
 
 Notes from a user are almost always a procedure. Turning them into a skill means extracting the judgment — the invariants, the boundary, the decision signals — and making that judgment reusable, not the sequence.
-e.
