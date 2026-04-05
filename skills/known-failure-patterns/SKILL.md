@@ -1,6 +1,6 @@
 ---
 name: known-failure-patterns
-description: "Invoke when the task is to convert an observed agent mistake or recurring failure mode into a durable prevention mechanism. This skill decides the highest-feasible sedimentation layer for the constraint: a project rule, an automated test, or a tool that removes the error-prone operation entirely. Use when a failure pattern has been identified and the question is how to keep it from recurring."
+description: "Convert an observed agent mistake into a durable prevention mechanism — rule, test, or tool. TRIGGER when: a failure pattern has been identified and the question is how to prevent recurrence. DO NOT TRIGGER when: debugging an active bug (use systematic-debugging) or building new features."
 ---
 
 # Known Failure Patterns

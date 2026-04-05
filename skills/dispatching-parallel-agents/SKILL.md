@@ -1,6 +1,6 @@
 ---
 name: dispatching-parallel-agents
-description: "Invoke when multiple tasks are clearly independent — non-overlapping files, no shared state or diagnosis — and parallel execution would meaningfully reduce total time. Cost of unnecessary invocation: a brief independence check. Cost of missing: sequential execution of work that could have completed in parallel."
+description: "Dispatch independent tasks to concurrent agents. TRIGGER when: multiple tasks have non-overlapping files and no shared state, and parallelism saves meaningful time. DO NOT TRIGGER when: tasks share diagnosis, state, or files, or only one task exists."
 ---
 
 # Dispatching Parallel Agents

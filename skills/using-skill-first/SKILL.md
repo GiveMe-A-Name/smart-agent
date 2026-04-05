@@ -1,6 +1,6 @@
 ---
 name: using-skill-first
-description: "Invoke once per session, before the first action is taken. Installs the discipline of scanning the skill list before every subsequent action — those scans happen in thinking, not by re-invoking this skill. Cost of unnecessary invocation: a brief lookup. Cost of missing: an entire session of actions taken without checking available guidance."
+description: "Invoke once per session before the first action. Installs the habit of scanning the skill list before every subsequent step. DO NOT re-invoke mid-conversation — subsequent scans happen in thinking."
 ---
 
 # Using Skills First

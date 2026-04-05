@@ -1,6 +1,6 @@
 ---
 name: systematic-research
-description: "Invoke when the task requires information from outside the local codebase — documentation, APIs, library behavior, external systems, or current state of the world. Cost of unnecessary invocation: a short framing pass. Cost of missing: conclusions that sound authoritative but rest on unverified assumptions or stale knowledge. When in doubt, invoke."
+description: "Gather and validate information from outside the local codebase — docs, APIs, library behavior, external systems. TRIGGER when: the task requires external information not already verified in context. DO NOT TRIGGER when: all needed information is in the local codebase or already verified."
 ---
 
 # Systematic Research

@@ -1,6 +1,6 @@
 ---
 name: technical-communication
-description: "Invoke when writing technical documents that will be read by others — design docs, RFCs, ADRs, postmortems, runbooks, migration guides, or any document that records a technical decision or enables someone else to act. Cost of unnecessary invocation: a short writing quality pass. Cost of missing: documents that are ignored because they are unreadable, decisions that are relitigated because they were never properly recorded, or knowledge that is lost because it lived only in someone's head. When uncertain whether the writing quality matters, invoke."
+description: "Write technical documents that are read, understood, and acted upon — design docs, RFCs, ADRs, postmortems, runbooks. TRIGGER when: writing a document intended for others to read and act on. DO NOT TRIGGER when: writing code comments (part of implementation) or informal messages (Slack, scratch notes)."
 ---
 
 # Technical Communication

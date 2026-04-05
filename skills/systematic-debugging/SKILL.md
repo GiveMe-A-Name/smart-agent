@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: "Invoke when something is broken or behaving unexpectedly and the fix is not yet confirmed. Cost of unnecessary invocation: minor overhead. Cost of missing: a fix that masks the root cause — the bug returns in a different form. When in doubt, invoke before touching any code."
+description: "Find root causes, not just fixes — systematic diagnosis before changing code. TRIGGER when: something is broken or behaving unexpectedly and the fix is not yet confirmed. DO NOT TRIGGER when: building a new feature or refactoring with no current failure."
 ---
 
 # Systematic Debugging

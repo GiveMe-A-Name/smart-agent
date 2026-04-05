@@ -55,16 +55,17 @@ Check the `description` field:
 - does it describe when to use the skill rather than the workflow?
 - would it help discovery?
 - is the problem substantial enough that this skill should apply at all, rather than a local wording or formatting fix?
-- does it follow the recommended format: "Invoke [when/unless] [observable condition]. Cost of unnecessary invocation: [specific minor cost]. Cost of missing: [specific major harm]."?
-- if using "unless", is the exclusion condition trivially confirmable from independent facts (not impression-based)?
-- does it prefer "when" over "unless" to avoid rationalization pressure at the first gate?
+- does it follow the recommended format: "[One-line capability statement]. TRIGGER when: [observable conditions]. DO NOT TRIGGER when: [disambiguation boundaries]."?
+- is the most critical trigger info within the first 250 characters (display truncation limit)?
+- does the DO NOT TRIGGER clause disambiguate from similar skills using observable facts, not impressions?
 
 Common failures:
 - workflow summary
 - vague wording like "helps with skills"
 - no concrete contexts or symptoms
-- missing cost asymmetry statement
-- "unless" conditions based on impressions ("already obvious", "already confirmed") rather than verifiable facts
+- cost template consuming space without aiding trigger decision
+- impression-based exclusions ("already obvious", "already confirmed") rather than observable facts
+- missing disambiguation against similar skills that share overlapping trigger conditions
 
 Check the Trigger Logic section (see `references/skill-trigger-design-principles.md` for the full checklist):
 - does the skill have an **invocation default** paragraph that states the cost asymmetry — what happens when the skill is missed vs. invoked unnecessarily?
@@ -72,7 +73,7 @@ Check the Trigger Logic section (see `references/skill-trigger-design-principles
 - is there a **"default warm-up" or "every action" condition** that gives blanket permission to skip? (remove it)
 - do redirect conditions say **"do X first, then return here"** rather than just "do not use"?
 - are **specific skill names hardcoded** in redirect conditions? (replace with principle descriptions)
-- does the **description** reflect direction-3 — "invoke unless confirmed otherwise" rather than "use when substantial enough"?
+- does the **description** front-load capability and trigger conditions within 250 characters, with DO NOT TRIGGER for disambiguation where similar skills exist?
 
 ### 2. Capability Boundary
 

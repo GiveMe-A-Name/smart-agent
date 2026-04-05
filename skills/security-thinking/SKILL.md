@@ -1,6 +1,6 @@
 ---
 name: security-thinking
-description: "Invoke when the code being written or reviewed handles untrusted input, manages authentication or authorization, stores or transmits sensitive data, adds new dependencies, or exposes new interfaces. Cost of unnecessary invocation: a short security review pass. Cost of missing: a vulnerability that costs orders of magnitude more to fix after deployment than before. When uncertain whether security considerations apply, invoke."
+description: "Review code for security implications — injection, auth, data exposure, dependency risk. TRIGGER when: code handles untrusted input, manages auth, stores/transmits sensitive data, adds dependencies, or exposes new interfaces. DO NOT TRIGGER when: code has no security-relevant surface (pure internal logic, no I/O, no auth)."
 ---
 
 # Security Thinking

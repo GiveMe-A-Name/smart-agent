@@ -72,7 +72,7 @@ The structure maps one-to-one onto the original bullet points. Nothing was gener
 ```markdown
 ---
 name: api-error-handling
-description: "Invoke when implementing or modifying HTTP API error handling — especially when deciding which status codes to retry, configuring backoff, or when retry behavior is inconsistent across the codebase. Cost of unnecessary invocation: brief review of retry policy. Cost of missing: silent error swallowing, inconsistent retry behavior, or retrying non-recoverable failures."
+description: "Implement consistent HTTP API error handling — retry policy, backoff, and error classification. TRIGGER when: implementing or modifying HTTP error handling, deciding which status codes to retry, or retry behavior is inconsistent across the codebase. DO NOT TRIGGER when: handling non-HTTP errors (database, filesystem) or debugging a failing test."
 ---
 
 # API Error Handling
@@ -127,7 +127,7 @@ Stop and re-evaluate if:
 
 ### What Is Better
 
-**The description names observable trigger conditions** with explicit cost asymmetry — not steps. An agent scanning skills can match this to the current task ("I'm deciding whether to retry this request") without reading the body, and the costs make the default obvious.
+**The description names observable trigger conditions with disambiguation boundaries** — not steps or cost persuasion. An agent scanning skills can match this to the current task ("I'm deciding whether to retry this request") without reading the body, and the DO NOT TRIGGER clause prevents misapplication to non-HTTP errors.
 
 **The invariants are red lines, stated first.** The "never swallow" rule appears as a constraint, not as step 5. An agent cannot reach the implementation sections without passing the invariants.
 

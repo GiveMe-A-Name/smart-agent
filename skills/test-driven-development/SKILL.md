@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: "Invoke before writing any implementation code for a feature, bugfix, refactor, or behavior change. Cost of unnecessary invocation: a short judgment pass. Cost of missing: untested code, silent regressions, and design problems discovered too late to fix cheaply. When uncertain whether the work has testable behavior, invoke."
+description: "Write tests before implementation code. TRIGGER when: about to implement a feature, bugfix, refactor, or behavior change. DO NOT TRIGGER when: change has no testable behavior — pure config (JSON/YAML), type/interface declarations, file moves, renames, formatting."
 ---
 
 # Test-Driven Development

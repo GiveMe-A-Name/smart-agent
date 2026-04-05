@@ -1,6 +1,6 @@
 ---
 name: implementation-judgment
-description: "Invoke before writing any behavior-affecting code — bug fixes, new features, review responses, and small patches alike. The structural questions this skill addresses (right layer, correct responsibility placement, silently broken contract) appear in all code changes, not only large design decisions. Cost of unnecessary invocation: a few extra reasoning steps. Cost of missing: a patch that weakens structure, moves responsibility to the wrong layer, or locks in a wrong abstraction — often invisibly."
+description: "Apply engineering judgment before writing behavior-affecting code — right layer, correct responsibility, contract integrity. TRIGGER when: about to write code that changes runtime behavior (bug fixes, features, patches). DO NOT TRIGGER when: change is confirmed zero-behavioral (rename, file move, comment, formatting)."
 ---
 
 # Implementation Judgment

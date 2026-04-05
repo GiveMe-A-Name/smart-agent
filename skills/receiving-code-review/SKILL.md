@@ -1,6 +1,6 @@
 ---
 name: receiving-code-review
-description: "Invoke when review feedback exists — PR comments, inline annotations, or user-pasted suggestions — and the task is deciding what to do with it before touching code. Cost of unnecessary invocation: a short verification pass. Cost of missing: blind compliance with technically wrong suggestions, or structural damage from uncritically applied feedback."
+description: "Evaluate review feedback before acting on it — assess correctness against design intent, not blind compliance. TRIGGER when: PR comments, inline annotations, or pasted review suggestions exist and the task is deciding what to do. DO NOT TRIGGER when: reviewing others' code (use code-review) or no review feedback exists yet."
 ---
 
 # Receiving Code Review

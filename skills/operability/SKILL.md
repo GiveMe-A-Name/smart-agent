@@ -1,6 +1,6 @@
 ---
 name: operability
-description: "Invoke before shipping any code that will run in production — new services, new features, infrastructure changes, and significant behavioral changes. Cost of unnecessary invocation: a short production-readiness check. Cost of missing: code that works in development but fails, degrades silently, or is impossible to debug in production. When uncertain whether production considerations apply, invoke."
+description: "Check production readiness — monitoring, debugging, graceful degradation, safe deployment. TRIGGER when: shipping code to production (new services, features, infra changes, significant behavioral changes). DO NOT TRIGGER when: work is purely local tooling or development scripts with no production impact."
 ---
 
 # Operability

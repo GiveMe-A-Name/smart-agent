@@ -1,6 +1,6 @@
 ---
 name: understanding-codebases
-description: "Invoke when the task involves working on code and current understanding is based on issue descriptions, user explanations, or prior knowledge — not read source files. Cost of unnecessary invocation: minor overhead from a targeted exploration. Cost of missing: unfounded conclusions that contaminate all subsequent planning, investigation, and implementation. When uncertain whether evidence is sufficient, invoke."
+description: "Build evidence-based understanding of code before suggesting changes. TRIGGER when: current understanding is based on descriptions, user explanations, or prior knowledge — not read source files. DO NOT TRIGGER when: relevant source code has already been read and traced in this session."
 ---
 
 # Codebase Understanding

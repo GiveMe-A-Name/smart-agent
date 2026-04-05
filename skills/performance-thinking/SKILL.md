@@ -1,6 +1,6 @@
 ---
 name: performance-thinking
-description: "Invoke when the code being written or reviewed will run on a hot path, process significant data volumes, serve user-facing latency-sensitive requests, or when performance requirements exist. Cost of unnecessary invocation: a short performance review pass. Cost of missing: a performance problem discovered in production that is orders of magnitude more expensive to fix under load than to prevent during development. When uncertain whether performance matters for this change, invoke."
+description: "Evaluate performance as a design constraint. TRIGGER when: code runs on a hot path, processes growing data volumes, serves latency-sensitive requests, or has explicit performance requirements/SLAs. DO NOT TRIGGER when: code is offline tooling, one-shot scripts, or has no performance sensitivity."
 ---
 
 # Performance Thinking

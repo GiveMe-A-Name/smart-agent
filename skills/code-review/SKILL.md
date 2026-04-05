@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: "Invoke when code changes exist — local diff, staged changes, or a remote PR — and the task is to evaluate them. Cost of unnecessary invocation: a short review pass. Cost of missing: bugs in production, or false safety from an incomplete review."
+description: "Evaluate code changes for correctness, design, and risk. TRIGGER when: a diff, staged changes, or PR exists and the task is to review them. DO NOT TRIGGER when: responding to existing review feedback (use receiving-code-review) or no code changes exist yet."
 ---
 
 # Code Review

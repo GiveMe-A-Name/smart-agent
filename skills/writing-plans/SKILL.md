@@ -1,6 +1,6 @@
 ---
 name: writing-plans
-description: "Invoke before implementing any change when you cannot immediately state the files involved, what specifically changes, and how to verify it. Cost of unnecessary invocation: a prose note or short task list. Cost of missing: mid-implementation surprises, wasted work from missing dependencies, or a codebase left in a broken state. When uncertain whether a sufficient plan exists, invoke."
+description: "Plan before implementing when the path is unclear. TRIGGER when: you cannot immediately state the files involved, what changes, and how to verify it. DO NOT TRIGGER when: executing an existing plan, or the change is trivially scoped to a single known file."
 ---
 
 # Writing Plans

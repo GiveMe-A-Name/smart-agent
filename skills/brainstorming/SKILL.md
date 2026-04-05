@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: "Invoke when a feature, product change, workflow, or new component is being considered and no committed spec exists. Cost of unnecessary invocation: a short design conversation. Cost of missing: building the wrong thing — wrong interfaces, missing constraints, structure that must be undone. When uncertain whether a spec exists or is complete, invoke."
+description: "Explore design options for a feature, workflow, or component before any spec exists. TRIGGER when: idea is open-ended, no committed spec or design doc exists yet. DO NOT TRIGGER when: a spec already exists and the task is implementation or planning."
 ---
 
 # Brainstorming Ideas Into Designs

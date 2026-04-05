@@ -13,9 +13,9 @@ When the agent operates in thinking mode, skill invocation decisions can follow 
 The agent performs a structured assessment internally:
 
 1. **Recognize the situation** — what type of task is this?
-2. **Check skill applicability** — does a skill exist for this?
-3. **Evaluate trigger conditions** — do the observable conditions match?
-4. **Apply cost asymmetry** — what's the cost of false positive vs false negative?
+2. **Scan skill descriptions** — which TRIGGER conditions match the current state?
+3. **Check DO NOT TRIGGER** — does a disambiguation boundary exclude this skill?
+4. **Apply invocation default** — when uncertain, invoke (cost asymmetry from Trigger Logic body).
 
 This assessment happens in the thinking block and is not visible to the user.
 
@@ -48,12 +48,10 @@ User request: "Add authentication to the API"
 
 **Thinking block** (internal):
 ```
-This is a new feature implementation. Let me check if I should use a planning skill.
-- Is this non-trivial? Yes, authentication affects multiple files and has security implications.
-- Do I have a complete plan? No.
-- Cost of unnecessary invocation: brief planning pass.
-- Cost of missing: building without considering security implications, missing edge cases.
-- Decision: invoke the planning skill.
+This is a new feature implementation. Let me check the skill list.
+- writing-plans: "Plan before implementing when the path is unclear. TRIGGER when: you cannot immediately state the files involved..."
+- Can I state the files, changes, and verification? No — auth affects multiple files and has security implications.
+- Decision: invoke writing-plans.
 ```
 
 **Response** (visible):
@@ -69,9 +67,9 @@ For agents without thinking mode, the assessment must be more implicit or happen
 
 To support both thinking and non-thinking modes:
 
-1. **Make trigger conditions explicit and observable** — works for both modes
-2. **State cost asymmetry clearly** — helps both modes make the right default choice
-3. **Keep invariants clear** — guides behavior regardless of reasoning style
+1. **Front-load capability and TRIGGER conditions in the description** — the description is what the agent scans in both modes
+2. **Use DO NOT TRIGGER for disambiguation** — helps the agent route correctly between similar skills
+3. **Keep cost asymmetry in the Trigger Logic body** — the agent reads this after loading, where it informs the invocation default
 4. **Design Anti-Rationalization prompts as structured questions, and Completion Criteria as explicit exit conditions** — both can be applied in a thinking block or explicitly
 
-The core skill design principles (observable conditions, cost asymmetry, state-based triggers) work well for both modes. Thinking mode simply allows the assessment to happen more efficiently.
+The core skill design principles (observable conditions, state-based triggers, disambiguation boundaries) work well for both modes. Thinking mode simply allows the assessment to happen more efficiently.

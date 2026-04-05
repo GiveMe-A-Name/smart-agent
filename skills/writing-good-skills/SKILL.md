@@ -1,6 +1,6 @@
 ---
 name: writing-good-skills
-description: "Invoke when creating a skill, modifying a SKILL.md, or when a skill's behavior diverges from expectations. Cost of unnecessary invocation: a brief structural review. Cost of missing: a skill that silently triggers at the wrong time, encodes routing instead of capability, or teaches the wrong behavior while appearing complete. When uncertain whether a change affects trigger conditions or boundaries, invoke."
+description: "Guide skill creation and modification — structure, trigger conditions, boundaries. TRIGGER when: creating a skill, modifying a SKILL.md, or a skill's behavior diverges from expectations. DO NOT TRIGGER when: using a skill normally or working on non-skill files."
 ---
 
 # Writing Good Skills
@@ -102,10 +102,12 @@ See `examples/routing-vs-boundary.md` for a contrast pair.
 - Scenario-based triggers fire on specific patterns: "user pastes X," "output looks like Y." These miss every unimagined case.
 - Uncertain → invoke is the right default. The cost asymmetry is clear: unnecessary invocation costs a short reasoning pass; missed invocation costs downstream errors that are hard to recover. State this asymmetry explicitly in the Trigger Logic section.
 - `Do not use` conditions are only necessary when there is a realistic wrong-invocation scenario the positive trigger state does not already exclude. Before adding one, name the specific wrong invocation it prevents. If the answer is vague, delete the condition.
-- `Do not use` conditions placed in the description face maximum rationalization pressure — they are evaluated before the agent has invested in the situation. Prefer moving them to the Trigger Logic body.
+- Distinguish two kinds of negative conditions in the description:
+  - **Disambiguation boundaries** (`DO NOT TRIGGER when: [observable fact, pointing to correct alternative]`) — belong in the description because the agent needs them at routing time to choose between similar skills.
+  - **Impression-based exclusions** (`unless the fix is obvious`) — belong in the Trigger Logic body, not the description. These face maximum rationalization pressure when evaluated before the agent has investigated.
 
 See `references/skill-trigger-design-principles.md` for the full trigger design framework.
-See `references/description-patterns.md` for the description-field and invocation-default patterns.
+See `references/description-patterns.md` for the description format: `[Capability]. TRIGGER when: [...]. DO NOT TRIGGER when: [...]`.
 See `references/thinking-mode-considerations.md` for how these principles apply in thinking-mode agents.
 
 ### 4. Lean vs. Hollow

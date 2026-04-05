@@ -1,6 +1,6 @@
 ---
 name: requirement-clarification
-description: "Invoke when the request leaves intent, constraints, or tradeoffs unresolved in ways that would change the approach if answered differently. Cost of unnecessary invocation: 2–3 clarifying questions at most. Cost of missing: a plan or implementation built toward the wrong goal. When uncertain whether requirements are clear, invoke."
+description: "Clarify ambiguous intent, constraints, or tradeoffs before planning or implementation. TRIGGER when: the request is ambiguous in ways that would change the approach if answered differently. DO NOT TRIGGER when: requirements are clear enough to proceed, or work is already in progress with confirmed direction."
 ---
 
 # Requirement Clarification

@@ -56,9 +56,10 @@ The asymmetry in error costs makes this the right default:
 - **False positive** (loaded unnecessarily): minor overhead, a few extra reasoning steps
 - **False negative** (missed when needed): compromised depth throughout all subsequent work, hard to recover
 
-Put this asymmetry directly in the skill description — do not leave it for the AI to infer:
+State this asymmetry in the Trigger Logic body of the skill, where the agent reasons about it after loading. The description field should focus on routing precision — what the skill does and when to trigger it — not on persuading the agent that the skill is worth loading.
 
-> "The cost of an unnecessary invocation is minor overhead. The cost of a missed invocation is compromised depth throughout all subsequent work. When in doubt, invoke."
+In the Trigger Logic body:
+> "**Invocation default**: The cost of an unnecessary invocation is minor overhead. The cost of a missed invocation is compromised depth throughout all subsequent work. When in doubt, invoke."
 
 ---
 
@@ -76,11 +77,13 @@ Direction 1 defines the "certain to skip" criteria in terms of observable facts,
 
 ### "Invocation default" paragraph (Direction 3)
 
-Add at the top of every skill's Trigger Logic:
+Add at the top of every skill's **Trigger Logic body** (not the description):
 
 > "**Invocation default**: The cost of an unnecessary invocation is [minor overhead]. The cost of a missed invocation is [specific downstream harm]. [When condition X is not confirmed from code evidence, invoke this skill.]"
 
 The downstream harm description should be specific to the skill — not generic.
+
+The **description field** should not carry cost asymmetry sentences. Instead, the description uses the format: `"[Capability]. TRIGGER when: [conditions]. DO NOT TRIGGER when: [disambiguation]."` — see `description-patterns.md` for the full pattern.
 
 ### "Do not use" conditions (Direction 1)
 
@@ -123,5 +126,6 @@ Before finalizing any skill's trigger conditions, verify:
 - [ ] Is there a "default warm-up" condition that gives blanket permission to skip? (remove)
 - [ ] Do redirect conditions say "do X first, then return here" rather than just "do not use"?
 - [ ] Are specific skill names hardcoded in redirect conditions? (replace with principle descriptions)
-- [ ] Does the description use "when" as the trigger? (prefer "when" over "unless" — see `description-patterns.md`)
-- [ ] Are any "Do not use" conditions placed in the description? If so, move them to the Trigger Logic body.
+- [ ] Does the description follow the `[Capability]. TRIGGER when: [...]. DO NOT TRIGGER when: [...]` format? (see `description-patterns.md`)
+- [ ] Is the most critical trigger info within the first 250 characters?
+- [ ] Do any `DO NOT TRIGGER` conditions in the description use impression-based exclusions? If so, either rewrite as observable facts or move to the Trigger Logic body.
