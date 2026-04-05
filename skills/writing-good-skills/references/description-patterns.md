@@ -15,11 +15,15 @@ If the `description` carries boundary law, decision logic, or action guidance, i
 Understanding how descriptions are consumed affects how to write them:
 
 - All skill descriptions are loaded into the agent's context at session start — only `name` + `description`, not the full SKILL.md body. The full body loads only after the agent decides to invoke.
-- Display truncation occurs at **250 characters**. The hard limit is **1024 characters**. The global budget is **~1% of context window**.
+- **Two different truncation boundaries exist — do not confuse them:**
+  - **250 characters — UI display truncation.** When a user browses the skill list (e.g. `/skills`), each description is truncated at 250 chars in the listing. This is a display concern only.
+  - **1024 characters — hard field limit.** The maximum length the `description` field accepts.
+  - **The LLM reads the full description up to 1024 characters.** The 250-char truncation does NOT affect the model's ability to read the complete text. The model receives the full description in `<available_skills>`.
+- The global budget across all skills is **~1% of context window** (minimum 8000 chars).
 - The triggering decision is made entirely by LLM reasoning — no classifier, no embedding, no intent detection. The model reads descriptions as natural language and decides.
 - This mechanism is shared across Claude Code, Codex CLI, and any system following the Agent Skills standard.
 
-Implication: the first 250 characters must contain the most important trigger information. Everything after 250 chars may be truncated in skill listings.
+**Implication: front-load capability + TRIGGER conditions within the first 250 characters so they survive UI display truncation. DO NOT compress the entire description to fit within 250 characters** — doing so would sacrifice DO NOT TRIGGER disambiguation boundaries that the LLM reads and uses for routing. A description of 250–350 characters that front-loads correctly is better than a 240-character description that omits disambiguation.
 
 ## Core Tests
 
@@ -131,8 +135,9 @@ These belong in the main skill body if they belong anywhere.
 8. Use concrete keywords the user would naturally say (file types, task names, domain terms)
 
 **Polish:**
-9. Ensure the most critical trigger info is in the first 250 characters
+9. Ensure capability + TRIGGER conditions are in the first 250 characters (UI display truncation)
 10. Keep total under 1024 characters (hard limit)
+11. Do NOT compress to fit within 250 characters — 250–350 chars with proper front-loading and DO NOT TRIGGER is better than 240 chars without disambiguation
 11. Confirm boundary language, invariants, and action guidance remain in the main file, not here
 
 ## DO NOT TRIGGER: When to Include, What to Include
