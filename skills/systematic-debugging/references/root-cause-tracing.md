@@ -88,10 +88,10 @@ Look for: test file names, line numbers triggering the call, repeated patterns.
 
 ## Finding Which Test Causes Pollution
 
-Use `find-polluter.sh` in this directory:
+Use `../scripts/find-polluter.sh`:
 
 ```bash
-./find-polluter.sh '.git' 'src/**/*.test.ts'
+../scripts/find-polluter.sh '.git' 'src/**/*.test.ts'
 ```
 
 Runs tests one-by-one, stops at first polluter.

@@ -90,14 +90,14 @@ Reach for the mental model that fits the observable signal. After each action, a
 |---|---|---|
 | Clear error message pointing to a specific location | May be a direct hit, but verify — could be symptom site, not owner | **Symptom site ≠ Owning layer** — trace backward before editing |
 | "It used to work" / something changed recently | Likely a regression | `git log`, `git bisect` — **divide and conquer through time** |
-| Fails in full suite, passes in isolation | Test pollution or ordering dependency | `find-polluter.sh`, bisection — **reproduction** |
-| Intermittent / flaky | Uncontrolled variable: timing, state, ordering | **Reproduction** — find the variable, see `condition-based-waiting.md` |
+| Fails in full suite, passes in isolation | Test pollution or ordering dependency | `scripts/find-polluter.sh`, bisection — **reproduction** |
+| Intermittent / flaky | Uncontrolled variable: timing, state, ordering | **Reproduction** — find the variable, see `references/condition-based-waiting.md` |
 | Multi-component system, unclear which layer | Need to isolate the broken layer | **Observation** — instrument boundaries, check data at each crossing |
 | You've formed a theory but haven't tested it | Risk of confirmation bias | **Search problem** — design an experiment that could DISPROVE your theory |
 | 2+ failed hypotheses, feeling stuck | Assumptions may be wrong | **Check the plug**, question assumptions, get a fresh view — explain the problem aloud |
 | Each fix exposes a new failure elsewhere | Structural/design problem, not a single bug | **Architecture escalation** — surface to human partner |
-| Error deep in a call stack, unclear origin | Need to trace backward to the original trigger | **Causal chain depth** + `root-cause-tracing.md` |
-| Fix worked but you want it to stay fixed | Need to prevent the bug class, not just this instance | **Causal chain depth** + `defense-in-depth.md` |
+| Error deep in a call stack, unclear origin | Need to trace backward to the original trigger | **Causal chain depth** + `references/root-cause-tracing.md` |
+| Fix worked but you want it to stay fixed | Need to prevent the bug class, not just this instance | **Causal chain depth** + `references/defense-in-depth.md` |
 | Build fails after dependency update | Version conflict or breaking change in dep | **Build debugging** — read changelog between versions, check lock file diff |
 | "Works on my machine" but fails in CI/staging | Environment difference | **Config/environment debugging** — diff runtime versions, env vars, config sources |
 | Code looks correct but behavior is wrong | Configuration, feature flag, or stale artifact | **Config debugging** — print actual resolved config, clean caches, check feature flags |
@@ -137,10 +137,10 @@ When escalating: state what you know (symptom, evidence gathered, hypotheses tes
 
 ## Supporting Techniques
 
-- `root-cause-tracing.md` — tracing backward through a call stack to the original trigger
-- `defense-in-depth.md` — after finding root cause, adding validation at multiple layers so the bug class cannot recur
-- `condition-based-waiting.md` — when the bug involves timing or async behavior
-- `find-polluter.sh` — when a test fails only in a full suite run
+- `references/root-cause-tracing.md` — tracing backward through a call stack to the original trigger
+- `references/defense-in-depth.md` — after finding root cause, adding validation at multiple layers so the bug class cannot recur
+- `references/condition-based-waiting.md` — when the bug involves timing or async behavior
+- `scripts/find-polluter.sh` — when a test fails only in a full suite run
 - `references/specialized-domains.md` — domain-specific heuristics for distributed systems, performance, concurrency, data/state, build/tooling, and config/environment bugs
 - `references/mental-models.md` — full detail for the five mental models
 - `references/cognitive-traps.md` — the seven cognitive biases that make debugging hard, with countermeasures

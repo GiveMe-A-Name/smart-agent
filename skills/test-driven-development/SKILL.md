@@ -57,27 +57,6 @@ This is the primary value — not coverage, not regression safety (though those 
 - Bugs must never be fixed without a test that first reproduces the bug
 - If skipping TDD, name a specific no-behavior criterion explicitly (not "it's simple")
 
-## Completion Criteria
-
-- [ ] All invariants were followed (test before code, watched it fail, watched it pass).
-- [ ] If TDD was skipped, a specific no-behavior criterion was named.
-- [ ] No test asserts on mock internals (call counts, call order, mock state) or internal implementation details rather than observable output.
-- [ ] Any test-writing friction was treated as a design signal — if friction appeared, the code was redesigned rather than the test complexity increased.
-- [ ] If modifying legacy code, characterization tests were written before changing behavior.
-- [ ] If testing async or concurrent code, explicit synchronization is used instead of sleeps.
-
-**If any criterion is not met, return to the relevant section before exiting.**
-
-## Anti-Rationalization Check
-
-Pause before exiting.
-
-Do not treat this section as another checklist to clear. Use it to challenge whether the test discipline was genuinely applied.
-
-Did I ignore any applicable self-correction signals because the tests are green now?
-
-Am I exiting because tests are genuinely in place, or because the current test suite looks reassuring enough?
-
 ## Decision Signals
 
 These signals guide judgment before and during TDD execution. They are not steps.
@@ -137,17 +116,34 @@ Red-green-refactor. Repeat per behavior.
 3. **REFACTOR**: Remove duplication, improve names. No new behavior. All tests stay green throughout.
 4. Repeat for the next behavior.
 
-See `references/tdd-cycle.md` for: cycle mechanics, triangulation technique, test level selection, stuck-on-red patterns, and common rationalizations.
-
+See `references/tdd-cycle.md` for cycle mechanics, triangulation, stuck-on-red patterns, and rationalizations.
 See `references/testing-anti-patterns.md` for mock discipline — read before writing any test infrastructure.
+See `references/advanced-testing-strategies.md` for property-based, contract, and mutation testing.
+See `references/practical-testing-challenges.md` for legacy code, async/concurrent code, and flaky tests.
+See `examples/complete-example.md` for a full worked walkthrough.
 
-See `references/advanced-testing-strategies.md` for: property-based testing, contract testing, mutation testing, and integration/e2e testing decisions.
+## Completion Criteria
 
-See `references/practical-testing-challenges.md` for: legacy code, test data management, async/concurrent code, and managing flaky tests.
+- [ ] All invariants were followed (test before code, watched it fail, watched it pass).
+- [ ] If TDD was skipped, a specific no-behavior criterion was named.
+- [ ] No test asserts on mock internals (call counts, call order, mock state) or internal implementation details rather than observable output.
+- [ ] Any test-writing friction was treated as a design signal — if friction appeared, the code was redesigned rather than the test complexity increased.
+- [ ] If modifying legacy code, characterization tests were written before changing behavior.
+- [ ] If testing async or concurrent code, explicit synchronization is used instead of sleeps.
 
-See `examples/complete-example.md` for a full worked walkthrough: from requirement to passing feature, including orientation decision, design pressure, triangulation, and refactor.
+**If any criterion is not met, return to the relevant section before exiting.**
 
-## Self-Correction Signals
+## Anti-Rationalization Check
+
+Pause before exiting.
+
+Do not treat this section as another checklist to clear. Use it to challenge whether the test discipline was genuinely applied.
+
+Did I ignore any applicable self-correction signals because the tests are green now?
+
+Am I exiting because tests are genuinely in place, or because the current test suite looks reassuring enough?
+
+## Failure Signals
 
 Stop and revise when:
 - code was written before a test exists
@@ -161,5 +157,3 @@ Stop and revise when:
 - a test is flaky and you are re-running it instead of diagnosing the cause
 - you are modifying legacy code without writing characterization tests first
 - test fixtures are copied and pasted with minor variations instead of using factories/builders
-- review feedback says "the goal is not fully achieved" and you are adding more tests toward that goal without first confirming the goal with the user
-- you are treating a reviewer's articulation of the goal as equivalent to the user's confirmed intent — they are not the same; writing toward an unconfirmed goal deepens the wrong implementation

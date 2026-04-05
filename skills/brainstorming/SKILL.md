@@ -58,7 +58,7 @@ When scope is too large and the user isn't ready to decompose, name that blocker
 
 **Project context:** Explore files, docs, and recent commits before asking questions. Questions you could answer by reading the codebase waste the stakeholder's time. Follow existing patterns. Where existing code has problems that affect the work (overgrown files, tangled responsibilities), include targeted improvements as part of the design — not as unrelated refactoring.
 
-**Visual companion:** Offer when upcoming questions will involve mockups, layouts, or diagrams. Decide per-question whether the content is genuinely visual or can be handled in the terminal. When offering, use this message — nothing else alongside it:
+**Visual companion:** At session start, assess whether the topic involves UI design, UX flows, visual layouts, or architecture diagrams. If yes, offer the visual companion before asking your first question — do not wait until a visual question comes up mid-session. Decide per-question whether the content is genuinely visual or can be handled in the terminal. When offering, use this message — nothing else alongside it:
 
 > "Some of what we're working on might be easier to explain if I can show it to you in a web browser. I can put together mockups, diagrams, comparisons, and other visuals as we go. This feature is still new and can be token-intensive. Want to try it? (Requires opening a local URL)"
 
@@ -103,11 +103,9 @@ Am I exiting because the design is genuinely complete and approved, or because t
 
 Stop and reassess if:
 - You are discussing implementation details (library choices, file organization, syntax) before understanding the problem
-- You are asking multiple questions in a single message
 - You are about to write the spec but major design sections are still unresolved or unapproved
 - You proposed 2–3 approaches but they are variants of the same idea rather than genuinely different directions
 - You have asked more than 5–6 questions without reaching approach proposals (see the "Enough questions" decision signal)
-- The spec review loop has run 3 times without clearing medium/high-risk issues — surface to human, do not loop again
 - The user pushes back on doing a design and wants to go straight to code — hold the HARD-GATE; do not compromise, explain why the design step matters
 - You committed to an approach that depends on unverified third-party behavior — spike first
 - You are comparing approaches but each is described in a different frame, making comparison impossible — use consistent dimensions
