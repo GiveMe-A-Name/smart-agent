@@ -65,31 +65,31 @@ Verify: `python cli/export.py --dry-run output/` prints paths, no files created;
 
 **Risk analysis:** The main uncertainty is whether `on_complete` provides enough context to construct the webhook payload. We find out in Task 1.
 
-**File map:**
-- Create `notifications/webhook.py` — `WebhookNotifier` class
-- Create `tests/notifications/test_webhook.py` — unit + integration tests
+**File map** *(design sketch — names may change during execution)*:
+- Create webhook notifier in `notifications/` — likely `notifications/webhook.py`
+- Create tests in `tests/notifications/`
 - Modify `config.yaml` schema — add `webhooks:` section
-- Modify `job_runner.py:on_complete` — wire up `WebhookNotifier`
+- Modify `job_runner.py:on_complete` — wire up the notifier
 
 ### Task 1: Walking Skeleton — Hardcoded webhook fires on job completion
 *Proves the approach works end-to-end. Resolves the main risk.*
 
-Files: Create `notifications/webhook.py`, `tests/notifications/test_webhook.py`; Modify `job_runner.py`
+Files: Create webhook notifier module in `notifications/` and its tests in `tests/notifications/`; Modify `job_runner.py`
 
-- [ ] Create `WebhookNotifier` with a `notify(job_result)` method that POSTs to a hardcoded URL using `httpx`
+- [ ] Create a notifier with a `notify(job_result)` method that POSTs to a hardcoded URL
 - [ ] Write test: mock HTTP, assert POST is called with correct payload structure
-- [ ] Wire into `job_runner.py:on_complete` — instantiate `WebhookNotifier` and call `notify()`
-- [ ] Run: `pytest tests/notifications/test_webhook.py -v` → PASS
+- [ ] Wire into `job_runner.py:on_complete`
+- [ ] Run: `pytest tests/notifications/ -v` → PASS
 - [ ] Commit point: tests green, webhook fires with hardcoded URL
 
 ### Task 2: Make it configurable
 *Known-how-to-do work — low risk.*
 
-Files: Modify `config.yaml`, `notifications/webhook.py`, `job_runner.py`
+Files: Modify `config.yaml`, the notifier created in Task 1, `job_runner.py`
 
 - [ ] Add `webhooks:` section to config schema with `url` and `secret` fields
-- [ ] Modify `WebhookNotifier` to accept URL from config instead of hardcoded
-- [ ] In `job_runner.py`: read config, only instantiate `WebhookNotifier` if `webhooks.url` is set
+- [ ] Notifier accepts URL from config instead of hardcoded
+- [ ] In `job_runner.py`: read config, only instantiate notifier if `webhooks.url` is set
 - [ ] Add test: no webhook call when config is absent
 - [ ] Run: `pytest tests/ -v` → PASS
 - [ ] Commit point: tests green, webhook is config-driven
@@ -97,11 +97,11 @@ Files: Modify `config.yaml`, `notifications/webhook.py`, `job_runner.py`
 ### Task 3: Add retry logic
 *Routine work, well-understood patterns.*
 
-Files: Modify `notifications/webhook.py`, `tests/notifications/test_webhook.py`
+Files: Modify the notifier and its tests (created in Task 1)
 
-- [ ] Add retry logic: up to 3 retries with exponential backoff on 5xx, give up immediately on 4xx
+- [ ] Add retry with exponential backoff on 5xx, give up immediately on 4xx
 - [ ] Write tests: retry on 503, no retry on 400, success on 2nd attempt
-- [ ] Run: `pytest tests/notifications/test_webhook.py -v` → PASS
+- [ ] Run: `pytest tests/notifications/ -v` → PASS
 - [ ] Commit point: tests green, retry logic complete
 
 **Final verification:** Run a test job with webhook URL pointed at `localhost` echo server, confirm POST received with correct payload.
@@ -110,11 +110,19 @@ Files: Modify `notifications/webhook.py`, `tests/notifications/test_webhook.py`
 
 ### Execution Log (example — appended during execution)
 
-[2026-04-02] Task 1: complete. Walking skeleton worked. Discovered `on_complete` passes a `JobResult` object — payload mapping is straightforward.
+[2026-04-02] Task 1: complete — walking skeleton works end-to-end. `on_complete` passes a
+  `JobResult` object with `job_id`, `status`, and `output`; payload mapping is straightforward
+  and no schema changes are needed.
 
-[2026-04-02] Task 2: complete.
+[2026-04-02] Task 2: complete — `WebhookNotifier` now reads URL from `config.yaml webhooks.url`;
+  instantiation is skipped when config is absent, so no accidental webhook calls in
+  environments without config.
 
-[2026-04-03] Task 3: failed first attempt — `httpx` retry logic conflicts with `asyncio` event loop in test environment. Switched to `tenacity` library for retries. Task 3 complete.
+[2026-04-03] Task 3: failed — `pytest tests/notifications/test_webhook.py::test_retry_on_503 FAILED`
+  → RuntimeError: no running event loop — `httpx.AsyncClient.send()` called outside asyncio
+  event loop in the test environment. Switched to `tenacity.retry` wrapping synchronous
+  `httpx.post` instead of httpx's built-in async retry. `pytest tests/notifications/test_webhook.py -v`
+  → PASS. Task 3: complete.
 
 ---
 
@@ -152,12 +160,12 @@ Tasks 4 and 5 can be done in parallel after Task 3.
 
 *Contract-first: define the boundary before building either side. This is the foundation.*
 
-Files: Create `plugins/interface.py`, `plugins/__init__.py`, `tests/plugins/test_interface.py`
+Files: Create interface module and `NoOpPlugin` in `plugins/`; create tests in `tests/plugins/`
 
-- [ ] Define `PluginBase` ABC with `process(data: PipelineData) -> PipelineData` and `validate() -> bool`
-- [ ] Define `PluginMetadata` dataclass: name, version, author, description
-- [ ] Write a concrete `NoOpPlugin` that passes data through unchanged (useful for testing)
-- [ ] Write tests: `NoOpPlugin` conforms to interface, metadata is accessible
+- [ ] Define plugin ABC with `process(data) -> data` and `validate() -> bool`
+- [ ] Define plugin metadata structure: name, version, author, description
+- [ ] Write a concrete no-op plugin that passes data through unchanged (useful for testing)
+- [ ] Write tests: no-op plugin conforms to interface, metadata is accessible
 - [ ] Run: `pytest tests/plugins/ -v` → PASS
 - [ ] Commit point: plugin contract is defined and tested
 
@@ -165,11 +173,11 @@ Files: Create `plugins/interface.py`, `plugins/__init__.py`, `tests/plugins/test
 
 *Proves the approach works end-to-end without any dynamic loading.*
 
-Files: Modify `pipeline/runner.py`; Create `tests/plugins/test_pipeline_integration.py`
+Files: Modify `pipeline/runner.py`; create integration test in `tests/plugins/`
 
-- [ ] Modify `pipeline/runner.py` to accept a list of `PluginBase` instances in addition to hardcoded processors
-- [ ] Wire `NoOpPlugin` into the pipeline as a test
-- [ ] Write integration test: pipeline runs with `NoOpPlugin`, data passes through correctly
+- [ ] Pipeline runner accepts plugin instances in addition to hardcoded processors
+- [ ] Wire no-op plugin (from Task 1) into the pipeline
+- [ ] Integration test: pipeline runs with plugin, data passes through correctly
 - [ ] Run: `pytest tests/ -v` → PASS
 - [ ] Commit point: pipeline supports plugins, one hardcoded plugin works
 
@@ -177,32 +185,83 @@ Files: Modify `pipeline/runner.py`; Create `tests/plugins/test_pipeline_integrat
 
 *Risk-first: this is the biggest unknown. Validate approach before building on it.*
 
-Files: Create `plugins/sandbox.py`, `tests/plugins/test_sandbox.py`
+Files: Create sandboxing module and its tests in `plugins/`
 
 - [ ] Research and implement sandboxing approach (subprocess isolation vs. restricted globals)
-- [ ] Create `SandboxedPluginRunner` that executes a plugin's `process()` in isolation
-- [ ] Write tests: plugin cannot access filesystem, network timeout is enforced, crash doesn't kill host
-- [ ] Run: `pytest tests/plugins/test_sandbox.py -v` → PASS
+- [ ] Sandboxed runner executes a plugin's `process()` in isolation
+- [ ] Tests: plugin cannot access filesystem, network timeout is enforced, crash doesn't kill host
+- [ ] Run: `pytest tests/plugins/ -v` → PASS
 - [ ] Commit point: sandboxing works, constraints are known
 - [ ] **After this task**: refine Tasks 4-5 based on what sandboxing constraints revealed
 
-### Task 4: Auto-Discovery and Validation (refine after Task 3)
+### Task 4: Auto-Discovery and Validation *(goal-level — depends on Task 3)*
 
-Goal: Load plugins from a configured directory, validate them against the interface, register valid plugins.
+Goal: Load plugins from a configured directory, validate against the interface, register valid plugins.
 
-Files: Create `plugins/discovery.py`, `plugins/validator.py`; Modify `config.yaml`
+Files: Create discovery and validation modules in `plugins/` (structure depends on sandboxing approach from Task 3); Modify `config.yaml`
 
-*Detail to be filled after Task 3 is complete.*
+*Approach depends on sandboxing constraints revealed in Task 3. Will be detailed after Task 3 completes.*
 
-### Task 5: CLI and Config Integration (refine after Task 3, parallel with Task 4)
+- [ ] Plugins are discovered from a configured directory without loading plugin code at discovery time
+- [ ] Invalid plugins (wrong interface, timeout, crash) are rejected before registration
+- [ ] Valid plugins are registered in a form the pipeline runner can use at runtime
+- [ ] Run: `pytest tests/plugins/test_discovery.py -v` → PASS
+- [ ] Commit point: discovery and validation work; invalid plugins are rejected
 
-Goal: Add CLI commands to list/enable/disable plugins. Add config section for plugin directory and enabled plugins.
+### Task 5: CLI and Config Integration *(goal-level — depends on Task 3; parallel with Task 4)*
+
+Goal: Add CLI commands to list/enable/disable plugins.
 
 Files: Modify `cli/plugins.py`, `config.yaml`
 
-*Detail to be filled after Task 3 is complete.*
+*Interaction model depends on sandboxing constraints from Task 3 — e.g. whether plugins can be inspected in-process.*
+
+- [ ] Users can list discovered plugins with enabled/disabled status
+- [ ] Users can enable/disable individual plugins
+- [ ] Run: `pytest tests/cli/test_plugins.py -v` → PASS
+- [ ] Commit point: CLI controls which plugins are active
 
 **Final verification:** Place a sample plugin in the plugins directory, run the pipeline, confirm it's auto-discovered, validated, sandboxed, and executed correctly.
+
+---
+
+### Execution Log
+
+[2026-04-06] Task 1: complete — `PluginBase` ABC, `PluginMetadata`, and `NoOpPlugin` defined.
+  `PipelineData` moved to `plugins/interface.py` to avoid circular import — `plugins/` cannot
+  import from `pipeline/` at module level. All tasks that modify `pipeline/` should import
+  `PipelineData` from `plugins/interface.py`.
+
+[2026-04-06] Task 2: complete — `NoOpPlugin` wired into `pipeline/runner.py`; confirmed plugins
+  are called mid-pipeline (not in `on_complete`), data flows through synchronously. Plugin list
+  is passed at runner construction time, not per-run.
+
+[2026-04-07] Task 3: failed first attempt — used `RestrictedPython` to block `__import__`,
+  `open`, `socket`. `pytest tests/plugins/test_sandbox.py::test_filesystem_access FAILED`
+  → plugin accessed filesystem via `importlib.import_module` bypass; `RestrictedPython`
+  cannot reliably block all stdlib entry points without patching each one individually.
+  Switched to subprocess isolation: `SandboxedPluginRunner` spawns child process via
+  `subprocess.Popen`, plugin communicates over JSON stdin/stdout.
+  `pytest tests/plugins/test_sandbox.py -v` → PASS. Task 3: complete.
+
+  Plan revision triggered — sandboxing revealed plugins are fully out-of-process and
+  stateless from the host's perspective. Updated goal-level Tasks 4-5:
+  - Task 4 revised: validation must run inside subprocess, not import class directly;
+    discovery reads metadata from a manifest file (e.g. `plugin.json`) without loading
+    any plugin code; registration stores `(path, metadata)` tuples, not class references.
+  - Task 5 revised: CLI operates on config file only; in-process plugin introspection
+    is not possible with subprocess isolation.
+
+[2026-04-08] Task 4: failed — `pytest tests/plugins/test_discovery.py::test_invalid_plugin_rejected FAILED`
+  → subprocess hung indefinitely; plugin's `validate()` called `input()`, blocking on stdin.
+  Fix: added 5s timeout to `SandboxedPluginRunner.run()`; plugins exceeding timeout are
+  rejected as invalid. `pytest tests/plugins/ -v` → PASS. Task 4: complete.
+  Files actually created: `plugins/discovery.py` (scan + validate combined — separate
+  validator module wasn't needed since validation is one `SandboxedPluginRunner.run()` call).
+
+[2026-04-09] Task 5: complete — added `plugin list / enable / disable` CLI commands;
+  config key `plugins.enabled[]` drives which discovered plugins are active at runtime.
+  Disabled plugins are still discovered and validated, just not loaded into the pipeline.
 
 ---
 
