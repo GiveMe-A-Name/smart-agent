@@ -94,6 +94,15 @@ Triangulation is the mechanical process of forcing generalization without guessi
 
 Resist writing multiple failing tests before implementing. The discipline of one cycle (RED → GREEN → REFACTOR) at a time keeps each step small enough that failures are instantly diagnosable. The moment you have two failing tests, you lose the clean signal that tells you exactly what broke.
 
+**Signs you are testing too much in a single cycle:**
+- The test name contains "and"
+- Assertions cover multiple independent concerns
+- The test exercises multiple execution paths simultaneously
+
+Split it. A feature is a series of short TDD cycles. Each cycle should be completable in minutes, not hours.
+
+**What constitutes a behavior**: any observable change a caller could depend on — a return value, a side effect, an error thrown, a state transition. Each behavior is one cycle.
+
 ---
 
 ## Design Pressure
