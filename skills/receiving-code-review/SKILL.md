@@ -7,6 +7,8 @@ description: "Evaluate review feedback before acting on it — assess correctnes
 
 Evaluate feedback as a principal engineer would: against design intent, technical evidence, and architectural direction — not by social compliance. A reviewer sees the diff; you hold the implementation intent, the constraints that shaped the approach, and the tradeoffs that were consciously accepted. This asymmetry is the foundation of every decision. Collaboration does not mean compliance.
 
+Every reviewer comment contains three separable claims: an **observation** (what the current code does), a **premise** (what goal the code should serve), and a **proposed change**. Verify each independently — the observation may be correct while the premise is wrong.
+
 ## Trigger Logic
 
 **Invocation default**: Implementing review feedback without evaluation leads to blind compliance — applying suggestions that are technically wrong for this codebase, breaking existing behavior, undermining design intent, or gold-plating things that were never needed. The cost of invoking this skill on feedback that turns out to be straightforward is a short verification pass. The cost of skipping it is a wrong implementation that passes review but breaks in production or silently degrades the architecture.
@@ -65,6 +67,8 @@ Did I accept any reviewer's framing of what the code should do without verifying
 
 These questions shape judgment for each feedback item. They are not sequential steps — the signal that matters depends on the comment.
 
+**Reviewer's premise vs. reviewer's observation**: A comment like "this doesn't achieve X" contains two claims: (1) the current code doesn't do X, and (2) X was the correct goal. Verify claim 1 against the code. Verify claim 2 against *your* implementation intent — not against what the reviewer says the goal is. If X was never explicitly confirmed, treat it as an unverified goal before building toward it. This is critical when X would alter global strategy, close existing capability paths, or conflict with capabilities added since the last explicit agreement.
+
 **What kind of claim is this?**
 - Bug / logic error / security → verify against the codebase; likely valid regardless of source
 - Design / architecture suggestion → evaluate against design intent; a different approach is not automatically better
@@ -76,8 +80,6 @@ These questions shape judgment for each feedback item. They are not sequential s
 - Do they know the constraints that shaped this approach?
 - Are they applying patterns from a different codebase that don't translate here?
 - Are they seeing full change context, or only one diff?
-
-**Reviewer's premise vs. reviewer's observation**: A comment like "this doesn't achieve X" contains two claims: (1) the current code doesn't do X, and (2) X was the correct goal. Verify claim 1 against the code. Verify claim 2 against *your* implementation intent — not against what the reviewer says the goal is. If X was never explicitly confirmed, treat it as an unverified goal before building toward it. This is critical when X would alter global strategy, close existing capability paths, or conflict with capabilities added since the last explicit agreement.
 
 **Source calibration:** Human partner carries architectural and intent context by default; dispatched reviewer sub-agent may miss intent and history — verify before implementing; external reviewer may lack platform constraints — verify more explicitly. A technically wrong suggestion is wrong regardless of source.
 

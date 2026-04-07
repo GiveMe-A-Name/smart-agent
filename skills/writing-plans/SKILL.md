@@ -32,7 +32,7 @@ Does NOT own:
 - Root cause investigation
 - Engineering judgment about HOW each change should land — that belongs to execution
 
-Does DOES define the plan document structure, including the Execution Log populated during execution.
+Does define the plan document structure; execution log maintenance rules live in `references/execution-handoff.md`.
 
 ## Invariants
 
@@ -129,15 +129,13 @@ For medium/large plans only: dispatch a plan-document-reviewer subagent (see `pl
 
 Save to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, then offer to execute. The plan settles scope and targets; execution still requires judgment about how each change lands.
 
-During execution, maintain an `## Execution Log` at the bottom of the plan document. **Never edit the plan tasks section during execution** — it stays static as source of truth.
+Include an `## Execution Log` section at the bottom of the plan document — section created at plan time (leave empty); entries written during execution. Three hard constraints apply:
 
-Each log entry answers: **what was done and why** — not just status. A future agent reading the log should understand the intent behind each change, not just that it happened.
+- **Never edit the plan tasks section during execution** — it stays static as source of truth
+- **Each entry must answer what was done and why** — not just status
+- **Revision only updates not-yet-started tasks** — completed and in-progress tasks are never rewritten
 
-- **Every task**: record what changed and the reasoning behind key decisions — especially for changes that other tasks will also touch. Calibrate detail to how non-obvious the decision is; obvious steps can be brief.
-- **Failed tasks**: also record the specific failing test + error output, and why the fix works — enough context to reconstruct a targeted repair without re-investigating.
-- **Plan revision triggers**: which assumption broke, exactly how future tasks were updated, and why.
-
-If a plan revision trigger fires: update not-yet-started tasks in the plan section and record the reason in the log. Do not rewrite completed or in-progress tasks.
+For log entry format, failed-task recording, and revision mechanics — see `references/execution-handoff.md`.
 
 ---
 

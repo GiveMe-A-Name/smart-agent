@@ -24,6 +24,8 @@ If you do not yet understand what is broken, diagnose first. Parallel dispatch i
 
 ## Decision Signals
 
+### Pre-Dispatch
+
 **Independence test:** A task is independent if you can answer yes to all of the following:
 - Could fixing this task leave the others unaffected? (If fixing A might fix B, investigate together first)
 - Would each agent edit non-overlapping files and resources?
@@ -42,6 +44,8 @@ If any answer is no, tasks are not independent. Use sequential agents or investi
 
 If you cannot write a self-contained prompt, the task is not scoped correctly.
 
+### Post-Dispatch
+
 **Verification judgment:** After agents return, do not assume fixes are compatible. Check: did any agents edit the same files? If yes, review those changes for conflicts before running the full suite. Spot-check at least one agent's work — agents can make systematic errors that look correct in isolation.
 
 **Partial failure handling:** When one agent succeeds and another fails, do not treat them as a batch that either all succeeds or all fails. Instead:
@@ -56,10 +60,7 @@ If you cannot write a self-contained prompt, the task is not scoped correctly.
 - Did any agent's findings change the understanding of the problem in a way that makes other agents' scopes wrong? If so, the correct response is to stop, reassess, and potentially re-dispatch with updated context.
 - If agents are still running and you receive early results that invalidate other agents' premises, cancel the invalidated agents rather than letting them complete wasted work.
 
-**Budget and timeout awareness:** Parallel agents consume resources. Apply judgment about scale:
-- Dispatch the minimum number of agents needed — 3-4 agents for truly independent tasks is reasonable; 10+ agents suggests the problem hasn't been decomposed properly.
-- For exploratory tasks where scope is uncertain, prefer sequential agents over parallel — the first agent's findings inform the second agent's scope.
-- If an agent is taking significantly longer than expected, that is a signal — the task may be more complex than scoped, or the agent may be stuck. Don't wait indefinitely; check on long-running agents.
+**Budget and timeout awareness:** Dispatch the minimum number needed — 3-4 agents is reasonable; 10+ suggests decomposition is wrong. For exploratory tasks where scope is uncertain, prefer sequential — the first agent's findings should inform the second agent's scope. If an agent is taking significantly longer than expected, check on it rather than waiting indefinitely.
 
 ## Invariants
 
@@ -96,27 +97,5 @@ Stop and reassess if:
 - You are dispatching 5+ agents — reassess whether the decomposition is right
 - A partial failure occurred and you are discarding the successful agent's valid work along with the failure
 
-## Agent Prompt Structure
-
-A good agent prompt is focused, self-contained, and specific about output:
-
-```
-Fix the 3 failing tests in src/agents/agent-tool-abort.test.ts:
-
-1. "should abort tool with partial output capture" — expects 'interrupted at' in message
-2. "should handle mixed completed and aborted tools" — fast tool aborted instead of completed
-3. "should properly track pendingToolCount" — expects 3 results but gets 0
-
-These appear to be timing/race condition issues.
-
-Your task:
-1. Read the test file and understand what each test verifies
-2. Identify root cause — timing issues or actual bugs?
-3. Fix — replace arbitrary timeouts with event-based waiting if appropriate
-
-Do NOT change production code outside agent-tool-abort.ts.
-Do NOT just increase timeouts — find the real issue.
-
-Return: summary of root cause and what you changed.
-```
+See `references/prompt-template.md` for a concrete example of a well-scoped agent prompt.
 
