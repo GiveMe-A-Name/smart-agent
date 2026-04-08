@@ -108,7 +108,13 @@ Files: Modify the notifier and its tests (created in Task 1)
 
 ---
 
-### Execution Log (example — appended during execution)
+## Execution Log
+
+*(append entries here as each task completes — format: `[YYYY-MM-DD] Task N: what was done and why; key decisions; any failures and how they were fixed`)*
+
+---
+
+### After execution (example)
 
 [2026-04-02] Task 1: complete — walking skeleton works end-to-end. `on_complete` passes a
   `JobResult` object with `job_id`, `status`, and `output`; payload mapping is straightforward
@@ -225,7 +231,13 @@ Files: Modify `cli/plugins.py`, `config.yaml`
 
 ---
 
-### Execution Log
+## Execution Log
+
+*(append entries here as each task completes — format: `[YYYY-MM-DD] Task N: what was done and why; key decisions; any failures and how they were fixed`)*
+
+---
+
+### After execution (example)
 
 [2026-04-06] Task 1: complete — `PluginBase` ABC, `PluginMetadata`, and `NoOpPlugin` defined.
   `PipelineData` moved to `plugins/interface.py` to avoid circular import — `plugins/` cannot
