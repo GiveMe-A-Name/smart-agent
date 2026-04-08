@@ -129,7 +129,13 @@ For medium/large plans only: dispatch a plan-document-reviewer subagent (see `pl
 
 Save to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, then offer to execute. The plan settles scope and targets; execution still requires judgment about how each change lands.
 
-Include an `## Execution Log` section at the bottom of the plan document — section created at plan time (leave empty); entries written during execution. Three hard constraints apply:
+Include an `## Execution Log` section at the bottom of the plan document — section created at plan time with exactly this placeholder line (do not leave it blank):
+
+```
+*(append entries here as each task completes — format: `[YYYY-MM-DD] Task N: what was done and why; key decisions; any failures and how they were fixed`)*
+```
+
+Entries are written during execution. Three hard constraints apply:
 
 - **Never edit the plan tasks section during execution** — it stays static as source of truth
 - **Each entry must answer what was done and why** — not just status
