@@ -76,16 +76,7 @@ When uncertain between invoke and skip, default to invoke. The cost of an unnece
 
 ## Skill Checks Are Per-Action, Not Per-Conversation
 
-Checking before the first action does not cover subsequent actions. Before executing any action — including each item in a todo list — check whether a skill applies to that specific action.
-
-Listing todos is itself an action. Executing each todo is a separate action. Both require their own skill check.
-
-## Skill Assessment
-
-Before any action:
-1. **State the action** — What am I about to do?
-2. **Scan** — Tier 1 or Tier 2 as appropriate. Use the structured output format.
-3. **Decide per candidate** — Invoke, or skip with a concrete reason. When uncertain, invoke.
+Skill checks are per action, not per conversation: creating a todo list is one action, and executing each todo is a separate action that requires its own scan.
 
 ## Anti-Pattern: What Goes Wrong Without Scanning
 
