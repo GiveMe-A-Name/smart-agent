@@ -51,7 +51,9 @@ If you can't name the files involved or state how to verify completion, you have
 ## Completion Criteria
 
 - [ ] The plan starts with a human-readable summary (Layer 1 for all sizes; Layer 2 also for medium/large).
+- [ ] **Human readability litmus test:** Read Layer 1 aloud. If a product manager who doesn't know this codebase couldn't understand it, rewrite. Layer 1 must use domain language — no file paths, no method names, no code references.
 - [ ] The plan states task size, nature, current state, and decomposition strategy.
+- [ ] Each task opens with one sentence in human terms explaining *why this task exists* — what problem it solves or what risk it resolves, not what it does technically.
 - [ ] Each task is a vertical slice: delivers verifiable value, leaves the codebase working, ordered risk-first.
 - [ ] For existing files being modified: paths are exact. For new files in medium/large work: module and direction are clear, exact names are execution-time judgment. Planned changes are concrete, not vague.
 - [ ] For medium/large: contingencies for the riskiest assumptions and plan revision triggers identified.
@@ -90,6 +92,7 @@ Regardless of size, a usable plan is concrete:
 - **Vertical slice per task** — delivers verifiable value, not just a layer
 - **Working state after each task** — commit point rule applies at every level
 - **Targets, not methods** — if a step reads like pseudocode or a code walkthrough, it belongs in execution, not the plan
+- **Task purpose line required** — every task must open with one sentence explaining why it exists in human terms (e.g. *"Proves the approach works before investing in config and retry logic"*), not a restatement of what the checklist does
 
 ## Failure Signals
 

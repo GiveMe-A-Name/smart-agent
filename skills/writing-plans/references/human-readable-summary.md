@@ -37,3 +37,48 @@ When a plan revision occurs during execution, update the summary to reflect the 
 - Use **outcome language**, not implementation language — "users receive webhook calls when jobs complete" not "POST request is sent in `on_complete` handler"
 - Keep it **short** — Layer 1 should be 5 lines; Layer 2 should be 3-5 bullet points or a short paragraph
 - **No file paths** in the summary — that's what the technical plan is for
+
+---
+
+## Before / After: What Good Looks Like
+
+### Bad Layer 1 (technical language, code references)
+
+> - **Goal:** Fix `auth_middleware.py:47` to return 401 instead of 404
+> - **Why:** `token.exists()` is checked before `token.is_valid()`, causing 404 on the exists path
+> - **Expected outcome:** `authenticate()` returns `HTTPException(status_code=401)` for expired tokens
+> - **Impact scope:** `auth_middleware.py`, `tests/test_auth.py`
+> - **Size:** Tiny
+
+**Problems:** Goal names a file and line number. Why describes internal call order. Expected outcome cites a function signature. Impact scope lists file paths. A PM reads this and learns nothing about what was broken or what gets fixed.
+
+### Good Layer 1 (domain language, outcome-focused)
+
+> - **Goal:** Fix expired tokens returning the wrong error code
+> - **Why:** Users see "not found" errors when their session expires, making them think the feature is broken rather than their login
+> - **Expected outcome:** Expired tokens now correctly return "Unauthorized" so users know to log in again
+> - **Impact scope:** Authentication middleware only
+> - **Size:** Tiny
+
+**Why this works:** A PM can read it, understand what was wrong, and judge whether the fix is the right call — without knowing anything about the codebase.
+
+---
+
+### Bad Layer 2 (implementation-level, not strategic)
+
+> 1. Modify `notifications/webhook.py` to add `retry()` method
+> 2. Update `job_runner.py:on_complete` to call `WebhookNotifier.notify()`
+> 3. Add `webhooks.url` key to `config.yaml` schema
+
+**Problem:** This describes what code changes, not *why* the plan is shaped this way. A reviewer can't tell whether the ordering is intentional or whether the approach is sound.
+
+### Good Layer 2 (strategy and reasoning)
+
+> Build incrementally, tackling the riskiest part first — wiring into the job completion event. Three steps:
+> 1. Get a hardcoded webhook firing end-to-end (proves the approach works before investing in config or retry)
+> 2. Make the URL configurable (low risk, straightforward)
+> 3. Add retry on failure (well-understood pattern)
+>
+> Main risk: the job completion event might not carry enough context for a useful payload. We find out in step 1, before committing to the rest.
+
+**Why this works:** Explains the *strategy* and *why the order matters*. A reviewer can now judge whether the approach is sound, not just whether the steps are listed.

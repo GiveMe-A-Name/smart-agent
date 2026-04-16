@@ -38,6 +38,8 @@ Task tool (general-purpose):
     - **Premature detail**: Later tasks specified at the same detail level as near tasks (progressive refinement missing)
     - **Missing or code-level summary**: No human-readable summary, or summary contains file paths and code references instead of human concepts
     - **Non-working intermediate states**: A task that would leave broken tests or incomplete code
+    - **Technical language in Layer 1 or Layer 2**: File paths, method names, variable names, or code constructs anywhere in the summary — block approval; the summary exists specifically to be readable without knowing the codebase
+    - **Missing task purpose line**: Task opens directly with a checklist, with no sentence explaining *why this task exists* in human terms — a reviewer cannot judge whether the task ordering is correct without this
 
     ## Calibration
 
