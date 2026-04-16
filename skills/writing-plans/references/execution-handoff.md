@@ -1,5 +1,13 @@
 # Execution Handoff Reference
 
+## Read-Only Constraints During Execution
+
+Two sections of the plan document are frozen once execution begins and must never be modified:
+
+1. **Human Review Section** — frozen at approval. It is a contract between the human and the agent. Read it for context; never write to it. If execution reveals the contract is fundamentally wrong (goal or approach changed), stop and ask the human to re-approve a revised plan — do not silently update the Human Review Section.
+
+2. **Completed and in-progress tasks** — frozen as a historical record. Only not-yet-started tasks may be revised.
+
 ## Execution Log
 
 Maintain an `## Execution Log` at the bottom of the plan document during execution. **Never edit the plan tasks section during execution** — it stays static as source of truth.

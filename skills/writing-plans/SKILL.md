@@ -50,10 +50,12 @@ If you can't name the files involved or state how to verify completion, you have
 
 ## Completion Criteria
 
-- [ ] The plan starts with a human-readable summary (Layer 1 for all sizes; Layer 2 also for medium/large).
-- [ ] **Human readability litmus test:** Read Layer 1 aloud. If a product manager who doesn't know this codebase couldn't understand it, rewrite. Layer 1 must use domain language — no file paths, no method names, no code references.
+- [ ] The plan starts with a Human Review Section (Layer 1 for all sizes; Layer 2 + Task Overview + Key Decisions also for medium/large).
+- [ ] **Human readability litmus test:** Read the Human Review Section aloud. If a product manager who doesn't know this codebase couldn't understand it, rewrite. Zero file paths, zero method names, zero code references anywhere in this section.
+- [ ] **Task Overview present (medium/large):** Each task has one plain-English sentence in the Human Review Section explaining what it achieves and why it comes at this point in the sequence.
+- [ ] **Key Decisions present (medium/large):** Every design choice requiring human ratification is listed with alternatives considered and reasoning.
 - [ ] The plan states task size, nature, current state, and decomposition strategy.
-- [ ] Each task opens with one sentence in human terms explaining *why this task exists* — what problem it solves or what risk it resolves, not what it does technically.
+- [ ] Each task in the execution section opens with one sentence in human terms explaining *why this task exists* — what problem it solves or what risk it resolves.
 - [ ] Each task is a vertical slice: delivers verifiable value, leaves the codebase working, ordered risk-first.
 - [ ] For existing files being modified: paths are exact. For new files in medium/large work: module and direction are clear, exact names are execution-time judgment. Planned changes are concrete, not vague.
 - [ ] For medium/large: contingencies for the riskiest assumptions and plan revision triggers identified.
@@ -129,11 +131,11 @@ Regardless of size, a usable plan is concrete:
 
 For medium/large plans only: dispatch a plan-document-reviewer subagent (see `plan-document-reviewer-prompt.md`). Skip for tiny/small — overhead exceeds value.
 
-## Human-Readable Summary
+## Human Review Section
 
-Every plan document starts with a summary written for human reviewers, not agents. Place it at the very top, before the assessment and technical tasks. Tiny/Small plans need only Layer 1 (overview); Medium/Large plans need both layers.
+Every plan document starts with a **Human Review Section** — a self-contained block written for human approval, not agent execution. Place it at the very top, before the assessment and technical tasks. This section is a contract: once approved, it is frozen and must never be modified for any reason.
 
-For structure, scaling rules, and update rules — see `references/human-readable-summary.md`.
+For fields, scaling rules, freeze semantics, and Before/After examples — see `references/human-readable-summary.md`.
 
 ## Execution Handoff
 
@@ -145,13 +147,7 @@ Include an `## Execution Log` section at the bottom of the plan document — sec
 *(append entries here as each task completes — format: `[YYYY-MM-DD] Task N: what was done and why; key decisions; any failures and how they were fixed`)*
 ```
 
-Entries are written during execution. Three hard constraints apply:
-
-- **Never edit the plan tasks section during execution** — it stays static as source of truth
-- **Each entry must answer what was done and why** — not just status
-- **Revision only updates not-yet-started tasks** — completed and in-progress tasks are never rewritten
-
-For log entry format, failed-task recording, and revision mechanics — see `references/execution-handoff.md`.
+For log entry format, read-only constraints, failed-task recording, and revision mechanics — see `references/execution-handoff.md`.
 
 ---
 

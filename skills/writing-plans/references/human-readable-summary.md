@@ -1,6 +1,10 @@
-# Human-Readable Summary
+# Human Review Section
 
-Plan documents serve two audiences: **agents** (who execute) and **humans** (who approve and understand). The technical task details are agent-friendly but hard for humans to scan. The summary provides progressive disclosure — humans read as deep as they need to judge the plan.
+Plan documents serve two audiences: **agents** (who execute) and **humans** (who approve and understand). These audiences need different things from the same document.
+
+The Human Review Section is the human's surface. It is written once, approved once, and then **frozen for the life of the plan**. Agents read it for context but never modify it. This freeze is what makes review meaningful — a human can trust that what they approved is still what the agent is executing against.
+
+The execution detail (task checklists, file paths, verification commands) lives below the Human Review Section. Agents work there. Humans may read it, but they are not required to.
 
 ---
 
@@ -20,16 +24,42 @@ A short paragraph or bullet list that describes **how** in human terms — the s
 
 If the human reads Layer 1 and still can't judge whether the direction is correct, Layer 2 gives enough strategic detail to make that call without reading file paths or task checklists.
 
+## Task Overview (medium/large only)
+
+One sentence per task, in plain English, explaining what each task achieves and why it comes at this point in the sequence. This lets the human verify the ordering logic without reading the execution detail.
+
+Example:
+> - Task 1: Prove the approach works end-to-end before investing in configuration or retry logic
+> - Task 2: Make the webhook URL configurable — low risk, builds on the proven skeleton
+> - Task 3: Add retry on failure — well-understood pattern, comes last because it depends on the working base
+
+No file paths. No method names. If a task's purpose can't be stated in one human sentence, the task needs rethinking.
+
+## Key Decisions (medium/large only)
+
+Each design choice that requires human ratification. Format:
+
+> **[Decision]:** [alternatives considered] → [chosen approach and why]
+
+Only include decisions where a reasonable person might have chosen differently. Obvious choices with no real alternative can be omitted.
+
+Example:
+> **Retry strategy:** client-side retry with exponential backoff vs. queue-based retry → chose client-side because job completion is already synchronous and introducing a queue would require new infrastructure for a non-critical feature.
+
 ---
 
 ## Scaling Rules
 
-- **Tiny/Small** — Layer 1 only. The plan itself is short enough that a human can read it directly. Layer 2 would repeat the plan.
-- **Medium/Large** — Both layers required. The technical detail is dense enough that humans need a separate readable entry point.
+- **Tiny/Small** — Layer 1 only. The plan itself is short enough that a human can read it directly.
+- **Medium/Large** — Layer 1 + Layer 2 + Task Overview + Key Decisions. The technical detail is dense enough that humans need a complete separate entry point.
 
-## Update Rules
+## Freeze Rules
 
-When a plan revision occurs during execution, update the summary to reflect the revised direction. A stale summary is worse than no summary — it misleads the human reviewer. Layer 1 and Layer 2 must stay consistent with the current plan state.
+The Human Review Section is frozen at approval. Mark it with `[APPROVED — READ ONLY]` when the human confirms.
+
+- **During execution**: read for context, never modify
+- **During plan revision**: if not-yet-started tasks change, update the Execution Log — not the Human Review Section
+- **If the contract breaks**: if execution reveals the goal or approach in the Human Review Section is fundamentally wrong, stop and ask the human to re-approve a new plan. Do not silently update the frozen section.
 
 ## Writing Principles
 

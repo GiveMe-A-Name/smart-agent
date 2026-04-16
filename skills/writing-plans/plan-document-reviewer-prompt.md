@@ -19,7 +19,7 @@ Task tool (general-purpose):
 
     | Category | What to Look For |
     |----------|------------------|
-    | Human-Readable Summary | Layer 1 present for all sizes; Layer 2 also present for medium/large; uses human concepts not file paths |
+    | Human Review Section | Layer 1 present for all sizes; Layer 2 + Task Overview + Key Decisions also present for medium/large; zero file paths, zero code references anywhere in this section; marked [APPROVED — READ ONLY] if already approved |
     | Completeness | TODOs, placeholders, incomplete tasks, missing steps |
     | Spec Alignment | Plan covers spec requirements, no major scope creep |
     | Decomposition Strategy | Is a strategy explicitly stated? Does it match the work? |
@@ -36,10 +36,12 @@ Task tool (general-purpose):
     - **Big bang testing**: All tests deferred to a final task instead of verifying each task independently
     - **Missing risk assessment**: No mention of what could go wrong or what's uncertain
     - **Premature detail**: Later tasks specified at the same detail level as near tasks (progressive refinement missing)
-    - **Missing or code-level summary**: No human-readable summary, or summary contains file paths and code references instead of human concepts
     - **Non-working intermediate states**: A task that would leave broken tests or incomplete code
-    - **Technical language in Layer 1 or Layer 2**: File paths, method names, variable names, or code constructs anywhere in the summary — block approval; the summary exists specifically to be readable without knowing the codebase
-    - **Missing task purpose line**: Task opens directly with a checklist, with no sentence explaining *why this task exists* in human terms — a reviewer cannot judge whether the task ordering is correct without this
+    - **Missing Human Review Section**: No human review block at the top of the plan — block approval
+    - **Technical language in Human Review Section**: File paths, method names, variable names, or code constructs anywhere in Layer 1, Layer 2, Task Overview, or Key Decisions — block approval; this section must be readable without knowing the codebase
+    - **Missing Task Overview (medium/large)**: No plain-English task sequence in the Human Review Section — reviewer cannot judge ordering without reading the full execution detail
+    - **Missing Key Decisions (medium/large)**: No design decisions listed — reviewer cannot ratify the approach
+    - **Missing task purpose line**: Task in execution section opens directly with a checklist, with no sentence explaining *why this task exists* in human terms
 
     ## Calibration
 
