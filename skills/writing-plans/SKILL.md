@@ -50,6 +50,7 @@ If you can't name the files involved or state how to verify completion, you have
 
 ## Completion Criteria
 
+- [ ] The plan starts with a human-readable summary (Layer 1 for all sizes; Layer 2 also for medium/large).
 - [ ] The plan states task size, nature, current state, and decomposition strategy.
 - [ ] Each task is a vertical slice: delivers verifiable value, leaves the codebase working, ordered risk-first.
 - [ ] For existing files being modified: paths are exact. For new files in medium/large work: module and direction are clear, exact names are execution-time judgment. Planned changes are concrete, not vague.
@@ -124,6 +125,12 @@ Regardless of size, a usable plan is concrete:
 ## Review Loop
 
 For medium/large plans only: dispatch a plan-document-reviewer subagent (see `plan-document-reviewer-prompt.md`). Skip for tiny/small — overhead exceeds value.
+
+## Human-Readable Summary
+
+Every plan document starts with a summary written for human reviewers, not agents. Place it at the very top, before the assessment and technical tasks. Tiny/Small plans need only Layer 1 (overview); Medium/Large plans need both layers.
+
+For structure, scaling rules, and update rules — see `references/human-readable-summary.md`.
 
 ## Execution Handoff
 

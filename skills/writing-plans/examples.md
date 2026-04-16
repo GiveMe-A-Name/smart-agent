@@ -13,6 +13,13 @@ Each example shows: situation assessment → decomposition strategy → plan at 
 - Nature: Bug fix — root cause identified: `auth_middleware.py:47` checks `token.exists()` before `token.is_valid()`, returns 404 on the `exists()` path
 - Current state: `authenticate()` in `auth_middleware.py` handles all token errors; no other callers affected
 
+> **Summary (Layer 1)**
+> - **Goal:** Fix expired tokens returning 404 instead of 401
+> - **Why:** Users see "not found" errors when their tokens expire, confusing them into thinking the endpoint doesn't exist
+> - **Expected outcome:** Expired tokens correctly return 401 Unauthorized
+> - **Impact scope:** Authentication middleware only
+> - **Size:** Tiny
+
 **Plan:**
 
 Root cause: `auth_middleware.py:47` checks token existence before validity — expired tokens fall through the existence check and return 404 instead of 401. Fix: add a validity check at `auth_middleware.py:47` so expired tokens return 401.
@@ -29,6 +36,13 @@ Verify: `pytest tests/test_auth.py::test_expired_token_returns_401 -v` → PASS
 - Size: Small — touches 3 files, stays in one domain (CLI layer), existing arg-parsing pattern applies
 - Nature: Feature — `export.py` and its test already exist, just extending behavior
 - Current state: `cli/export.py` uses `argparse`, writes via `FileWriter`; `FileWriter` has a `write()` method that can be conditionally skipped
+
+> **Summary (Layer 1)**
+> - **Goal:** Add `--dry-run` flag to CLI `export` command
+> - **Why:** Users want to preview what files would be exported before actually writing them
+> - **Expected outcome:** Running `export --dry-run` prints output paths without creating any files
+> - **Impact scope:** CLI export command and file writer
+> - **Size:** Small
 
 **Decomposition strategy:** Vertical slicing — each step delivers testable behavior.
 
@@ -57,6 +71,22 @@ Verify: `python cli/export.py --dry-run output/` prints paths, no files created;
 - Size: Medium — introduces a new concept (webhooks), crosses job execution and config domains, needs new test design
 - Nature: Feature — nothing like this exists; need to decide how webhook config is stored and how retries work
 - Current state: `job_runner.py` fires `on_complete` event; config is stored in `config.yaml`; no HTTP client currently in use
+
+> **Summary (Layer 1)**
+> - **Goal:** Add webhook notifications when jobs complete
+> - **Why:** Users need real-time notification of job results in their own systems without polling
+> - **Expected outcome:** When a job finishes, the system POSTs the result to a user-configured URL with retry on failure
+> - **Impact scope:** Job execution system, configuration, new notification module
+> - **Size:** Medium
+>
+> **Summary (Layer 2 — Approach)**
+>
+> Build incrementally starting with the riskiest part — integrating with the job completion event system. Three steps:
+> 1. Get a hardcoded webhook firing end-to-end on job completion (proves the approach works)
+> 2. Make the webhook URL configurable (straightforward, low risk)
+> 3. Add retry with exponential backoff (well-understood pattern)
+>
+> Main risk: the job completion event might not carry enough context to construct a useful payload. We find out in step 1 before investing in config and retry logic.
 
 **Decomposition strategy:**
 - **Walking skeleton first** — get the simplest POST working end-to-end before adding config, retries, or error handling
@@ -140,6 +170,24 @@ Files: Modify the notifier and its tests (created in Task 1)
 - Size: Large — new architecture concept, affects pipeline, config, CLI, and introduces plugin API contract
 - Nature: Architecture — design decisions about plugin interface, discovery, loading, and sandboxing
 - Current state: Pipeline is hardcoded in `pipeline/runner.py`, calls each processor in sequence. Config is `config.yaml`. No dynamic loading exists.
+
+> **Summary (Layer 1)**
+> - **Goal:** Add a user-extensible plugin system for custom data processors
+> - **Why:** Users need to add custom processing logic without modifying core pipeline code
+> - **Expected outcome:** Users drop plugin files into a directory; the system auto-discovers, validates, sandboxes, and runs them as part of the pipeline. CLI commands let users list/enable/disable plugins.
+> - **Impact scope:** Data pipeline, configuration system, CLI, new plugin infrastructure
+> - **Size:** Large
+>
+> **Summary (Layer 2 — Approach)**
+>
+> Contract-first design: define the plugin interface before building anything on top of it. Then prove it works with a hardcoded plugin through the pipeline (walking skeleton). Tackle sandboxing early — it's the biggest unknown and affects everything downstream.
+>
+> Key design decisions:
+> - Plugins implement a standard interface (`process` + `validate`) with metadata
+> - Sandboxing approach (subprocess vs. restricted globals) determined by early spike — later tasks adapt based on findings
+> - Auto-discovery and CLI commands planned at goal-level, detailed after sandboxing constraints are known
+>
+> Main risks: (1) getting the plugin interface contract wrong forces rework on everything, (2) sandboxing may impose constraints that change how discovery and CLI work.
 
 **Decomposition strategy:**
 - **Contract-first** — define the plugin interface before building discovery or loading. This is the foundation everything else depends on.
