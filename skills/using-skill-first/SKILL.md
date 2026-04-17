@@ -52,21 +52,6 @@ Before each subsequent action within the same task context:
 
 This keeps scan cost manageable without skipping the check entirely.
 
-### Scan Output Format
-
-Each scan must produce structured output in thinking, not free-form reasoning:
-
-```
-[skill-scan] action: <what I am about to do>
-[skill-scan] tier: full | working-set
-[skill-scan] candidates:
-  - <skill-name>(invoke: <reason>)
-  - <skill-name>(skip: <specific reason why it does not apply to THIS action>)
-[skill-scan] no candidates — proceeding
-```
-
-A skip reason of "not applicable" or "not relevant" is not specific enough. Name what about this action makes the skill not apply.
-
 ### Invoke vs. Skip
 
 - **Invoke** — the skill plausibly applies. Call it.
