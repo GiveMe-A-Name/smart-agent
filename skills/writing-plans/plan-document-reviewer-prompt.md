@@ -19,7 +19,7 @@ Task tool (general-purpose):
 
     | Category | What to Look For |
     |----------|------------------|
-    | Human Review Section | Layer 1 present for all sizes; Layer 2 + Task Overview + Key Decisions also present for medium/large; zero file paths, zero code references anywhere in this section; marked [APPROVED — READ ONLY] if already approved |
+    | Human Review Section | Intent Statement present as the very first line (one sentence, user-goal framing); Layer 1 present for all sizes; Layer 2 + Task Overview + Key Decisions also present for medium/large; zero file paths, zero code references anywhere in this section; marked [APPROVED — READ ONLY] if already approved |
     | Completeness | TODOs, placeholders, incomplete tasks, missing steps |
     | Spec Alignment | Plan covers spec requirements, no major scope creep |
     | Decomposition Strategy | Is a strategy explicitly stated? Does it match the work? |
@@ -38,6 +38,7 @@ Task tool (general-purpose):
     - **Premature detail**: Later tasks specified at the same detail level as near tasks (progressive refinement missing)
     - **Non-working intermediate states**: A task that would leave broken tests or incomplete code
     - **Missing Human Review Section**: No human review block at the top of the plan — block approval
+    - **Missing Intent Statement**: Human Review Section does not open with a one-sentence Intent line — block approval
     - **Technical language in Human Review Section**: File paths, method names, variable names, or code constructs anywhere in Layer 1, Layer 2, Task Overview, or Key Decisions — block approval; this section must be readable without knowing the codebase
     - **Missing Task Overview (medium/large)**: No plain-English task sequence in the Human Review Section — reviewer cannot judge ordering without reading the full execution detail
     - **Missing Key Decisions (medium/large)**: No design decisions listed — reviewer cannot ratify the approach

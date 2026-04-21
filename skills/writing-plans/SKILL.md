@@ -142,7 +142,7 @@ For fields, scaling rules, freeze semantics, and Before/After examples — see `
 
 ## Execution Handoff
 
-Save to `docs/superpowers/plans/YYYY-MM-DD-<name>.md`, then offer to execute. The plan settles scope and targets; execution still requires judgment about how each change lands.
+Save to `docs/plans/YYYY-MM-DD-<name>.md`, then offer to execute. The plan settles scope and targets; execution still requires judgment about how each change lands.
 
 Include an `## Execution Log` section at the bottom of the plan document — section created at plan time with exactly this placeholder line (do not leave it blank):
 

@@ -13,6 +13,8 @@ Each example shows: situation assessment → decomposition strategy → plan at 
 - Nature: Bug fix — root cause identified: `auth_middleware.py:47` checks `token.exists()` before `token.is_valid()`, returns 404 on the `exists()` path
 - Current state: `authenticate()` in `auth_middleware.py` handles all token errors; no other callers affected
 
+> **Intent:** Fix the authentication bug where expired tokens show users a "not found" error instead of prompting them to log in again.
+>
 > **Summary (Layer 1)**
 > - **Goal:** Fix expired tokens returning 404 instead of 401
 > - **Why:** Users see "not found" errors when their tokens expire, confusing them into thinking the endpoint doesn't exist
@@ -37,6 +39,8 @@ Verify: `pytest tests/test_auth.py::test_expired_token_returns_401 -v` → PASS
 - Nature: Feature — `export.py` and its test already exist, just extending behavior
 - Current state: `cli/export.py` uses `argparse`, writes via `FileWriter`; `FileWriter` has a `write()` method that can be conditionally skipped
 
+> **Intent:** Give CLI users a way to preview what the export command will do before actually writing any files.
+>
 > **Summary (Layer 1)**
 > - **Goal:** Add `--dry-run` flag to CLI `export` command
 > - **Why:** Users want to preview what files would be exported before actually writing them
@@ -72,6 +76,8 @@ Verify: `python cli/export.py --dry-run output/` prints paths, no files created;
 - Nature: Feature — nothing like this exists; need to decide how webhook config is stored and how retries work
 - Current state: `job_runner.py` fires `on_complete` event; config is stored in `config.yaml`; no HTTP client currently in use
 
+> **Intent:** Let users receive real-time notifications in their own systems when jobs complete, without having to poll.
+>
 > **Summary (Layer 1)**
 > - **Goal:** Add webhook notifications when jobs complete
 > - **Why:** Users need real-time notification of job results in their own systems without polling
@@ -171,6 +177,8 @@ Files: Modify the notifier and its tests (created in Task 1)
 - Nature: Architecture — design decisions about plugin interface, discovery, loading, and sandboxing
 - Current state: Pipeline is hardcoded in `pipeline/runner.py`, calls each processor in sequence. Config is `config.yaml`. No dynamic loading exists.
 
+> **Intent:** Let users extend the data pipeline with their own custom processing logic by dropping plugin files into a directory, without touching core pipeline code.
+>
 > **Summary (Layer 1)**
 > - **Goal:** Add a user-extensible plugin system for custom data processors
 > - **Why:** Users need to add custom processing logic without modifying core pipeline code

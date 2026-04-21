@@ -62,8 +62,9 @@ Example:
 
 ## Scaling Rules
 
-- **Tiny/Small** — Layer 1 only. The plan itself is short enough that a human can read it directly.
-- **Medium/Large** — Layer 1 + Layer 2 + Task Overview + Key Decisions. The technical detail is dense enough that humans need a complete separate entry point.
+- **All sizes** — Intent Statement always required. It is the first line of the Human Review Section regardless of plan size.
+- **Tiny/Small** — Intent Statement + Layer 1 only. The plan itself is short enough that a human can read it directly.
+- **Medium/Large** — Intent Statement + Layer 1 + Layer 2 + Task Overview + Key Decisions. The technical detail is dense enough that humans need a complete separate entry point.
 
 ## Freeze Rules
 
