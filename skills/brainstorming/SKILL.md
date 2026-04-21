@@ -45,8 +45,8 @@ When scope is too large and the user isn't ready to decompose, name that blocker
 - One question per message — no exceptions
 - Always propose 2–3 approaches before presenting a design — unless the user has explicitly named an approach and said they do not need alternatives
 - Every project gets a design — simple ones get a short one, not no design
-- Spec is committed to git before the user reviews it
-- Verbal approval of a design in conversation is not the same as approval of the written spec
+- Commit timing is a judgment call: a new standalone spec document warrants an immediate commit; incremental additions to existing files should be batched until all related changes are complete
+- After committing, present the full changeset to the user and wait for explicit confirmation — verbal approval during conversation is not the same as approval of the committed changes
 - No unrelated refactoring — only improvements that directly serve the current goal
 
 ## Decision Signals
