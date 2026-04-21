@@ -8,6 +8,18 @@ The execution detail (task checklists, file paths, verification commands) lives 
 
 ---
 
+## Intent Statement (1-second read)
+
+The very first line of the Human Review Section. One sentence stating what the agent understands the user's intent to be — framed from the user's perspective, not the agent's task list.
+
+> **Intent:** [One sentence — what the user wants to achieve, in their terms]
+
+This is an alignment checkpoint. The user reads this line first and either confirms the direction or corrects it before reviewing anything else. If this line is wrong, the rest of the plan doesn't matter.
+
+**How to write it:** Mirror the user's goal, not the implementation. "Move all logging and metrics dependencies into the shared package so individual Next.js and Express apps no longer bundle them separately" — not "Modify `apps/web/package.json` and `apps/api/package.json` to remove winston and prom-client imports."
+
+---
+
 ## Layer 1: Overview (5-second read)
 
 A short block that lets a human decide "direction correct or not" at a glance:

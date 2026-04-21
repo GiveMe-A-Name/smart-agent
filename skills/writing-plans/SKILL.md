@@ -50,6 +50,7 @@ If you can't name the files involved or state how to verify completion, you have
 
 ## Completion Criteria
 
+- [ ] The Human Review Section opens with a standalone **Intent** statement — one sentence stating what the user wants to achieve in their terms. This appears before Layer 1 and before all other fields.
 - [ ] The plan starts with a Human Review Section (Layer 1 for all sizes; Layer 2 + Task Overview + Key Decisions also for medium/large).
 - [ ] **Human readability litmus test:** Read the Human Review Section aloud. If a product manager who doesn't know this codebase couldn't understand it, rewrite. Zero file paths, zero method names, zero code references anywhere in this section.
 - [ ] **Task Overview present (medium/large):** Each task has one plain-English sentence in the Human Review Section explaining what it achieves and why it comes at this point in the sequence.
@@ -134,6 +135,8 @@ For medium/large plans only: dispatch a plan-document-reviewer subagent (see `pl
 ## Human Review Section
 
 Every plan document starts with a **Human Review Section** — a self-contained block written for human approval, not agent execution. Place it at the very top, before the assessment and technical tasks. This section is a contract: once approved, it is frozen and must never be modified for any reason.
+
+The Human Review Section must open with a one-sentence **Intent** statement before all other fields. This is the alignment checkpoint: the user reads it first, confirms or corrects direction, then decides whether to review the rest.
 
 For fields, scaling rules, freeze semantics, and Before/After examples — see `references/human-readable-summary.md`.
 
