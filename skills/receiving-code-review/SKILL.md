@@ -65,6 +65,8 @@ Did I accept any reviewer's framing of what the code should do without verifying
 
 ## Decision Signals
 
+Before applying these signals, evaluate the comment against the five dimensions in `references/evaluation-criteria.md`: problem vs. preference, consequence test, evidence first, scope classification, and value assessment.
+
 These questions shape judgment for each feedback item. They are not sequential steps — the signal that matters depends on the comment.
 
 **Reviewer's premise vs. reviewer's observation**: A comment like "this doesn't achieve X" contains two claims: (1) the current code doesn't do X, and (2) X was the correct goal. Verify claim 1 against the code. Verify claim 2 against *your* implementation intent — not against what the reviewer says the goal is. If X was never explicitly confirmed, treat it as an unverified goal before building toward it. This is critical when X would alter global strategy, close existing capability paths, or conflict with capabilities added since the last explicit agreement.
