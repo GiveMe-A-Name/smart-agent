@@ -64,6 +64,7 @@ Stop and reassess if:
 - [ ] Enough context was read around each changed function — including callers — not just the diff hunks.
 - [ ] Every issue includes file:line, what is wrong, and why it matters, with honest severity calibration.
 - [ ] Relevant specialized lenses (Security, Performance, Migration, Dependency, API Design) were applied where applicable — see `references/specialized-lenses.md`.
+- [ ] User-defined design judgment dimensions were applied where relevant — see `references/user-review-standards.md`.
 - [ ] If the code appears AI-generated, reviewer-specific checks were applied — see `references/ai-generated-code.md`.
 - [ ] A clear verdict is present (Ready to merge / Not ready / Ready with fixes).
 
