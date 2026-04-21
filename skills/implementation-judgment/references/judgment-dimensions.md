@@ -20,8 +20,9 @@ See `examples/wrong-abstraction.md` for a case where eagerly extracting surface-
 **Question**: Which layer should own this complexity? Is the change pushing complexity toward the right boundary or scattering it?
 
 **Key signals**:
+- Complexity has two sources: **dependencies** (how much surrounding context a reader must load to understand this code) and **obscurity** (information that is hidden, unnamed, or implicit). Reducing these two matters more than any other optimization — more than performance, line count, or clever structure.
 - Deep modules are better than shallow modules. A module with a simple interface that hides complex implementation is more valuable than one with a complex interface and trivial implementation.
-- If callers need to know implementation details to use a function correctly, the abstraction boundary is in the wrong place.
+- If callers need to know implementation details to use a function correctly, the abstraction boundary is in the wrong place. A self-explanatory interface means the name and signature alone communicate what the function does and what constraints apply — no source-reading required. Example: `cache.get_or_compute(key, fn, ttl)` is self-explanatory; `cache.get(key)` followed by manual set/expire logic is not.
 - Pull complexity downward: if you can make 5 callers simpler by making 1 implementation more complex, do it. The net cognitive load decreases.
 - When adding a configuration parameter or flag, ask: could this decision be made automatically inside the module instead of pushed to every caller? Each configuration parameter is complexity exported to every user.
 - Validation, transformation, and error handling for a particular concern should live together in one layer, not be scattered across multiple layers with each layer doing a partial job.
