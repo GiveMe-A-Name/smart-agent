@@ -43,7 +43,6 @@ When scope is too large and the user isn't ready to decompose, name that blocker
 ## Invariants
 
 - One question per message — no exceptions
-- Visual companion offer is its own message — no other content
 - Always propose 2–3 approaches before presenting a design — unless the user has explicitly named an approach and said they do not need alternatives
 - Every project gets a design — simple ones get a short one, not no design
 - Spec is committed to git before the user reviews it
@@ -59,12 +58,6 @@ When scope is too large and the user isn't ready to decompose, name that blocker
 **Blind spot injection:** At session start, read `skills/brainstorming/references/blind-spots.md`. Select 2–3 blind spots most relevant to this topic — not the most obvious ones, but those where the user's framing reveals the strongest implicit assumptions. Inject each as a dedicated standalone question at the moment it becomes most relevant during the session, not all at the start. Skip any blind spot the user has already addressed unprompted. Each injected blind spot question counts as one of the one-question-per-message turns.
 
 **Project context:** Explore files, docs, and recent commits before asking questions. Questions you could answer by reading the codebase waste the stakeholder's time. Follow existing patterns. Where existing code has problems that affect the work (overgrown files, tangled responsibilities), include targeted improvements as part of the design — not as unrelated refactoring.
-
-**Visual companion:** At session start, assess whether the topic involves UI design, UX flows, visual layouts, or architecture diagrams. If yes, offer the visual companion before asking your first question — do not wait until a visual question comes up mid-session. Decide per-question whether the content is genuinely visual or can be handled in the terminal. When offering, use this message — nothing else alongside it:
-
-> "Some of what we're working on might be easier to explain if I can show it to you in a web browser. I can put together mockups, diagrams, comparisons, and other visuals as we go. This feature is still new and can be token-intensive. Want to try it? (Requires opening a local URL)"
-
-Wait for the user's response before continuing. If they decline, proceed with text-only brainstorming. If they accept, read the detailed guide before proceeding: `skills/brainstorming/references/visual-companion.md`.
 
 **Technical feasibility spike:** Pause design and spike when: an approach depends on undocumented or ambiguous third-party behavior; performance characteristics are central to the decision and cannot be estimated; or the integration seam between two systems is poorly understood. A spike is not implementation — it answers one design question. Set a strict timebox (30 minutes to 2 hours). A spike that invalidates an approach is a success.
 
