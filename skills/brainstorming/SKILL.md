@@ -5,10 +5,10 @@ description: "Explore design options for a feature, workflow, or component befor
 
 # Brainstorming Ideas Into Designs
 
-Turns an idea into a validated, written spec through structured collaborative dialogue. The output is a committed design document — not just a conversation.
+Explores design options through structured dialogue until the user has confirmed a direction. The output is a clear, agreed design — not a spec, not code.
 
 <HARD-GATE>
-Do NOT write code, scaffold a project, or invoke any implementation skill until the user has approved the design, the spec has passed review, and the user has reviewed the committed spec.
+Do NOT write code, scaffold a project, or invoke any implementation skill until the user has explicitly confirmed the design direction in conversation.
 </HARD-GATE>
 
 ## Trigger Signals
@@ -31,10 +31,12 @@ Do not use this skill when:
 
 ## Capability Boundary
 
-This skill covers design-phase work: shaping an idea into a spec with enough fidelity to support implementation planning.
+This skill covers design exploration: understanding the problem, surfacing options, comparing tradeoffs, and reaching a confirmed direction.
 
 This skill does NOT own:
-- Implementation planning or test design
+- Spec writing or spec review
+- Committing design documents to git
+- Implementation planning or test design — use `writing-plans` after design is confirmed
 - Sub-project decomposition beyond identifying that it's needed
 - Designing a scope the user hasn't yet agreed to decompose
 
@@ -44,9 +46,7 @@ When scope is too large and the user isn't ready to decompose, name that blocker
 
 - One question per message — no exceptions
 - Always propose 2–3 approaches before presenting a design — unless the user has explicitly named an approach and said they do not need alternatives
-- Every project gets a design — simple ones get a short one, not no design
-- Commit timing is a judgment call: a new standalone spec document warrants an immediate commit; incremental additions to existing files should be batched until all related changes are complete
-- After committing, present the full changeset to the user and wait for explicit confirmation — verbal approval during conversation is not the same as approval of the committed changes
+- Every design gets explored — simple ones get a short session, not no session
 - No unrelated refactoring — only improvements that directly serve the current goal
 
 ## Decision Signals
@@ -69,16 +69,12 @@ When scope is too large and the user isn't ready to decompose, name that blocker
 
 **Enough questions:** Move to approach proposals when you can answer: what is it for, who uses it, what are the constraints, and what does success look like? If you cannot answer all four after 5–6 questions, move to proposals anyway — missing information is better surfaced through option trade-offs than through more questions.
 
-**Design sufficiency:** The design is complete when you can answer: (1) what units exist and what are their interfaces, (2) how data flows through the system, (3) what error cases exist, (4) how each unit is tested. Any gap means more work. For narrow, well-understood requests, a brief bullet-point summary covering these four dimensions is sufficient. Write the spec once the user has approved each major section — do not write to discover gaps.
-
-**Design isolation:** Break the system into units each with one clear purpose, well-defined interfaces, and independent testability. A unit you cannot understand or test independently needs its boundaries refined.
-
-**Spec review:** Dispatch reviewer using `skills/brainstorming/templates/spec-document-reviewer-prompt.md`. Assess issues independently — fix medium/high-risk issues (missing sections, contradictions, ambiguity that would cause wrong implementation); skip low-risk/stylistic issues. Stop the loop once no medium/high-risk issues remain. If medium/high-risk issues persist after 3 iterations, surface to the user — do not loop again.
+**Design sufficiency:** The design direction is clear enough to hand off when you can answer: what is being built, for whom, with what constraints, and what tradeoffs were consciously accepted. Hand off to `writing-plans` once the user confirms.
 
 ## Completion Criteria
 
-- [ ] All invariants were followed (one question per message, 2-3 approaches, spec committed).
-- [ ] The user approved the committed spec, not just the verbal design discussed in conversation.
+- [ ] All invariants were followed (one question per message, 2-3 approaches proposed).
+- [ ] The user has explicitly confirmed the design direction in conversation.
 - [ ] Approaches were compared against dimensions chosen for this specific decision, not a generic checklist.
 - [ ] If the design depends on external libraries or APIs, feasibility was verified through research or a spike.
 
@@ -98,10 +94,10 @@ Am I exiting because the design is genuinely complete and approved, or because t
 
 Stop and reassess if:
 - You are discussing implementation details (library choices, file organization, syntax) before understanding the problem
-- You are about to write the spec but major design sections are still unresolved or unapproved
+- Major design sections are still unresolved but you are about to hand off to planning or implementation
 - You proposed 2–3 approaches but they are variants of the same idea rather than genuinely different directions
 - You have asked more than 5–6 questions without reaching approach proposals (see the "Enough questions" decision signal)
-- The user pushes back on doing a design and wants to go straight to code — hold the HARD-GATE; do not compromise, explain why the design step matters
+- The user wants to go straight to code without confirming a direction — hold the HARD-GATE; explain why a confirmed direction matters before implementation
 - You committed to an approach that depends on unverified third-party behavior — spike first
 - You are comparing approaches but each is described in a different frame, making comparison impossible — use consistent dimensions
 - You are designing around an external dependency without checking whether it actually supports the required capability
