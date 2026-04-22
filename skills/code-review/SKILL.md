@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: "Evaluate code changes for correctness, design, and risk. TRIGGER when: a diff, staged changes, or PR exists and the task is to review them. DO NOT TRIGGER when: responding to existing review feedback (use receiving-code-review) or no code changes exist yet."
+description: "Evaluate code changes for correctness, design, and risk. TRIGGER when: code changes exist and the current task is to judge whether those changes are acceptable or what issues they contain. DO NOT TRIGGER when: no code changes exist yet or the task is to argue about already-given review feedback rather than evaluate the changed code."
 ---
 
 # Code Review
@@ -12,61 +12,74 @@ A review that catches nothing is worse than no review — it creates false confi
 **Invocation default**: Skipping structured review before merge lets problems compound. The cost of unnecessary rigor is a short overhead. The cost of missing it is bugs in production or findings that block merge after the fact.
 
 Use when:
-- code changes exist (local diff, staged changes, or remote PR) and the task is to evaluate them
-- completing a task in subagent-driven development and review is the gate before the next step
+- code changes exist (local diff, staged changes, or remote PR) and the current task is to evaluate those changes
+- the task is to decide whether the change is ready to merge, not ready, or acceptable only with fixes
 
 Do not use when:
-- the task is to respond to review feedback that already exists, not to evaluate new changes
-- no diff or changed code exists to evaluate yet — if you are writing code, invoke this skill after the code exists
+- the task is to judge or respond to already-existing review comments rather than evaluate the changed code itself
+- no diff or changed code exists to evaluate yet
 
 ## Capability Boundary
 
-This skill owns: reading code changes, identifying issues across all layers (justification through implementation), calibrating severity, and delivering a structured verdict.
+This skill owns: reading code changes, identifying issues across all layers (justification through implementation), calibrating severity, and delivering a review verdict grounded in code actually inspected.
 
 It does NOT:
 - implement fixes or refactor reviewed code
-- verify that previously given feedback was applied — that belongs to the next review cycle
+- adjudicate a feedback discussion once the task has shifted from reviewing the code change to reviewing the comment exchange
 - claim coverage over code that was not read
 
 ## Invariants
 
-**Upper-layer problems outweigh lower-layer problems.** A change that goes in the wrong direction does not become acceptable because the implementation is clean. Always work from the top layer down — if a higher-layer problem is severe enough, stop and surface it immediately rather than cataloging line-level issues in code that may need to be rewritten.
+**Upper-layer problems outweigh lower-layer problems.** Before recording Layer 2-3 findings, decide whether Layer 0 or Layer 1 contains a merge-blocking issue. If it does, surface that issue before lower-layer findings.
 
-**Read context, not just diff hunks.** For every changed function or module, read enough surrounding code to understand what callers expect, what invariants the module maintains, and what the changed lines actually do in context.
+**Read context, not just diff hunks.** For every function, method, query, or module cited in findings or verdict reasoning, open the surrounding implementation. If the change modifies a public interface, signature, schema, or call pattern, inspect at least one caller or consumer.
 
-**Only give feedback on code you actually read.** Never approve or comment on code outside the diff or files explicitly opened. "Looks good" without reading is a false safety signal.
+**Only give feedback on code you actually read.** Do not claim coverage over code you did not open. If some changed files were not reviewed, state that review limit explicitly.
 
-**Every issue needs: file:line, what is wrong, why it matters.** Vague findings ("improve error handling", "this could be cleaner") are not actionable.
+**Every issue needs: layer, file:line, what is wrong, why it matters.** Add a fix only when it is concrete enough to state without hand-waving. Vague findings ("improve error handling", "this could be cleaner") are not actionable.
 
-**Severity must reflect actual risk.** Critical means data loss, security vulnerability, broken functionality, or blocking regression — not style, not preference. Inflating severity makes all feedback less trustworthy.
+**Severity must reflect actual risk.** Label a finding `Critical` only if it matches the severity table: data loss, security vulnerability, broken functionality, blocking regression, or a Layer 0/1 problem that invalidates the change.
 
-**Run the project's automated checks before approving.** A passing review with failing lint/tests is not a passing review. If checks were skipped, say so explicitly.
+**Automated check status must be explicit.** If the repository exposes merge-gating or touched-area checks (for example lint, typecheck, test, build, or validation commands for files or behavior changed in the diff), record whether each such check passed, failed, or was not run. Do not return `Ready to merge` when any recorded check failed.
 
-**Give a clear verdict.** Every review ends with: Ready / Not ready / Ready with fixes. An ambiguous conclusion defers the merge decision to the author, which is the reviewer's job.
+**Give a clear verdict.** Every review ends with exactly one of: `Ready to merge`, `Not ready`, or `Ready with fixes`.
+
+## Decision Signals
+
+Apply review depth and lenses from stable change signals, not from habit.
+
+- Start at Layer 0, then Layer 1, then Layer 2, then Layer 3. If Layer 0 or Layer 1 contains a merge-blocking issue, surface it before cataloging lower-layer issues.
+- Apply the Security lens if the diff touches auth, permissions, secrets, crypto, user data access, payments, or deletion paths.
+- Apply the Performance lens if the diff changes query shape, caching, concurrency, batching, iteration over variable-size data, or request/response hot paths.
+- Apply the Migration lens if the diff changes schema, persisted data shape, rollout ordering, compatibility across versions, or backfill behavior.
+- Apply the Dependency lens if the diff adds, removes, or bumps packages, SDKs, build tooling, or external service clients.
+- Apply the API Design lens if the diff changes public endpoints, RPCs, events, CLI flags, config schema, exported functions, or exported types.
+- Apply user-defined review standards only when a concrete finding maps to one of those dimensions; name the dimension when you use it.
+- Apply AI-generated-code checks if the diff contains generated markers, large repetitive edits, mechanically repeated patterns, or machine-produced comments/prose.
 
 ## Failure Signals
 
 Stop and reassess if:
 
-- you are reviewing implementation before establishing what the change is supposed to do — "should this change exist?" and "is this the right approach?" must be answered before line-level review
-- you are reviewing diff hunks without having read the surrounding context for each changed function
-- you assessed correctness without checking the callers of changed functions — the call site is often where the real problem surfaces
+- you are reviewing implementation before writing a Layer 0 or Layer 1 assessment of what the change is supposed to do
+- you cited a finding on a function, method, query, or module without opening surrounding context
+- the diff changes a public interface, signature, schema, or call pattern and you did not inspect at least one caller or consumer
 - you are about to write "looks good" or approve without having read the code
-- every finding is labeled Critical — severity inflation makes all feedback untrustworthy
+- every finding is labeled `Critical` but one or more findings do not match the `Critical` severity definition
 - all your findings are Layer 3 and you found nothing at Layers 0-2 — either the change is genuinely excellent, or you didn't look hard enough at the higher layers
-- findings lack file:line, what is wrong, and why it matters — vague references and vague risks ("this could cause issues") are both non-actionable
-- the review ends without a verdict — an open-ended summary is not a review
+- findings lack layer, file:line, what is wrong, why it matters, or the lens/standard name when that attribution is what makes the finding defensible
+- the review ends without exactly one verdict — an open-ended summary is not a review
 - you are giving feedback on code outside the diff — you are responsible for what you reviewed, not what you assumed
 
 ## Completion Criteria
 
-- [ ] The review covers justification (should this change exist?), approach (right solution?), and implementation — not just implementation details.
-- [ ] Enough context was read around each changed function — including callers — not just the diff hunks.
-- [ ] Every issue includes file:line, what is wrong, and why it matters, with honest severity calibration.
-- [ ] Relevant specialized lenses (Security, Performance, Migration, Dependency, API Design) were applied where applicable — see `references/specialized-lenses.md`.
-- [ ] User-defined design judgment dimensions were applied where relevant — see `references/user-review-standards.md`.
-- [ ] If the code appears AI-generated, reviewer-specific checks were applied — see `references/ai-generated-code.md`.
-- [ ] A clear verdict is present (Ready to merge / Not ready / Ready with fixes).
+- [ ] The review contains an explicit Layer 0-1 assessment, even if the conclusion is that no issue was found at those layers.
+- [ ] For every function, method, query, or module cited in findings or verdict reasoning, surrounding context was opened; if a public interface, signature, schema, or call pattern changed, at least one caller or consumer was inspected.
+- [ ] Every issue includes layer, file:line, what is wrong, and why it matters; severity labels match the severity table.
+- [ ] Any issue whose reasoning depends on a specialized lens or user-defined standard names that lens or standard explicitly.
+- [ ] Each specialized lens whose change trigger was present was applied, and any finding that relies on a specialized lens or user-defined standard names it.
+- [ ] AI-generated-code checks were applied when generated markers or machine-like edit patterns were present.
+- [ ] Merge-gating or touched-area automated checks are listed with pass/fail/not-run status when such checks exist, and the review ends with exactly one verdict: `Ready to merge`, `Not ready`, or `Ready with fixes`.
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
@@ -117,13 +130,14 @@ For deep guidance on each layer's key questions and review navigation, see `refe
 
 ## Output Format
 
-See `templates/review-output.md` for the full output structure.
+See `templates/review-output.md` for the default output structure. Adapt section names or ordering if the same information remains explicit.
 
-**Required sections:** Change Assessment (Layer 0-1 findings) · Strengths · Issues (by severity) · Verdict
+**Minimum output:** Layer 0-1 assessment · Issues by severity (or explicit statement that none were found) · Automated check status when merge-gating or touched-area checks exist · Verdict
 
 **For each issue:**
 - Layer reference
 - `File:line` reference
+- Lens or standard name when the finding depends on one
 - What is wrong / Why it matters / How to fix (if not obvious)
 
 **Verdict options:** `Ready to merge` / `Not ready` / `Ready with fixes`

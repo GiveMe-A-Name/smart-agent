@@ -1,6 +1,6 @@
 # Code Review Output Template
 
-Use this structure for every review. Omit a section only if there are genuinely no findings at that level — do not omit to appear positive.
+Use this as the default structure when it helps. You may adapt section names or ordering if the review still states the Layer 0-1 assessment, concrete issues, and a verdict. Omit a section only if there are genuinely no findings at that level — do not omit to appear positive.
 
 ---
 
@@ -13,6 +13,8 @@ Use this structure for every review. Omit a section only if there are genuinely 
 **Design and approach (Layer 1):** [Is this the right solution? Are there simpler alternatives? Is it over/under-engineered? What are the second-order effects? Does it improve or degrade overall system health?]
 
 ## Strengths
+
+[Optional. Include when there is something concrete worth preserving or repeating.]
 
 [What is well done — be specific. Cite file:line or name the pattern.
 Examples: "Clean error propagation in auth.ts:42-58", "Tests cover the failure path at handler.test.ts:91", "Chose the simplest approach that solves the problem"]
@@ -27,6 +29,7 @@ If none: omit this section.]
 **1. [Short title]**
 - **Layer:** [0: Change Justification / 1: Design / 2: Implementation / 3: Maintainability]
 - **File:** `path/to/file.ts:line`
+- **Lens/Standard:** [Optional. Name the specialized lens or user-defined standard when it is what makes this finding defensible.]
 - **What:** [Specific description of the problem]
 - **Why:** [What breaks, what risk is introduced, what second-order effect is missed]
 - **Fix:** [How to address it — for Layer 0-1 issues, this may mean rethinking the approach]
@@ -39,6 +42,7 @@ If none: omit this section.]
 **1. [Short title]**
 - **Layer:** [0 / 1 / 2 / 3]
 - **File:** `path/to/file.ts:line`
+- **Lens/Standard:** [Optional. Name the specialized lens or user-defined standard when it is what makes this finding defensible.]
 - **What:** [Specific description]
 - **Why:** [Impact on correctness, maintainability, or reliability]
 - **Fix:** [Suggestion, if not obvious]
@@ -50,13 +54,20 @@ If none: omit this section.]
 
 **1. [Short title]**
 - **File:** `path/to/file.ts:line`
+- **Lens/Standard:** [Optional.]
 - **What / Why / Fix:** [Can be combined for brevity]
+
+## Automated Checks
+
+[Include when the repository exposes merge-gating or touched-area checks for the diff. Record each check as Passed / Failed / Not run.]
+
+- [Check name]: [Passed / Failed / Not run]
 
 ## Verdict
 
-**Ready to merge?** `Yes` / `No` / `With fixes`
+**Verdict:** `Ready to merge` / `Not ready` / `Ready with fixes`
 
-**Reasoning:** [One or two sentences of technical justification. Name which layer and which specific issues drive the verdict. If Not ready, state what must change before re-review.]
+**Reasoning:** [One or two sentences of technical justification. Name which layer and which specific issues drive the verdict. If the verdict is `Not ready`, state what must change before re-review.]
 
 ---
 
@@ -98,6 +109,7 @@ This change adds rate limiting to the public search API endpoint to prevent abus
 **2. No rate limit bypass for internal services**
 - **Layer:** 2: Implementation
 - **File:** `middleware.ts:22`
+- **Lens/Standard:** Performance
 - **What:** Rate limiting applies to all requests including internal service-to-service calls.
 - **Why:** Internal batch jobs that call the search API will be rate limited, breaking nightly indexing.
 - **Fix:** Add a bypass mechanism for authenticated internal callers (e.g., check for internal service token).
@@ -108,8 +120,13 @@ This change adds rate limiting to the public search API endpoint to prevent abus
 - **File:** `ratelimit.ts:30`
 - **What / Why / Fix:** `60000` should be a named constant `TOKEN_REFILL_INTERVAL_MS` for readability.
 
+### Automated Checks
+
+- Unit tests: Passed
+- Lint: Not run
+
 ### Verdict
 
-**Ready to merge?** No
+**Verdict:** `Not ready`
 
 **Reasoning:** The race condition in the token bucket (Critical, Layer 2) defeats the purpose of the rate limiter under the exact conditions it's designed to handle. The hardcoded thresholds (Important, Layer 1) will make operational response to abuse incidents unnecessarily slow. Fix both before re-review.
