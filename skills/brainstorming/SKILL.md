@@ -1,33 +1,25 @@
 ---
 name: brainstorming
-description: "Explore design options for a feature, workflow, or component before any spec exists. TRIGGER when: idea is open-ended, no committed spec or design doc exists yet. DO NOT TRIGGER when: a spec already exists and the task is implementation or planning."
+description: "Explore an open idea or problem until a clear direction is agreed. TRIGGER when: user opens a topic for collaborative exploration, describes a goal without naming a solution, asks 'how should we approach X' or 'should we do X or Y', or presents alternatives without choosing."
 ---
 
 # Brainstorming Ideas Into Designs
 
-Explores design options through structured dialogue until the user has confirmed a direction. The output is a clear, agreed design — not a spec, not code.
+Explores design options through open dialogue until the user has confirmed a direction. The output is a clear, agreed design — not a spec, not code.
 
 <HARD-GATE>
-Do NOT write code, scaffold a project, or invoke any implementation skill until the user has explicitly confirmed the design direction in conversation.
+Do NOT write code, scaffold a project, or begin any implementation work until the user has explicitly confirmed the design direction in conversation.
 </HARD-GATE>
 
 ## Trigger Signals
 
 **Invocation default**: Skipping design when it is needed converts unresolved questions into implementation mistakes — wrong interfaces, missing constraints, or structure that has to be undone. The cost of an unnecessary design session is a short conversation. The cost of missing it is building the wrong thing. Invoke this skill whenever no committed spec exists and the work involves decisions about what to build or how it should work.
 
-This skill should load when the user's message implies design is needed before implementation, even if they do not explicitly ask for a spec.
-
-Common signals:
-- They have an idea, feature, workflow, or product change, but key details are still undecided
-- They ask to brainstorm, think through, scope, design, compare options, or figure out the best approach
-- They ask implementation-first questions, but the real blocker is still unresolved design or unclear requirements
-- They describe a desired solution before clarifying the problem, users, constraints, tradeoffs, or success criteria
-- They are choosing between architectures, UX flows, API shapes, or system boundaries
-- They want to start building something new in an existing codebase, but the shape of the change is not yet agreed
+Invoke when: no committed spec or agreed design exists, and at least one decision about shape, scope, tradeoff, or approach remains open.
 
 Do not use this skill when:
 - a committed spec already exists, the approach and interfaces are decided, and the remaining step is writing code against that spec
-- the question is a factual lookup or a clarification with no decisions to make about shape, scope, tradeoffs, or approach
+- the question is a factual lookup or a clarification with no open design decisions
 
 ## Capability Boundary
 
@@ -36,47 +28,51 @@ This skill covers design exploration: understanding the problem, surfacing optio
 This skill does NOT own:
 - Spec writing or spec review
 - Committing design documents to git
-- Implementation planning or test design — use `writing-plans` after design is confirmed
+- Implementation planning or test design — out of scope for this skill even after design is confirmed
 - Sub-project decomposition beyond identifying that it's needed
 - Designing a scope the user hasn't yet agreed to decompose
-
-When scope is too large and the user isn't ready to decompose, name that blocker rather than designing around it.
 
 ## Invariants
 
 - One question per message — no exceptions
-- Always propose 2–3 approaches before presenting a design — unless the user has explicitly named an approach and said they do not need alternatives
+- Always surface 2–3 genuinely different directions before converging — unless the user has explicitly named an approach and said they do not need alternatives
 - Every design gets explored — simple ones get a short session, not no session
 - No unrelated refactoring — only improvements that directly serve the current goal
 
-## Decision Signals
+## What Good Looks Like
 
-**Scope flagging:** If the request describes multiple independent subsystems, flag decomposition immediately. Do not ask detail questions about a project that first needs to be broken apart. Help the user identify the independent pieces, their order, and then brainstorm only the first sub-project through the normal flow.
+Use this section to assess where the session is. These are not steps to execute — they are states to evaluate against.
 
-**Question ordering:** Start with purpose and constraints — what problem, for whom, with what limits. Move to success criteria and edge cases only after the problem is clear. Ask about technical preferences only when they would constrain the design direction, not as an opener. Starting with "what technology do you want to use?" before understanding the problem is a failure.
+**The problem is grounded**
 
-**Blind spot injection:** At session start, read `skills/brainstorming/references/blind-spots.md`. Select 2–3 blind spots most relevant to this topic — not the most obvious ones, but those where the user's framing reveals the strongest implicit assumptions. Inject each as a dedicated standalone question at the moment it becomes most relevant during the session, not all at the start. Skip any blind spot the user has already addressed unprompted. Each injected blind spot question counts as one of the one-question-per-message turns.
+The session is anchored to the root problem, not the surface framing. The user's original statement contains embedded assumptions — "we need to refactor the code" assumes structural change is the solution; the root problem is likely "code is hard to maintain." Grounded means those assumptions have been named and the underlying need is explicit.
 
-**Project context:** Explore files, docs, and recent commits before asking questions. Questions you could answer by reading the codebase waste the stakeholder's time. Follow existing patterns. Where existing code has problems that affect the work (overgrown files, tangled responsibilities), include targeted improvements as part of the design — not as unrelated refactoring.
+Not grounded: the discussion is organized around the user's original description without questioning what it assumes.
 
-**Technical feasibility spike:** Pause design and spike when: an approach depends on undocumented or ambiguous third-party behavior; performance characteristics are central to the decision and cannot be estimated; or the integration seam between two systems is poorly understood. A spike is not implementation — it answers one design question. Set a strict timebox (30 minutes to 2 hours). A spike that invalidates an approach is a success.
+**Divergence is genuine**
 
-**External research:** When an approach depends on external libraries, services, or APIs: verify the dependency actually supports the required capability before committing the design to it; check for known limitations, breaking changes, deprecation signals, and maintenance health. If evaluation requires sustained multi-source research, pause design, gather evidence, then return with facts.
+Divergence is happening when:
+- Information has surfaced that was absent from the original prompt — new constraints, user needs, or technical realities the user hadn't stated
+- The options on the table are fundamentally different, not variants of the same approach — they lead to materially different designs with different tradeoffs
+- The user's cognitive frame has been actively challenged — perspectives they would not reach on their own have been introduced (see `references/blind-spots.md`)
 
-**Approach recommendation:** Prefer approaches that meet constraints with minimal dependencies. When options are equivalent in outcome, prefer the simpler one. Lead with your recommendation and reasoning — don't just list options and make the user choose without guidance.
+Divergence is not happening when the agent is only asking clarifying questions within the user's original frame, or when all options cluster around the user's opening assumption.
 
-**Approach comparison:** Compare 2–3 approaches against consistent dimensions so the user can evaluate tradeoffs. Choose dimensions that matter for this specific decision: complexity and maintenance burden, risk profile and recoverability, dependency footprint, reversibility. Present as a table when comparing 3+ approaches across 3+ dimensions. Two approaches differing in one dimension do not need a table.
+**Convergence is real**
 
-**Enough questions:** Move to approach proposals when you can answer: what is it for, who uses it, what are the constraints, and what does success look like? If you cannot answer all four after 5–6 questions, move to proposals anyway — missing information is better surfaced through option trade-offs than through more questions.
+Convergence is real when:
+- The chosen direction carries explicit reasoning — "because X, not Y" — not just a stated preference
+- Rejected alternatives were consciously set aside with understood reasons, not quietly dropped
+- The direction that emerged is traceable to the dialogue itself — not a position either party held at the start
 
-**Design sufficiency:** The design direction is clear enough to hand off when you can answer: what is being built, for whom, with what constraints, and what tradeoffs were consciously accepted. Hand off to `writing-plans` once the user confirms.
+Convergence is not real when the user agrees with the agent's recommendation without the reasoning being examined, or when the final direction is identical to the user's opening assumption.
 
 ## Completion Criteria
 
-- [ ] All invariants were followed (one question per message, 2-3 approaches proposed).
-- [ ] The user has explicitly confirmed the design direction in conversation.
-- [ ] Approaches were compared against dimensions chosen for this specific decision, not a generic checklist.
-- [ ] If the design depends on external libraries or APIs, feasibility was verified through research or a spike.
+- [ ] The problem was grounded — root problem named, embedded assumptions surfaced
+- [ ] Divergence was genuine — new information surfaced, fundamentally different directions explored, cognitive frame challenged
+- [ ] Convergence is real — chosen direction has explicit reasoning, rejected alternatives understood, direction traceable to dialogue
+- [ ] The user has explicitly confirmed the direction in conversation
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
@@ -93,12 +89,7 @@ Am I exiting because the design is genuinely complete and approved, or because t
 ## Failure Signals
 
 Stop and reassess if:
-- You are discussing implementation details (library choices, file organization, syntax) before understanding the problem
-- Major design sections are still unresolved but you are about to hand off to planning or implementation
-- You proposed 2–3 approaches but they are variants of the same idea rather than genuinely different directions
-- You have asked more than 5–6 questions without reaching approach proposals (see the "Enough questions" decision signal)
+- You are discussing implementation details (library choices, file organization, syntax) before the root problem is grounded
+- Major design decisions are still unresolved but implementation work is about to begin
+- You surfaced 2–3 directions but they are variants of the same idea rather than genuinely different approaches
 - The user wants to go straight to code without confirming a direction — hold the HARD-GATE; explain why a confirmed direction matters before implementation
-- You committed to an approach that depends on unverified third-party behavior — spike first
-- You are comparing approaches but each is described in a different frame, making comparison impossible — use consistent dimensions
-- You are designing around an external dependency without checking whether it actually supports the required capability
-- You recommended a higher-complexity or higher-dependency approach when a simpler equivalent would meet all stated constraints

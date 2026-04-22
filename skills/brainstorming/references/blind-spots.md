@@ -1,6 +1,6 @@
 # Brainstorming Blind Spots
 
-Six blind spots humans systematically miss during brainstorming. At session start, read this file and select 2–3 entries where the user's current framing shows the strongest matching detect signals. Inject each as a dedicated standalone question at the moment the signals appear — not all at the start. Each injected question counts as one of the one-question-per-message turns.
+Six blind spots humans systematically miss during brainstorming. Select 2–3 entries where the user's current framing shows the strongest matching detect signals. Inject each as a dedicated standalone question at the moment the signals appear. Each injected question counts as one of the one-question-per-message turns.
 
 **Selection rule**: Prefer blind spots the user is least likely to reach on their own. Skip any whose detect signals are absent or that the user has already addressed unprompted.
 
