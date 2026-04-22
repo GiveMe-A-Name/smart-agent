@@ -93,3 +93,48 @@ When a trigger fires, pause and revise. Pushing through a plan that no longer ma
 **Cross-boundary coordination.** When the plan touches code owned by others (different modules, different teams, shared interfaces):
 - **Define the contract first.** If building two sides of an interface, agree on it before building either side.
 - **Explicit handoff points.** Where does one piece of work end and another begin? What does "done" look like for the piece you own? Ambiguous boundaries cause duplicate work or gaps.
+
+---
+
+## Stop Signals
+
+A stop signal is a pre-declared condition under which the agent must pause and ask before continuing — not revise the plan autonomously, but surface the situation and wait for a decision. Stop signals are not failure conditions; they are expected forks where the right path requires human judgment.
+
+Three categories cover most cases:
+
+**Resource change** — the plan is about to introduce something that wasn't agreed to:
+- "If resolving this requires a new external dependency, pause and confirm before introducing it."
+- "If the fix requires changing the public API contract, pause before proceeding."
+
+**Premise invalidated** — a core assumption the plan rests on turns out to be false:
+- "If `on_complete` doesn't carry enough context to build a useful payload, pause before designing a workaround."
+- "If the existing schema doesn't support this, pause — the plan assumed it did."
+
+**Progress overrun** — a task takes significantly longer than expected, signaling the estimates for remaining work are wrong:
+- "If any single task takes more than 2× its estimate, report current progress and remaining estimate before continuing."
+- "If total elapsed time exceeds 4 hours, surface what's done and what's left."
+
+Write stop signals as concrete conditions, not vague thresholds. "If something seems complex" is not a stop signal. "If adding retry logic requires a new external dependency" is.
+
+---
+
+## Explicit Exclusions and Conflict Priority
+
+**Explicit exclusions.** State what the plan deliberately does not include. This is most valuable when the scope boundary is non-obvious — when a reasonable agent could plausibly infer that X is in scope, even though it isn't.
+
+- "Not building a webhook management UI — URL is config-only."
+- "Not handling partial failures — assumes all-or-nothing semantics."
+- "Not adding authentication to the new endpoint in this iteration."
+
+One or two lines is enough. The goal is to prevent execution-time scope expansion, not to enumerate everything that won't be built.
+
+**Conflict priority.** When the plan has multiple goals that can pull in opposite directions, name the tiebreaker explicitly. An agent that hits a real conflict mid-execution will make the call itself if no priority is declared — and it will often get it wrong.
+
+Format: `When [X] conflicts with [Y], prefer [X]. [One sentence of reasoning.]`
+
+Examples:
+- "When correctness conflicts with performance, prefer correctness. Performance can be improved post-launch."
+- "When security conflicts with schedule, prefer security. Flag the blocker rather than working around it."
+- "When completeness conflicts with code cleanliness, prefer completeness in this iteration — refactoring is a separate task."
+
+Conflict priority belongs in the Human Review Section for medium/large work, not buried in a task.

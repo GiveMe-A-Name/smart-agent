@@ -101,6 +101,17 @@ Verify: `python cli/export.py --dry-run output/` prints paths, no files created;
 
 **Risk analysis:** The main uncertainty is whether `on_complete` provides enough context to construct the webhook payload. We find out in Task 1.
 
+**Explicit exclusions:**
+- Not adding webhook signing/authentication — URLs are assumed internal
+- Not supporting multiple webhook targets per job
+- Not building a webhook management UI — URL is config-only
+
+**Conflict priority:** When feature completeness conflicts with schedule, prefer a working subset over a partial implementation of everything. Retry logic (Task 3) is lower priority than a working configurable webhook (Tasks 1–2).
+
+**Stop signals:**
+- If `job_runner.py`'s `on_complete` event doesn't carry enough data to build a useful payload → pause and ask before designing a workaround
+- If retry logic requires introducing a new external dependency → pause and confirm before adding it
+
 **File map** *(design sketch — names may change during execution)*:
 - Create webhook notifier in `notifications/` — likely `notifications/webhook.py`
 - Create tests in `tests/notifications/`

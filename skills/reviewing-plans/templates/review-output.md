@@ -54,7 +54,7 @@ If none: omit this section.]
 
 ## Verdict
 
-**Ready to implement?** `Yes` / `No` / `With fixes`
+**Ready to implement?** `Approved` / `Approved with fixes` / `Blocked`
 
 **Reasoning:** [One or two sentences of technical justification. Name which layer and which specific issues drive the verdict. If No, state what must change before re-review.]
 
@@ -94,6 +94,6 @@ This plan builds an incremental factor computation pipeline that reads price dat
 
 ### Verdict
 
-**Ready to implement?** No
+**Ready to implement?** Blocked
 
 **Reasoning:** The CLI architecture violates a hard repo constraint (Critical, Layer 0), and the incremental completeness check has a fundamental data-integrity flaw (Critical, Layer 1). Both require approach changes, not implementation fixes, before this plan can be executed.

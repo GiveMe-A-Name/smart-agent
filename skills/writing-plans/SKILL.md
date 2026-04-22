@@ -61,6 +61,10 @@ If you can't name the files involved or state how to verify completion, you have
 - [ ] For existing files being modified: paths are exact. For new files in medium/large work: module and direction are clear, exact names are execution-time judgment. Planned changes are concrete, not vague.
 - [ ] For medium/large: contingencies for the riskiest assumptions and plan revision triggers identified.
 - [ ] For cross-boundary work: interfaces and handoffs are explicit.
+- [ ] **Execution cold-start test:** Read the first task in isolation, without any conversation context. An agent should be able to identify the specific files to open and the first concrete change to make. If the first task requires inferring context from a prior message, revise it.
+- [ ] For medium/large: at least one explicit exclusion stated — what is deliberately out of scope.
+- [ ] For medium/large: stop signals listed in the plan document — conditions under which the agent must pause and ask before continuing.
+- [ ] For medium/large with multiple competing goals: conflict priority stated.
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
@@ -94,8 +98,11 @@ Regardless of size, a usable plan is concrete:
 - **One thing per step** — if a step has "and", it's two steps
 - **Vertical slice per task** — delivers verifiable value, not just a layer
 - **Working state after each task** — commit point rule applies at every level
-- **Targets, not methods** — if a step reads like pseudocode or a code walkthrough, it belongs in execution, not the plan
+- **Contract, not implementation** — specify what the system promises (endpoint, inputs, outputs, error conditions), not how it delivers (which library, which algorithm, which code structure); if a step reads like pseudocode or a code walkthrough, it belongs in execution
 - **Task purpose line required** — every task must open with one sentence explaining why it exists in human terms (e.g. *"Proves the approach works before investing in config and retry logic"*), not a restatement of what the checklist does
+- **Explicit exclusions** — for medium/large: state what the plan does NOT cover; without this, an agent will extrapolate scope at execution time
+- **Conflict priority** — for medium/large with competing goals: name which wins when they conflict (e.g., "correctness over performance; security before schedule")
+- **Stop signals** — for medium/large: name conditions that require pausing and asking before continuing; see `references/planning-methodology.md`
 
 ## Failure Signals
 
@@ -104,7 +111,7 @@ Regardless of size, a usable plan is concrete:
 - Plan document heavier than the work itself
 - Running a review loop on a tiny/small task
 - Planning tasks 6+ in full detail when tasks 1-3 haven't been done yet
-- Describing HOW to implement rather than WHAT changes and WHERE
+- Specifying implementation details (library choice, algorithm, code structure) rather than the behavioral contract
 
 **Under-planning** — stop if:
 - Starting medium/large work without a file map
@@ -113,6 +120,9 @@ Regardless of size, a usable plan is concrete:
 - No dependency analysis for work crossing multiple modules
 - No contingency for the riskiest assumption in a medium/large plan
 - No plan revision triggers — plan assumes everything goes as expected
+- Tasks reference context from the planning conversation rather than stating it directly in the document
+- No explicit exclusions for medium/large work where an agent could plausibly extend scope
+- No stop signals — agent has no defined conditions to pause and ask
 - Cross-boundary work with no agreed interfaces or handoff points
 
 **Horizontal slicing** — stop if:
