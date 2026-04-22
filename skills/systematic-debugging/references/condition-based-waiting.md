@@ -16,6 +16,7 @@ digraph when_to_use {
     "Use condition-based waiting" [shape=box];
 
     "Test uses setTimeout/sleep?" -> "Testing timing behavior?" [label="yes"];
+    "Test uses setTimeout/sleep?" -> "Use condition-based waiting" [label="no"];
     "Testing timing behavior?" -> "Document WHY timeout needed" [label="yes"];
     "Testing timing behavior?" -> "Use condition-based waiting" [label="no"];
 }

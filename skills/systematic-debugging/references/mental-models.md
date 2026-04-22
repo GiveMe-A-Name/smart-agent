@@ -40,13 +40,13 @@ The file or line where the error surfaces is where the symptom appears, not nece
 
 When you see an error at `file.ts:42`, your first question is NOT "what's wrong at line 42?" — it's *"what put the system in a state where line 42 fails?"* The answer often lives in a completely different file, layer, or even repository.
 
-Before accepting the stack-trace location as the bug, check all four competing explanations:
+Before accepting the stack-trace location as the bug, check the competing explanations that are plausible in this case:
 - **Expectation wrong?** Is the assertion itself testing for the wrong thing?
 - **Fixture wrong?** Is the test setup producing bad input or state?
-- **Environment wrong?** Is something outside the code (config, timing, deps) causing this?
+- **Environment wrong?** If config, timing, deps, build state, or tooling could reasonably explain it, is something outside the code causing this?
 - **Implementation wrong?** Is the production code actually at fault?
 
-Check all four before committing to one.
+Check each plausible explanation before committing to one.
 
 ---
 

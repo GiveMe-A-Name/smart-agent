@@ -10,13 +10,13 @@ Bugs often manifest deep in the call stack. Your instinct is to fix where the er
 digraph when_to_use {
     "Bug appears deep in stack?" [shape=diamond];
     "Can trace backwards?" [shape=diamond];
-    "Fix at symptom point" [shape=box];
+    "Add instrumentation / isolate more" [shape=box];
     "Trace to original trigger" [shape=box];
     "Add defense-in-depth" [shape=box];
 
     "Bug appears deep in stack?" -> "Can trace backwards?" [label="yes"];
     "Can trace backwards?" -> "Trace to original trigger" [label="yes"];
-    "Can trace backwards?" -> "Fix at symptom point" [label="no - dead end"];
+    "Can trace backwards?" -> "Add instrumentation / isolate more" [label="no - need more evidence"];
     "Trace to original trigger" -> "Add defense-in-depth";
 }
 ```
@@ -88,13 +88,14 @@ Look for: test file names, line numbers triggering the call, repeated patterns.
 
 ## Finding Which Test Causes Pollution
 
-Use `../scripts/find-polluter.sh`:
+If the repository has no dedicated polluter-finding script, bisect the test set manually:
 
 ```bash
-../scripts/find-polluter.sh '.git' 'src/**/*.test.ts'
+# Run half the candidate tests, then the other half.
+# Keep halving until the polluter is isolated.
 ```
 
-Runs tests one-by-one, stops at first polluter.
+The key is the strategy, not a specific helper script: isolate the smallest test subset that still pollutes shared state, then trace why that test leaves residue behind.
 
 ## Key Principle
 
@@ -109,7 +110,7 @@ digraph principle {
 
     "Found immediate cause" -> "Can trace one level up?";
     "Can trace one level up?" -> "Trace backwards" [label="yes"];
-    "Can trace backwards?" -> "Is this the source?";
+    "Can trace one level up?" -> "Is this the source?" [label="no"];
     "Is this the source?" -> "Trace backwards" [label="no"];
     "Is this the source?" -> "Fix at source" [label="yes"];
     "Fix at source" -> "Add validation at each layer";

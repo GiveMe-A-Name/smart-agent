@@ -21,7 +21,7 @@ Do not use when:
 
 ## Capability Boundary
 
-This skill owns the full debugging cycle: from a visible failure to a single verified fix. It does NOT own architectural changes — 3+ fix failures that keep exposing new coupling is an escalation signal, not a scope expansion.
+This skill owns the full debugging cycle: from a visible failure to a verified fix and, optionally, adding defense-in-depth to prevent the bug class from recurring. It does NOT own architectural changes — 3+ fix failures that keep exposing new coupling is an escalation signal, not a scope expansion.
 
 ## Invariants
 
@@ -42,8 +42,8 @@ Root cause means you can state: *"The bug is at [specific location] because [mec
 - [ ] The fix outcome could be predicted before running it.
 - [ ] The fix was verified against the original failure.
 - [ ] Related bugs following the same pattern were checked.
-- [ ] Environment, configuration, and build issues were ruled out before focusing on code logic.
-- [ ] If significant time passed without progress, escalation happened with context instead of continued spinning.
+- [ ] If the failure showed any config/environment/build signal from Reading the Situation (e.g., "works on my machine", error references tooling, code looks correct but behavior wrong), environment, configuration, and build explanations were checked or ruled out.
+- [ ] If 1+ hour passed without progress, escalation happened with context instead of continued spinning.
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
@@ -67,7 +67,7 @@ Stop and reassess immediately when:
 |---|---|---|
 | Editing before restating the exact failure | Diagnosis is still implicit | State the failure in specific terms first |
 | Picked the stack-trace file as owner without proof | Symptom site confused with owning layer | Trace the failure path to the behavior source |
-| Skipped competing explanations | Jumped to conclusion | Check expectation, fixture, environment before blaming implementation |
+| Skipped plausible competing explanations | Jumped to conclusion | Check expectation, fixture, and any plausible environment/config/build explanations before blaming implementation |
 | Multiple changes at once | Can't isolate what fixed it | Revert. One variable at a time. |
 | Weakening assertions or increasing timeouts | Hiding the symptom, not finding the cause | Keep the assertion; find the cause |
 | "It's probably X, let me try that" | Hypothesis without evidence | State the evidence first |
@@ -90,7 +90,7 @@ Reach for the mental model that fits the observable signal. After each action, a
 |---|---|---|
 | Clear error message pointing to a specific location | May be a direct hit, but verify — could be symptom site, not owner | **Symptom site ≠ Owning layer** — trace backward before editing |
 | "It used to work" / something changed recently | Likely a regression | `git log`, `git bisect` — **divide and conquer through time** |
-| Fails in full suite, passes in isolation | Test pollution or ordering dependency | `scripts/find-polluter.sh`, bisection — **reproduction** |
+| Fails in full suite, passes in isolation | Test pollution or ordering dependency | bisection — run tests in halves to isolate the polluter — **reproduction** |
 | Intermittent / flaky | Uncontrolled variable: timing, state, ordering | **Reproduction** — find the variable, see `references/condition-based-waiting.md` |
 | Multi-component system, unclear which layer | Need to isolate the broken layer | **Observation** — instrument boundaries, check data at each crossing |
 | You've formed a theory but haven't tested it | Risk of confirmation bias | **Search problem** — design an experiment that could DISPROVE your theory |
@@ -114,7 +114,7 @@ Five thinking tools. Each is a lens for seeing a bug differently. Reach for whic
 
 **Observation Over Theory** — read the full error; print actual values; instrument at boundaries. Theory formed without data is usually wrong and causes anchoring.
 
-**Symptom Site ≠ Owning Layer** — the file/line where the error surfaces is not necessarily where the fix belongs. First question: *"What put the system in a state where this line fails?"* Check expectation, fixture, environment, and implementation before accepting the stack-trace location.
+**Symptom Site ≠ Owning Layer** — the file/line where the error surfaces is not necessarily where the fix belongs. First question: *"What put the system in a state where this line fails?"* Check expectation, fixture, implementation, and any plausible environment/config/build explanations before accepting the stack-trace location.
 
 **Causal Chain Depth** — apply 5 Whys. Fix at the surface and the bug class recurs; fix at the root and it cannot. Every time you think you've found the cause, ask one more "why."
 
@@ -140,7 +140,6 @@ When escalating: state what you know (symptom, evidence gathered, hypotheses tes
 - `references/root-cause-tracing.md` — tracing backward through a call stack to the original trigger
 - `references/defense-in-depth.md` — after finding root cause, adding validation at multiple layers so the bug class cannot recur
 - `references/condition-based-waiting.md` — when the bug involves timing or async behavior
-- `scripts/find-polluter.sh` — when a test fails only in a full suite run
 - `references/specialized-domains.md` — domain-specific heuristics for distributed systems, performance, concurrency, data/state, build/tooling, and config/environment bugs
 - `references/mental-models.md` — full detail for the five mental models
 - `references/cognitive-traps.md` — the seven cognitive biases that make debugging hard, with countermeasures
