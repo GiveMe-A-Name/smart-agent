@@ -1,6 +1,6 @@
 ---
 name: understanding-codebases
-description: "Build evidence-based understanding of code before suggesting changes. TRIGGER when: current understanding is based on descriptions, user explanations, or prior knowledge — not read source files. DO NOT TRIGGER when: relevant source code has already been read and traced in this session."
+description: "Build evidence-based understanding of code before suggesting changes. TRIGGER when: current understanding is based on descriptions, user explanations, or prior knowledge — not read source files."
 ---
 
 # Codebase Understanding
@@ -49,9 +49,9 @@ This skill does not own:
 
 **When to widen scope**: expand beyond the initial slice only when a current lookup reveals dependencies that block answering the question — not by default.
 
-**When to stop exploring**: the first 20% of investigation typically gives 80% of the understanding. When each new file adds only marginal information, stop. Remaining unknowns will surface during implementation; that is normal.
+**When to stop exploring**: stop when the last two file reads or searches produced no new information about ownership, call flow, or candidate change points. Remaining unknowns will surface during implementation; that is normal.
 
-**When to consult git history**: when code seems over-engineered, contradictory, or naming is too opaque to infer intent — `git blame` plus the commit message often explains what application code alone cannot.
+**When to consult git history**: when code cannot be explained from its structure alone — two paths appear to handle the same case, naming gives no signal about purpose (e.g., `handle`, `process`, `doWork`), or the code is more complex than the behavior it produces can account for. `git blame` plus the commit message often explains what application code alone cannot.
 
 **When to read infrastructure/config**: when deployment constraints, environment variables, or build system shape could affect the answer — not as a default first step.
 

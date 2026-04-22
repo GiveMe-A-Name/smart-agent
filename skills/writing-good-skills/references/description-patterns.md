@@ -27,11 +27,31 @@ Understanding how descriptions are consumed affects how to write them:
 
 ## Core Tests
 
-Apply before writing or reviewing any description:
-- Does it say *when* to use the skill, not *what steps* it performs?
-- Does it help the agent *decide to load* the skill — not help them use it after loading?
-- Does the first 250 characters contain the primary trigger condition?
-- If you remove named skill references, does it remain meaningful?
+Apply before writing or reviewing any description. Each test has a verifiable pass/fail form.
+
+**Test 1: When, not how**
+Does the description state *when* to trigger, not *what steps* to perform?
+
+- Pass: `"TRIGGER when: a diff or PR exists and the task is to review it"`
+- Fail: `"This skill gathers notes, writes a first draft, compares outputs, and packages the result"` — describes steps, not trigger state
+
+**Test 2: Routes to load, not how to use**
+Does it help the agent decide *whether to load* the skill — not how to use it after loading?
+
+- Pass: `"Evaluate code changes for correctness, design, and risk"`
+- Fail: `"Use this skill's Boundary section to classify the change, then apply the relevant invariant"` — teaches usage, not routing
+
+**Test 3: Trigger within 250 characters**
+Does capability + TRIGGER condition appear before the 250-char display cutoff?
+
+- Pass: capability statement (~60 chars) + `TRIGGER when` (~80 chars) = 140 chars total — key info survives truncation
+- Fail: 200-char preamble about cost and context, TRIGGER condition buried after char 250 — invisible in UI listing
+
+**Test 4: Meaningful after removing named-skill references**
+Remove all "use X instead" phrases. Does the description still identify what state triggers this skill?
+
+- Pass: description still identifies the trigger state independently — sibling references were additive, not load-bearing
+- Fail: description becomes `"Use when not doing what receiving-code-review does"` — collapses after removal; the positive trigger was never stated
 
 ## Recommended Format
 
@@ -43,7 +63,7 @@ description: "[One-line capability statement]. TRIGGER when: [observable conditi
 
 1. **What** (capability) — one sentence, front-loaded. This is what the model reads first and what survives truncation.
 2. **TRIGGER when** — specific, observable conditions. Use concrete terms the user would naturally say (file extensions, task types, domain keywords).
-3. **DO NOT TRIGGER when** — disambiguation boundaries. Most valuable when similar skills exist. Points the model to the correct alternative.
+3. **DO NOT TRIGGER when** — sibling skill disambiguation only. Include when a named sibling skill has overlapping trigger conditions. Points the model to the correct alternative. If no sibling skill exists, fix the positive TRIGGER instead of adding this clause.
 
 **Quote the description when it contains colons.** YAML treats unquoted `: ` as a key-value separator, breaking frontmatter parsing. Always quote descriptions that use the TRIGGER/DO NOT TRIGGER format.
 
@@ -109,6 +129,13 @@ description: "Invoke unless the root cause is already obvious."
 
 Why it fails: "already obvious" is judged before reading code. This is a rationalization exit, not a disambiguation boundary.
 
+```yaml
+# Compensatory DO NOT TRIGGER — masking an imprecise positive trigger
+description: "Guide error handling decisions. TRIGGER when: you need to decide how to handle an error. DO NOT TRIGGER when: the correct approach is already clear."
+```
+
+Why it fails: the positive TRIGGER (`"you need to decide how to handle an error"`) is too broad and would match almost any error-adjacent task. The `DO NOT TRIGGER` clause attempts to compensate with an impression-based guard (`"already clear"`) — which is assessed before reading code. The fix is to narrow the positive TRIGGER (e.g., state the specific error categories, file types, or decision context it covers), not to add an exclusion.
+
 ## What Discovery Copy Must Not Do
 
 Do not use the `description` to:
@@ -142,19 +169,23 @@ These belong in the main skill body if they belong anywhere.
 
 ## DO NOT TRIGGER: When to Include, What to Include
 
-**Include when:**
-- A sibling skill covers a closely related trigger state (code-review vs. receiving-code-review)
-- The positive TRIGGER condition is broad enough that a realistic wrong-invocation exists
-- The boundary is an observable fact ("no code changes exist yet"), not an impression ("the change is trivial")
+`DO NOT TRIGGER` has exactly one legitimate job: route to the correct skill when two skills genuinely have overlapping positive trigger conditions. It is not a tool for reducing invocation frequency, adding impression-based guards, or compensating for an imprecise positive trigger.
 
-**Omit when:**
-- The positive TRIGGER condition is precise enough that no realistic confusion exists
-- The exclusion would be impression-based ("unless the problem is obvious")
-- The only purpose is to reduce invocation frequency, not to route to the correct skill
+**Legitimacy test** — run before writing any DO NOT TRIGGER clause:
+
+Remove the DO NOT TRIGGER clause. Can the agent route correctly from the positive TRIGGER alone?
+
+- **Yes** → DO NOT TRIGGER is unnecessary. Delete it.
+- **No, a named sibling skill has overlapping trigger conditions** → DO NOT TRIGGER is legitimate disambiguation. Keep it, name the sibling.
+- **No, no sibling skill exists** → The positive TRIGGER is imprecise. Fix the TRIGGER; do not add DO NOT TRIGGER to compensate.
 
 **Form matters:**
-- Good: `DO NOT TRIGGER when: responding to existing review feedback (use receiving-code-review)` — observable fact + alternative
-- Bad: `DO NOT TRIGGER when: the change is simple enough to not need this` — impression, rationalization exit
+
+Pass: `DO NOT TRIGGER when: responding to existing review feedback (use receiving-code-review)` — observable state + named sibling
+
+Fail: `DO NOT TRIGGER when: the change is simple enough to not need this` — impression assessed before investigation; fix the positive TRIGGER instead
+
+Fail: `DO NOT TRIGGER when: you already know what to do` — no named sibling, no observable fact; this is a rationalization exit, not disambiguation
 
 ## Review Questions
 

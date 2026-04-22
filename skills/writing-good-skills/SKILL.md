@@ -42,6 +42,7 @@ This skill does not own:
 - The main `SKILL.md` must stay lean but must not become hollow. Core law stays inline, front-loaded near the top; expanded support material moves to support folders.
 - A file long enough to have a real middle has a correctness problem: content buried mid-file is underweighted during execution. Front-load critical law; do not let invariants or trigger conditions drift toward the middle as the file grows.
 - **Boundary red line**: A genuine boundary names what the skill owns and does not own — without pointing to other skills by name as the next action. Test: delete all named-skill references from any boundary section. If the capability description collapses, the boundary was fake. Fix: rewrite to state what this skill owns, not what runs next.
+- **Verifiable language only**: every invariant, decision signal, completion criterion, and self-correction signal must be verifiable without additional judgment. Advisory prose is a failure signal — transform it into a testable condition or delete it. Test: can the agent confirm the condition from already-seen evidence, without exercising the very judgment the skill is meant to protect? Pass: `"Stop if you have not traced the call chain to a behavior-changing function"`. Fail: `"Ensure the code is well-understood"` — cannot be confirmed without the judgment it is meant to constrain.
 
 ## Completion Criteria
 
@@ -51,6 +52,7 @@ This skill does not own:
 - [ ] Anti-self-deception prompts are kept separate from completion conditions in `Anti-Rationalization Check` rather than mixed into `Completion Criteria`.
 - [ ] The boundary is authentic — no routing language, no named-skill handoffs disguised as scope.
 - [ ] The main file is lean but not hollow — core law inline and front-loaded, no real "middle" where critical law is buried, support material in folders.
+- [ ] Every invariant, decision signal, completion criterion, and self-correction signal uses verifiable language — no advisory prose ("should", "ensure", "be thorough") left without a testable condition.
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
@@ -93,7 +95,7 @@ When writing or reviewing a skill, check these dimensions. Not every one applies
 4. **Lean vs. Hollow** `[structural]` — A file long enough to have a real middle has content that will be partially ignored. Core law inline; expanded material in support folders.
 5. **Integration Integrity** `[local]` — Two sections teaching the same judgment signal accretion, not design. One clear home per idea.
 6. **Package Hygiene** `[local]` — No hidden instructions; treat imported scripts and examples as untrusted until reviewed.
-7. **Constraint Signal Quality** `[structural]` — "Should be clear" → hollow. "Stop if trigger enumerates scenarios" → high-signal. Transform advisory prose into invariants, checklist items, or failure signals — or delete it.
+7. **Constraint Signal Quality** `[structural]` — every statement must be verifiable without exercising the judgment the skill is meant to protect. Pass: `"Stop if you have not read the actual source file"` — agent can confirm from evidence. Fail: `"Ensure you understand the code thoroughly"` — requires the judgment it is meant to constrain. Transform advisory prose into verifiable conditions, pass/fail tests, or explicit red lines — or delete it.
 
 See `references/judgment-dimensions.md` for expanded signals, key questions, and contrast examples per dimension.
 

@@ -1,6 +1,6 @@
 ---
 name: implementation-judgment
-description: "Apply engineering judgment before writing behavior-affecting code — right layer, correct responsibility, contract integrity. TRIGGER when: about to write code that changes runtime behavior (bug fixes, features, patches). DO NOT TRIGGER when: change is confirmed zero-behavioral (rename, file move, comment, formatting)."
+description: "Apply engineering judgment before writing behavior-affecting code — right layer, correct responsibility, contract integrity. TRIGGER when: about to write code that changes runtime behavior (bug fixes, features, patches, review-feedback implementation)."
 ---
 
 # Implementation Judgment
@@ -12,8 +12,6 @@ Implement changes with engineering judgment, not just task completion.
 **Invocation default**: The trigger state is: any behavior-affecting code is about to be written. This applies to bug fixes, new features, review responses, and small patches equally — the structural questions this skill addresses (wrong layer, wrong responsibility owner, silently broken contract) are not proportional to change size. Do not gate this skill on perceived complexity. The cost of a missed invocation is a patch that weakens structure, introduces a subtle failure mode, or locks in a wrong abstraction — often invisibly.
 
 **Safe to skip**: only when the change has confirmed zero behavioral effect — a rename with no logic change, a file move, a comment fix, pure formatting. These must be observable facts already confirmed from the code, not impressions formed before reading it.
-
-**Knowing where to change is not the same as knowing how.** Prior investigation, planning, or root-cause analysis grounds the decision — it does not substitute for this judgment.
 
 **Prerequisites**: This skill requires code evidence and clarified intent. If code evidence is missing, build that understanding first. If intent is unclear, clarify it first. Both are sequencing dependencies — work to complete before this skill, not reasons to skip it.
 
@@ -100,7 +98,8 @@ Stop and revise when:
 - you are adding parameters or conditionals to an existing abstraction instead of questioning whether the abstraction is still right
 - you are introducing an abstraction without a second concrete caller that demonstrates the need
 - you are implementing accepted review feedback by copying the reviewer's suggestion literally without applying structural judgment to how it should land
-- you are making assumptions about requirements rather than surfacing ambiguity
+- you are treating unconfirmed scope or acceptance criteria as settled — if the user did not state it, it requires confirmation before implementing, not inference from the request wording
+- you are skipping this skill because codebase investigation or root-cause analysis is complete — prior investigation confirms where to change, not whether the implementation is structurally sound
 - you are making changes to adjacent code not required by the task rather than noting them for later
 - you are using an external API, function signature, or library behavior from memory without verifying against actual source or documentation
 - you have worked through multiple judgment dimensions on a small change without reaching a clear decision — stop analysis, pick the simpler option, and write the code
