@@ -26,17 +26,17 @@ This skill owns:
 - recognizing and counteracting cognitive biases during research
 
 This skill does not own:
-- deciding whether gathered information is sufficient for a final decision — that belongs to the skill or workflow consuming the research
-- product or requirement decisions
-- investigating the local codebase (that requires codebase understanding, not external research)
+- making the final product, architecture, or implementation decision from the research
+- defining new product requirements or priorities
+- investigating behavior that can be answered from the local codebase alone
 
 ## Invariants
 
 - Never issue a search with the original vague question — decompose into specific sub-questions first, each targeting a verifiable hypothesis.
 - Cross-validate every load-bearing claim across independent sources before treating it as established. Sources that all trace back to the same original count as one, not many.
 - Trace every secondary-source claim to its primary source when the conclusion depends on it.
-- Absence of evidence is not evidence of absence — distinguish "I found evidence X is true" from "I found no evidence X is false."
-- Use web search tools actively — internal knowledge cannot substitute for external verification of APIs, versions, configurations, or anything that changes over time.
+- If you cannot verify a claim externally, mark it as `unverified` or `unknown`; do not restate it as fact.
+- For any version-sensitive, time-sensitive, or behavior-sensitive claim, inspect at least one external authoritative source before concluding.
 
 ## Decision Signals
 
@@ -44,11 +44,11 @@ This skill does not own:
 
 **Cross-validation is sufficient when** the main conclusion is supported by at least two independent sources, with at least one at the authoritative or established-community tier. If only secondary sources exist, state that explicitly and lower confidence accordingly.
 
-**When sources conflict:** investigate rather than pick a side. Check which is more recent, more authoritative, more specific to your exact context. If the conflict cannot be resolved, report both positions with their evidence.
+**When sources conflict:** compare recency, authority, and specificity to the exact version, environment, or scope in question. If the conflict remains unresolved, report the conflict explicitly and do not collapse it into a single answer.
 
-**Open-ended vs. specific questions:** "What solutions exist for X?" produces a landscape — major options with documented trade-offs. "Does library X support Y?" produces a binary — confirmed or definitively absent from authoritative sources. Judge completeness differently for each.
+**Open-ended vs. specific questions:** for "What solutions exist for X?", completeness means the serious options are named and each has at least one sourced tradeoff or limitation. For "Does library X support Y?", completeness means the answer is stated as `yes`, `no`, or `unknown`, with the best available source attached.
 
-**Switch from research to prototyping when:** the question is "does this work in practice?" and documentation conflicts; you have two plausible approaches with unclear tradeoffs; or you have been researching an implementation question for 30+ minutes. A 10–30 minute proof-of-concept answers implementation questions faster than more searching. Stay in research for design direction, architecture, tradeoff evaluation, and high-risk domains (security, data integrity, compliance).
+**Switch from research to prototyping when:** the question is "does this work in practice?" and documentation conflicts; two implementation approaches remain plausible after source review; or an implementation question has consumed 30+ minutes of research without resolving the main uncertainty. Stay in research for design direction, architecture, tradeoff evaluation, and high-risk domains (security, data integrity, compliance).
 
 For deeper methodology on each of these signals, see `references/epistemic-foundations.md`.
 
@@ -58,9 +58,9 @@ Stop and revise when:
 - you searched with the original vague question instead of decomposing first
 - a search had no declared hypothesis to test — you were exploring, not verifying
 - you accepted a secondary source's load-bearing claim without tracing it to a primary source
-- you found only confirming evidence and did not actively seek disconfirmation or alternatives
+- no lookup or source check attempted to falsify the leading hypothesis or compare a live alternative
 - multiple sources agree but all trace to the same original — you have one piece of evidence, not many
-- your conclusion's confidence level does not match the quality and independence of its evidence
+- a load-bearing conclusion has no explicit confidence level, source basis, or `unknown` marker
 - you kept searching after all sub-questions had evidence-backed answers — over-research wastes context
 - you are presenting internal knowledge as researched fact without external verification
 - you accepted an AI-generated code snippet or API example without testing or verifying against official documentation
@@ -70,8 +70,9 @@ Stop and revise when:
 
 - [ ] The question was decomposed before searching, with a hypothesis or specific purpose per lookup.
 - [ ] Load-bearing claims were cross-validated across independent sources.
-- [ ] Disconfirming evidence was actively sought.
-- [ ] Each conclusion's confidence matches the quality and independence of its supporting evidence.
+- [ ] At least one lookup or source check attempted to falsify the leading hypothesis or compare a serious alternative.
+- [ ] Each load-bearing conclusion is labeled with confidence and supported by a source basis, or is explicitly marked `unknown`/`unverified`.
+- [ ] Open-ended questions name the serious options and their sourced tradeoffs; specific questions end in `yes`, `no`, or `unknown`.
 - [ ] AI-generated content was treated as secondary — verified against official sources when load-bearing.
 
 **If any criterion is not met, return to the relevant section before exiting.**
