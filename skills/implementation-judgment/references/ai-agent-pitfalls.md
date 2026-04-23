@@ -26,6 +26,21 @@ When splitting or moving functions across modules, losing track of what state wa
 
 When a fix, restoration, or simplification makes a currently reachable code path unreachable — a version-specific branch, a fallback mechanism, a native runtime path — the capability loss is not visible in the diff. Before implementing any change that eliminates a working path, explicitly identify what capability is being removed and surface it to the user before writing code.
 
+## Completion-Faking Through Verification Manipulation
+
+When the verification mechanism (tests, type checks, linters) fails, the path of least resistance is modifying the verification rather than the behavior. This produces a diff where everything passes but the underlying problem is unchanged or worsened.
+
+Specific forms:
+- Updating test snapshots without verifying the new snapshot reflects correct behavior
+- Deleting or commenting out failing assertions rather than fixing the failure
+- Changing assertion values to match the current (incorrect) output
+- Adding `// @ts-ignore` or type casts to silence type errors without understanding why they occur
+- Narrowing the test scope so the failing case is no longer tested
+
+The signal: verification passes, but the passing was caused by changing the verification, not the code under test. This is the implementation equivalent of reward hacking — optimizing for the score rather than the goal. Tests that pass after this are not evidence the implementation is correct; they are evidence the verification was weakened.
+
+When a test fails, the first question is not "how do I make this test pass?" but "what is the test telling me about the code?"
+
 ## Implementing Toward an Unverified Goal
 
 A reviewer's statement that "the goal hasn't been achieved" contains two claims: that the current code doesn't do X, and that X is the correct goal. The first is verifiable from code. The second must trace to the user's confirmed intent. If X was never explicitly confirmed by the user, implementing further toward it deepens the wrong objective.

@@ -11,7 +11,7 @@ Implement changes with engineering judgment, not just task completion.
 
 **Invocation default**: The trigger state is: any behavior-affecting code is about to be written. This applies to bug fixes, new features, review responses, and small patches equally — the structural questions this skill addresses (wrong layer, wrong responsibility owner, silently broken contract) are not proportional to change size. Do not gate this skill on perceived complexity. The cost of a missed invocation is a patch that weakens structure, introduces a subtle failure mode, or locks in a wrong abstraction — often invisibly.
 
-**Safe to skip**: only when the change has confirmed zero behavioral effect — a rename with no logic change, a file move, a comment fix, pure formatting. These must be observable facts already confirmed from the code, not impressions formed before reading it.
+**Safe to skip**: only when the change has confirmed zero behavioral effect — a rename with no logic change, a file move, a comment fix, pure formatting. These must be observable facts already confirmed from the code, not impressions formed before reading it [because "this looks like a simple rename" is an impression, not evidence — skipping based on impressions converts unknown structural concerns into invisible debt].
 
 **Prerequisites**: This skill requires code evidence and clarified intent. If code evidence is missing, build that understanding first. If intent is unclear, clarify it first. Both are sequencing dependencies — work to complete before this skill, not reasons to skip it.
 
@@ -71,13 +71,26 @@ This skill does not own:
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
+## Verification Approach
+
+This skill is artifact-type: completion is verified by self-checking the produced diff against the Completion Criteria checklist above. No separate user confirmation is required as a completion step — but the diff must be the evidence, not the agent's assessment of the diff.
+
 ## Anti-Rationalization Check
+
+This section exists because a tidy-looking diff and a structurally sound implementation are not the same thing — and the agent cannot reliably distinguish them from the inside.
 
 Pause before exiting.
 
 Did I add anything justified only by "this supports testability," "this could be useful," or "this is clean design" — without a concrete caller or usage evidence in the existing code?
 
 Am I exiting because the implementation is genuinely sound, or because the patch looks tidy enough?
+
+Completion-faking signals specific to implementation — stop if any apply:
+- Tests were modified to make the change pass rather than because the behavioral contract changed — passing tests are not evidence of correctness if the tests were adjusted to fit the implementation
+- An abstraction was introduced where no second concrete caller exists in the codebase at the time of writing
+- Behavior changed under an existing function name without surfacing that the implicit contract changed
+- A parameter or conditional was added to an existing abstraction instead of questioning whether the abstraction is still the right boundary
+- The diff is scoped to what was asked without checking whether the ask itself points to the wrong layer
 
 ## Scope Decision
 
