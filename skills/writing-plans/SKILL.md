@@ -17,8 +17,8 @@ Use this skill when:
 - the work is a refactor, migration, or architecture change where mapping what touches what matters before moving anything
 
 Do not use this skill when:
-- executing an already-agreed plan where scope, targets, and sequencing are settled
-- still in open-ended exploration, root-cause investigation, or brainstorming with no settled implementation target
+- executing an already-agreed plan where scope, targets, and sequencing are settled [because writing a second plan when one already governs execution creates ambiguity about which document is authoritative]
+- still in open-ended exploration, root-cause investigation, or brainstorming with no settled implementation target [because planning without a confirmed target produces a structurally complete document for the wrong problem]
 
 If prerequisite understanding is still missing — codebase evidence thin, or intent unclear — build that first.
 
@@ -40,7 +40,7 @@ Does define the plan document structure; execution log maintenance rules live in
 NO PLAN WITHOUT SITUATION ASSESSMENT FIRST
 ```
 
-You cannot start writing until you can state: *"This is a [size] [nature] task. The relevant code is [X]. The constraint is [Y]. Done means: [exact verification command → expected output]."*
+You cannot start writing until you can state: *"This is a [size] [nature] task. The relevant code is [X]. The constraint is [Y]. Done means: [exact verification command → expected output]."* [A plan written before reaching this state looks structurally complete while targeting the wrong files or solving the wrong scope — the structure becomes false confidence, not real guidance.]
 
 If you can't name the files involved or state how to verify completion, you haven't assessed enough.
 
@@ -68,13 +68,25 @@ If you can't name the files involved or state how to verify completion, you have
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
+## Verification Approach
+
+This skill is artifact-type: completion is verified by self-checking the plan document against the Completion Criteria checklist above. No separate user confirmation is required as a completion step — the Human Review Section embedded in the plan document is the mechanism for user approval of scope and direction.
+
 ## Anti-Rationalization Check
+
+This section exists because model introspection is unreliable when the work looks finished — a plan that satisfies all checklist items can still be a document that fails at execution time.
 
 Pause before exiting. Do not treat this section as another checklist to clear.
 
 Did I ignore failure signals (over-planning, under-planning, horizontal slicing) because the plan already looks orderly?
 
 Am I exiting because the plan is genuinely complete, or because the outline now looks structured enough?
+
+Completion-faking signals specific to plan writing — stop if any apply:
+- Task why-sentences restate the task name rather than explain why the task exists at this point in the sequence
+- Verification steps are written as prose ("run the tests") rather than executable commands with expected output — prose is not a verification step
+- Reading the first task requires the planning conversation for context — the plan is not self-contained
+- The Human Review Section would require domain knowledge to understand — it has not passed the product-manager readability test
 
 ---
 
@@ -110,15 +122,15 @@ Regardless of size, a usable plan is concrete:
 - Writing TDD ceremony for a one-function change
 - Plan document heavier than the work itself
 - Running a review loop on a tiny/small task
-- Planning tasks 6+ in full detail when tasks 1-3 haven't been done yet
+- Planning tasks 6+ in full detail when tasks 1-3 haven't been done yet [because early tasks will change the shape of later tasks — detailed planning beyond the next 2-3 tasks is planning for a future that does not exist yet]
 - Specifying implementation details (library choice, algorithm, code structure) rather than the behavioral contract
 
 **Under-planning** — stop if:
 - Starting medium/large work without a file map
-- Verification written as prose ("run the tests") rather than executable command with expected output
+- Verification written as prose ("run the tests") rather than executable command with expected output [because prose verification cannot be mechanically confirmed — "done" becomes unverifiable and the plan cannot serve as a cold-start execution document]
 - Planning a bug fix without knowing the root cause
 - No dependency analysis for work crossing multiple modules
-- No contingency for the riskiest assumption in a medium/large plan
+- No contingency for the riskiest assumption in a medium/large plan [because the riskiest assumption is where the plan is most likely to break — skipping it produces a plan that is only correct if everything goes right]
 - No plan revision triggers — plan assumes everything goes as expected
 - Tasks reference context from the planning conversation rather than stating it directly in the document
 - No explicit exclusions for medium/large work where an agent could plausibly extend scope

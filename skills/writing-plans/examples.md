@@ -344,6 +344,37 @@ Files: Modify `cli/plugins.py`, `config.yaml`
 
 ---
 
+## Anti-Pattern: Completion-Faking (What NOT to do)
+
+A plan can satisfy every checklist item while still failing at execution time. This example shows a plan that looks structurally complete but cannot be executed by a fresh agent.
+
+### Task 1: Set up the notifier
+*This is to set up the notifier component.*
+
+Files: `notifications/webhook.py`
+
+- [ ] Create the notifier
+- [ ] Write tests
+- [ ] Run the tests
+
+### Task 2: Configure it
+*This is to configure the webhook.*
+
+Files: `config.yaml`, `notifications/webhook.py`
+
+- [ ] Add config support
+- [ ] Test config behavior
+
+**Why this is bad:**
+
+- **Task why-sentences restate the task name.** "This is to set up the notifier component" says nothing about why this task exists at this point in the sequence, why it comes before Task 2, or what risk it resolves. Compare to the correct form: "Proves the approach works end-to-end before investing in config and retry logic."
+- **Verification steps are prose, not executable commands.** "Run the tests" cannot be confirmed by a fresh agent — which test file? What command? What passing output looks like? A plan with prose verification cannot serve as a cold-start execution document.
+- **Task 1 requires reading the planning conversation to know what "the notifier" is.** A fresh agent reading Task 1 in isolation cannot identify which file to create, what interface it should have, or what the test should assert. The plan transferred the agent's context but not the knowledge.
+
+All checklist items in SKILL.md's Completion Criteria can be satisfied by this plan — there are sections, there are tasks with opening sentences, there are verification steps. The structure is present; the substance is not. This is what proxy metric failure looks like in plan writing.
+
+---
+
 ## Anti-Pattern: Horizontal Slicing (What NOT to do)
 
 Here is the same webhook example from Medium, planned badly with horizontal slicing:
