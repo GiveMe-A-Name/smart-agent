@@ -20,7 +20,7 @@ Multiple reviewers flag the same issue, sometimes with different proposed fixes.
 
 ## Volume Management: Full Triage Protocol
 
-When a PR has 20+ comments from multiple reviewers, linear processing is a failure mode. Triage first.
+When a PR has 20+ comments from multiple reviewers, linear processing is a failure mode — and a completion-faking risk. A response to every comment creates the appearance of complete handling, but if high-severity items were processed in order rather than by priority, design-level concerns were evaluated after implementation-level fixes they might have invalidated. Triage first.
 
 **Prioritization order:**
 1. **Blocking / critical** — bugs, security, correctness. These must be fixed regardless. Start here.

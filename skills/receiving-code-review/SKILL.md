@@ -16,8 +16,8 @@ Every reviewer comment contains three separable claims: an **observation** (what
 Use when review feedback exists and the task is deciding what to do with it before touching code. The source does not matter — user-pasted comments, PR threads, screenshots, inline annotations, or structured output from a reviewer sub-agent all qualify.
 
 Do not use when:
-- no review feedback exists yet — the task is to write code, not evaluate feedback
-- feedback has already been fully evaluated and accepted, and the only remaining step is mechanical implementation with no judgment remaining
+- no review feedback exists yet — the task is to write code, not evaluate feedback [because evaluating feedback that doesn't exist collapses into design speculation, which belongs to a different task]
+- feedback has already been fully evaluated and accepted, and the only remaining step is mechanical implementation with no judgment remaining [because if evaluation is done and nothing remains except applying the decision, this skill has already completed — re-invoking it adds overhead to an already-resolved question]
 
 ## Capability Boundary
 
@@ -31,13 +31,13 @@ It does NOT:
 
 ## Invariants
 
-**Verify before implementing.** Never implement a suggestion without first checking it is technically sound for this codebase and aligned with the design intent.
+**Verify before implementing.** Never implement a suggestion without first checking it is technically sound for this codebase and aligned with the design intent. [Because a reviewer sees the diff only — you hold the constraints, prior decisions, and tradeoffs that shaped the approach. Their characterization of what the code should do may be wrong even when their observation about what the code currently does is correct. Implementing before verifying conflates two independent claims.]
 
-**You hold authoritative context.** When you implemented the code being reviewed, you carry the implementation intent. Never accept a reviewer's characterization of what the code should achieve, or what goal it was built toward, without tracing it against the intent you understood when making the change. The reviewer may be right about a bug while wrong about the goal.
+**You hold authoritative context.** When you implemented the code being reviewed, you carry the implementation intent. Never accept a reviewer's characterization of what the code should achieve, or what goal it was built toward, without tracing it against the intent you understood when making the change. The reviewer may be right about a bug while wrong about the goal. [Because the reviewer's view is bounded by the diff. Your implementation intent is primary evidence — the reviewer's framing is secondary. Letting secondary evidence overwrite primary without explicit comparison is how correct implementations get undone by well-meaning but incomplete feedback.]
 
-**No performative agreement.** Never say "You're absolutely right!", "Great point!", "Thanks for catching that!", or any expression of gratitude. Actions speak — fix it and show the change.
+**No performative agreement.** Never say "You're absolutely right!", "Great point!", "Thanks for catching that!", or any expression of gratitude. Actions speak — fix it and show the change. [Because agreement-signaling without evaluation is noise that masks whether the feedback was actually assessed. If the reviewer is right, show the fix. If they are wrong, state why. Anything in between obscures the actual judgment.]
 
-**Clarify all before implementing any.** If any item in multi-item feedback is unclear, stop and ask before touching anything. Items may be related; partial understanding leads to wrong implementation.
+**Clarify all before implementing any.** If any item in multi-item feedback is unclear, stop and ask before touching anything. Items may be related; partial understanding leads to wrong implementation. [Because in multi-item feedback, a design-level clarification in item 1 may invalidate the implementation-level items below it. Implementing item 3 before understanding item 1 creates churn — you fix item 3 and then discover item 1 requires rewriting it.]
 
 
 ## Completion Criteria
@@ -51,17 +51,33 @@ It does NOT:
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
+## Verification Approach
+
+This skill is artifact-type: the output is a set of decisions (Accept / Push back / Clarify) with technical reasoning per feedback item. Completion is verified by self-checking the decisions against the Completion Criteria checklist. The evidence is the per-item decision and reasoning — not the agent's impression that the feedback was carefully considered.
+
+A response that addresses every comment is not necessarily complete. The underlying test: for each item, can the decision be traced to code evidence and implementation intent — not just to the reviewer's framing?
+
 ## Anti-Rationalization Check
 
 Pause before exiting.
 
 Do not treat this section as another checklist to clear. Use it to challenge whether the feedback was genuinely evaluated.
 
+This check exists because responses that look evaluated are not the same as responses that are evaluated. A decision of "Accept" can be written for any comment — it does not prove the code was read, the premise was checked, or the implementation intent was traced. This section externalizes that checkpoint.
+
 Did I ignore any failure signals because a convenient resolution path already existed?
 
 Am I exiting because feedback is genuinely evaluated and addressed, or because the current responses look coherent enough?
 
 Did I accept any reviewer's framing of what the code should do without verifying it against my own implementation intent?
+
+Completion-faking signals specific to receiving code review — stop if any apply:
+
+- A comment was marked "Accept" without opening the referenced code and tracing the reviewer's premise to the implementation intent — the acceptance is performative, not verified
+- A pushback was written using "I prefer it this way" without technical evidence — this is a preference dressed as a reasoned position, which is both ineffective and inaccurate
+- The reviewer named what the goal should be, and that framing was accepted without tracing it to the implementation intent — the reviewer may have named the goal wrong, or named a goal that was explicitly rejected during design
+- Multiple reviewers converged on the same issue, and convergence was treated as proof — convergence shifts the prior but does not replace the verification requirement; multiple reviewers can share the same blind spot
+- Every comment has a response, so the review looks complete — but items were not triaged by severity first, meaning high-severity design concerns may have been processed after low-severity style fixes they might have invalidated
 
 ## Decision Signals
 

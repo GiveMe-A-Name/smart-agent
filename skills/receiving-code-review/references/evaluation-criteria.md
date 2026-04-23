@@ -27,6 +27,8 @@ Before any judgment:
 
 Judge against code evidence, not the comment's framing.
 
+**Common failure mode**: skipping the code read and grep when the reviewer's framing sounds plausible. A plausible framing is not evidence. "This should be extracted for testability" sounds reasonable — but if nothing currently calls the suggested abstraction, "testability" is a hypothetical benefit with real churn cost. Every usage claim needs to be grounded in the actual codebase before accepting.
+
 ## 4. Scope Classification
 
 | Scope | Threshold | Action |
