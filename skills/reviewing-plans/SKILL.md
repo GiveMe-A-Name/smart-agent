@@ -16,8 +16,8 @@ Use when:
 - another agent has produced a plan that needs independent verification
 
 Do not use when:
-- no plan document exists yet
-- the task is to respond to plan review feedback that already exists
+- no plan document exists yet [because reviewing a plan that doesn't exist converts the review into plan-writing, which is a different skill]
+- the task is to respond to plan review feedback that already exists [because responding to review feedback is implementation work — conflating it with reviewing produces an advocate for the implementation rather than an independent evaluator]
 
 ## Capability Boundary
 
@@ -30,15 +30,15 @@ It does NOT:
 
 ## Invariants
 
-**Read context before reviewing.** A plan review without reading CLAUDE.md, architecture docs, and any files the plan references is a false review. Every Layer 0 finding requires a named source: the specific constraint the plan violates, with a file:line citation.
+**Read context before reviewing.** A plan review without reading CLAUDE.md, architecture docs, and any files the plan references is a false review. Every Layer 0 finding requires a named source: the specific constraint the plan violates, with a file:line citation. [Because Layer 0 violations are the highest-value finding class — and they are invisible without reading the repo constraints the plan should align with.]
 
-**Upper-layer problems outweigh lower-layer problems.** A plan that violates repo constraints does not become acceptable because its tasks are well-sequenced. Work top-down — if a Layer 0 problem is severe enough to block implementation, surface it immediately rather than cataloging Layer 3 issues in a plan that may need to be rewritten.
+**Upper-layer problems outweigh lower-layer problems.** A plan that violates repo constraints does not become acceptable because its tasks are well-sequenced. Work top-down — if a Layer 0 problem is severe enough to block implementation, surface it immediately rather than cataloging Layer 3 issues in a plan that may need to be rewritten. [Because detailed executability polish on a misaligned plan sends implementers confidently in the wrong direction.]
 
-**Every issue needs: plan location, what is wrong, why it matters.** Findings like "the plan should verify this" or "this could cause problems" are not actionable. Name the specific section or line, the specific problem, and the specific consequence.
+**Every issue needs: plan location, what is wrong, why it matters.** Findings like "the plan should verify this" or "this could cause problems" are not actionable. Name the specific section or line, the specific problem, and the specific consequence. [Because an implementer cannot evaluate whether to accept a fix — or how urgent it is — without knowing where the issue is and what specifically breaks if it isn't addressed.]
 
-**Severity must reflect actual implementation risk.** Critical means the plan would implement the wrong thing, violate a documented constraint, or have a fundamental flaw that invalidates the approach — not style, not missing detail. Inflating severity makes all feedback untrustworthy.
+**Severity must reflect actual implementation risk.** Critical means the plan would implement the wrong thing, violate a documented constraint, or have a fundamental flaw that invalidates the approach — not style, not missing detail. Inflating severity makes all feedback untrustworthy. [Because when everything is Critical, implementers start discounting all findings — the signal is destroyed by the noise.]
 
-**Give a clear verdict.** Every review ends with: Approved / Approved with fixes / Blocked. An ambiguous conclusion defers the decision to the plan author, which is the reviewer's job.
+**Give a clear verdict.** Every review ends with: Approved / Approved with fixes / Blocked. An ambiguous conclusion defers the decision to the plan author, which is the reviewer's job. [Because listing considerations without a verdict shifts the decision to the person least able to evaluate the findings independently — the author who wrote the plan.]
 
 ## The Layered Review Model
 
@@ -91,6 +91,12 @@ Work from the most consequential question down.
 
 **Revision trigger check:** Does the plan state conditions under which the approach should be revisited? (e.g., "if Task 2 reveals X, redesign the query path"). For medium/large plans, absence of revision triggers is an Important finding — the plan assumes perfect foresight.
 
+## Verification Approach
+
+This skill is artifact-type: the review document is the artifact. Completion is verified by self-checking the produced review against the Completion Criteria checklist. The evidence is the review document itself — not the agent's assessment of whether the review feels thorough.
+
+A review that satisfies the checklist structurally is not necessarily complete. The checklist items are proxies. The underlying test: could an implementer read this review and know exactly what to fix, where to fix it, and whether the plan is safe to execute?
+
 ## Output Format
 
 See `templates/review-output.md` for the full output structure.
@@ -111,14 +117,14 @@ See `templates/review-output.md` for the full output structure.
 
 Stop and reassess if:
 
-- you are writing findings without having read CLAUDE.md and architecture docs — repo constraint violations are the highest-value finding and cannot be detected without this context
+- you are writing findings without having read CLAUDE.md and architecture docs [because Layer 0 violations are the highest-value class of finding and cannot be detected without reading the constraints the plan should align with — a review without this context is a false review]
 - every finding is Layer 3 (executability detail) and you found nothing at Layers 0–2 — either the plan is genuinely sound at the higher layers, or you didn't check intent, decision traceability, or cliff-edge risks
 - a Critical finding lacks a named source (specific file:line in repo docs) — a Critical finding without evidence is speculation
 - all findings are labeled Critical — severity inflation makes all feedback untrustworthy
 - findings are described as "could cause issues" or "may be a problem" without naming the specific consequence — vague risk statements are not actionable
 - the review ends without a verdict — an open-ended summary is not a review
 - you are reviewing plan structure and style while ignoring whether the plan would build the right thing
-- the plan has no intent statement and you did not flag its absence — a plan that only states "what" without "why" cannot be evaluated for alignment with actual need
+- the plan has no intent statement and you did not flag its absence [because a plan that only states "what" without "why" cannot be evaluated for alignment with actual need — and silently accepting the absence makes the review an evaluation of internal consistency on a plan that may be solving the wrong problem]
 
 ## Completion Criteria
 
@@ -139,6 +145,16 @@ Pause before exiting.
 
 Do not treat this section as another checklist to clear. Use it to challenge whether the apparent completeness of the review is real.
 
+This check exists because a review that looks thorough is not the same as a review that is thorough. The agent cannot reliably distinguish them from the inside — a complete findings list feels the same as a hollow one. This section externalizes that checkpoint.
+
 Did I mistake reading the plan document for sufficient context — without reading the repo constraints it should align with?
 
 Am I exiting because the review is genuinely complete, or because the findings list now looks thorough enough?
+
+Completion-faking signals specific to plan review — stop if any apply:
+
+- All findings are Layer 3 (executability) and nothing surfaced at Layers 0–1, not because the plan is genuinely sound at those layers, but because checking Layer 0 requires reading repo docs and that work was skipped
+- A Critical finding is present but labeled Important or Minor to appear balanced — severity was softened to avoid delivering a harsh conclusion
+- Findings use hedged language ("could cause issues", "may be a problem") without naming the specific consequence — they look like findings but cannot be acted on
+- The verdict is "Approved with fixes" when a Critical finding is present — a Critical finding means the approach or a documented constraint is violated, which qualifies as Blocked
+- The plan has no intent statement and it wasn't flagged — the review evaluated internal consistency on a plan that may be solving the wrong problem
