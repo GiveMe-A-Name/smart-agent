@@ -32,11 +32,11 @@ This skill does not own:
 
 ## Invariants
 
-- Never issue a search with the original vague question — decompose into specific sub-questions first, each targeting a verifiable hypothesis.
-- Cross-validate every load-bearing claim across independent sources before treating it as established. Sources that all trace back to the same original count as one, not many.
-- Trace every secondary-source claim to its primary source when the conclusion depends on it.
-- If you cannot verify a claim externally, mark it as `unverified` or `unknown`; do not restate it as fact.
-- For any version-sensitive, time-sensitive, or behavior-sensitive claim, inspect at least one external authoritative source before concluding.
+- Never issue a search with the original vague question — decompose into specific sub-questions first, each targeting a verifiable hypothesis. [Because vague queries produce vague results, and the first result anchors all subsequent searches into a confirmation bias spiral. Specific queries test specific hypotheses and produce falsifiable answers.]
+- Cross-validate every load-bearing claim across independent sources before treating it as established. Sources that all trace back to the same original count as one, not many. [Because echo chambers are indistinguishable from consensus without checking independence. Ten sources citing the same blog post are one piece of evidence — not ten.]
+- Trace every secondary-source claim to its primary source when the conclusion depends on it. [Because claims degrade through retelling — secondary sources drop caveats, version specifics, and contrary evidence the primary source contained. Tracing the chain also reveals when no primary source exists at all.]
+- If you cannot verify a claim externally, mark it as `unverified` or `unknown`; do not restate it as fact. [Because confidence must be calibrated to evidence quality. Presenting unverified claims as established facts misleads every downstream decision that depends on this research.]
+- For any version-sensitive, time-sensitive, or behavior-sensitive claim, inspect at least one external authoritative source before concluding. [Because correct information from version X applied to version Y is a research failure. Confidently stated stale information is more dangerous than acknowledged uncertainty.]
 
 ## Decision Signals
 
@@ -77,15 +77,31 @@ Stop and revise when:
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
+## Verification Approach
+
+This skill is evidence-accumulation-type: completion means every Completion Criteria item can be answered by pointing to specific sources with provenance — not from synthesis or memory, but from citable evidence. The verification is not "I believe the research is thorough" but "I can point to the primary or established-community source for each load-bearing claim."
+
+Research that looks complete is not the same as research that is complete. A findings document can have correct structure, confidence labels, and source citations while resting on a single secondary source or internal knowledge presented as external evidence. The checkable evidence is the source list itself — not the confidence level assigned.
+
 ## Anti-Rationalization Check
 
 Pause before exiting.
 
 Do not treat this section as another checklist to clear. Use it to challenge whether the question is genuinely answered.
 
+This check exists because research that feels thorough is not the same as research that is thorough. A synthesis can sound authoritative and well-organized while resting on unverified assumptions — the fluency of the output is not evidence of the quality of the evidence behind it.
+
 Am I treating a plausible synthesis as if it were well-supported evidence?
 
 Am I stopping because the question is genuinely answered, or because the current evidence looks sufficient enough to move on?
+
+Completion-faking signals specific to systematic research — stop if any apply:
+
+- A conclusion sounds authoritative and sourced, but all supporting sources were secondary tier — no authoritative source (official documentation, spec, RFC, library source) was actually consulted
+- Internal knowledge was used to fill a gap in external evidence, then presented as if that gap was addressed by research
+- Multiple sources agreed, and that convergence was counted as cross-validation — but all those sources cited the same original post, documentation page, or blog entry
+- Research stopped when the answer felt plausible rather than when all load-bearing claims were cross-validated against independent sources
+- AI-generated content on the topic was treated as corroborating evidence rather than as a secondary signal pointing toward authoritative sources that need to be read directly
 
 ---
 

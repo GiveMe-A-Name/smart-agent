@@ -12,6 +12,8 @@ Recurring research scenarios in software engineering. Each has a distinct comple
 
 **Common pitfall:** Evaluating libraries by their README quality or GitHub stars. Stars measure popularity, not quality. README quality measures marketing, not reliability.
 
+**Completion-faking signal:** Comparing libraries using only their marketing pages or top search results. Research looks complete when all options have a summary — but the summaries came from sources that all optimize for positive framing. The check: does each option have at least one sourced limitation or known failure mode?
+
 ---
 
 ## "How do I implement X with library Y?"
@@ -22,6 +24,8 @@ Recurring research scenarios in software engineering. Each has a distinct comple
 
 **Common pitfall:** Following a blog tutorial written for version 2.x when you're on version 4.x. Always check the publication date and target version of any tutorial or guide.
 
+**Completion-faking signal:** An AI-generated or blog-post code example was found, looks correct, and research stopped. The example may reference a nonexistent API or outdated behavior. The check: was the key API call or behavior verified against official documentation or library source for the specific version in use?
+
 ---
 
 ## "What's the best practice for X?"
@@ -31,3 +35,5 @@ Recurring research scenarios in software engineering. Each has a distinct comple
 **Completeness standard:** At least two independent sources that agree, with at least one explaining the reasoning behind the practice (not just stating it). If the "best practice" involves a tradeoff, both sides of the tradeoff should be represented.
 
 **Common pitfall:** Treating a practice as universal when it's context-dependent. "Always use an ORM" is not a best practice — it's a recommendation for certain contexts with specific tradeoffs.
+
+**Completion-faking signal:** Multiple sources agree on the practice, convergence was counted as validation — but all sources are secondary (blog posts, tutorials, forums) and none explain the reasoning or tradeoffs. The check: is there at least one source that names what the practice costs, not just what it provides?

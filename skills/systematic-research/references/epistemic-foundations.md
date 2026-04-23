@@ -81,6 +81,7 @@ Common biases that degrade research quality:
 - **Survivorship bias**: only seeing the successes (working solutions posted online) while missing the failures, edge cases, and caveats that didn't get documented.
 - **Premature closure**: stopping research when you find the first plausible answer rather than verifying it and checking alternatives.
 - **Conservatism**: insufficiently updating your belief when new evidence contradicts your initial position.
+- **Completeness theater**: the appearance of thorough research — multiple lookups performed, sources cited, confidence labels attached — without the actual cross-validation those signals imply. A findings document that looks well-sourced is more persuasive than one acknowledged as partial, which is precisely why this failure mode is dangerous. The check: can you point to the primary source for each load-bearing claim? If not, the confidence label is borrowed from the structure of the output, not earned by the evidence behind it.
 
 When your research feels suspiciously smooth — everything confirming, no contradictions, no surprises — pause and consider whether you are genuinely finding truth or falling into a trap.
 
