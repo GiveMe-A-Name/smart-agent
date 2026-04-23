@@ -123,18 +123,6 @@ If you find yourself in any of these states while trying to write a test, stop w
 
 ---
 
-## Completion Signals
-
-Work is complete when:
-- Every behavior added has a test that was watched fail before the code existed
-- All tests pass
-- Test output introduced by this change is clean
-- Tests verify real observable behavior, not mock behavior or implementation details
-
-If you cannot explain why each test was red before the implementation, TDD was not followed.
-
----
-
 ## When Stuck on RED
 
 | Problem | Resolution |
