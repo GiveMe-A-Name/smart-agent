@@ -1,6 +1,6 @@
 # Task-Driven Investigation Strategies
 
-Different tasks have different optimal starting points. Choose the strategy that matches the task.
+Different tasks have different optimal starting points. Choose the strategy that matches the task. The steps below are common starting sequences — not fixed procedures. Each step should be driven by what the previous lookup revealed, not executed mechanically in order. Skip steps that are not relevant; add steps when evidence demands it.
 
 ## Fixing a Bug
 
