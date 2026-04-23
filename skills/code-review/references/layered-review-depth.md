@@ -19,6 +19,8 @@ Then ask:
 
 **If the change should not exist**, stop here. Surface the concern with a constructive alternative. Reviewing implementation details of a change that shouldn't land wastes everyone's time.
 
+**Common failure mode — skipping Layer 0 because the PR description makes the purpose clear.** Reading the description tells you what the author intended. It does not tell you whether the code achieves it, or whether the goal itself is worth achieving now. Layer 0 requires active judgment on the *change*, not passive acceptance of the stated purpose. A reviewer who skips Layer 0 can produce a thorough Layer 2-3 review of a change that should have been rejected at the first question.
+
 ---
 
 ## Layer 1: Design and Approach — "Is this the right solution?"

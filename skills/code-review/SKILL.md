@@ -16,8 +16,8 @@ Use when:
 - the task is to decide whether the change is ready to merge, not ready, or acceptable only with fixes
 
 Do not use when:
-- the task is to judge or respond to already-existing review comments rather than evaluate the changed code itself
-- no diff or changed code exists to evaluate yet
+- the task is to judge or respond to already-existing review comments rather than evaluate the changed code itself [because when the task has shifted to a comment exchange, the target is the discussion — reviewing the wrong target produces arguments rather than code inspection]
+- no diff or changed code exists to evaluate yet [because reviewing code that doesn't exist collapses into speculation or design work, which belongs to different skills]
 
 ## Capability Boundary
 
@@ -30,19 +30,25 @@ It does NOT:
 
 ## Invariants
 
-**Upper-layer problems outweigh lower-layer problems.** Before recording Layer 2-3 findings, decide whether Layer 0 or Layer 1 contains a merge-blocking issue. If it does, surface that issue before lower-layer findings.
+**Upper-layer problems outweigh lower-layer problems.** Before recording Layer 2-3 findings, decide whether Layer 0 or Layer 1 contains a merge-blocking issue. If it does, surface that issue before lower-layer findings. [Because Layer 3 polish on a change that shouldn't exist is wasted review effort — and it signals approval of the direction.]
 
-**Read context, not just diff hunks.** For every function, method, query, or module cited in findings or verdict reasoning, open the surrounding implementation. If the change modifies a public interface, signature, schema, or call pattern, inspect at least one caller or consumer.
+**Read context, not just diff hunks.** For every function, method, query, or module cited in findings or verdict reasoning, open the surrounding implementation. If the change modifies a public interface, signature, schema, or call pattern, inspect at least one caller or consumer. [Because a diff only shows what changed — not what the change means to the surrounding system. A function that looks unchanged in the diff may have had its behavioral contract broken by the change next to it.]
 
-**Only give feedback on code you actually read.** Do not claim coverage over code you did not open. If some changed files were not reviewed, state that review limit explicitly.
+**Only give feedback on code you actually read.** Do not claim coverage over code you did not open. If some changed files were not reviewed, state that review limit explicitly. [Because findings on unread code are guesses — and guesses labeled as findings make every grounded finding in the review less trustworthy.]
 
 **Every issue needs: layer, file:line, what is wrong, why it matters.** Add a fix only when it is concrete enough to state without hand-waving. Vague findings ("improve error handling", "this could be cleaner") are not actionable.
 
-**Severity must reflect actual risk.** Label a finding `Critical` only if it matches the severity table: data loss, security vulnerability, broken functionality, blocking regression, or a Layer 0/1 problem that invalidates the change.
+**Severity must reflect actual risk.** Label a finding `Critical` only if it matches the severity table: data loss, security vulnerability, broken functionality, blocking regression, or a Layer 0/1 problem that invalidates the change. [Because severity inflation converts every issue into a blocker — implementers start discounting all findings and the review loses authority.]
 
-**Automated check status must be explicit.** If the repository exposes merge-gating or touched-area checks (for example lint, typecheck, test, build, or validation commands for files or behavior changed in the diff), record whether each such check passed, failed, or was not run. Do not return `Ready to merge` when any recorded check failed.
+**Automated check status must be explicit.** If the repository exposes merge-gating or touched-area checks (for example lint, typecheck, test, build, or validation commands for files or behavior changed in the diff), record whether each such check passed, failed, or was not run. Do not return `Ready to merge` when any recorded check failed. [Because a review that concludes "Ready to merge" while a merge gate is failing creates explicit false permission to land through a broken gate — this is worse than no verdict.]
 
-**Give a clear verdict.** Every review ends with exactly one of: `Ready to merge`, `Not ready`, or `Ready with fixes`.
+**Give a clear verdict.** Every review ends with exactly one of: `Ready to merge`, `Not ready`, or `Ready with fixes`. [Because an open-ended summary defers the merge decision to the person with the most conflict of interest — the author.]
+
+## Verification Approach
+
+This skill is artifact-type: the review document is the artifact. Completion is verified by self-checking the produced review against the Completion Criteria checklist. The evidence is the review document itself — not the agent's impression that the review was thorough.
+
+A review that satisfies the checklist structurally is not necessarily complete. The checklist items are proxies. The underlying test: could a developer read this review, know exactly what needs to change, and make a confident merge decision?
 
 ## Decision Signals
 
@@ -89,9 +95,19 @@ Pause before exiting.
 
 Do not treat this section as another checklist to clear. Use it to challenge whether the apparent completeness of the review is real.
 
+This check exists because a review that looks complete is not the same as a review that is complete. A findings list can be structurally correct — right format, correct layer labels, verdicts present — while covering code that was never opened. This section externalizes that checkpoint.
+
 Did I mistake superficial diff reading for sufficient context?
 
 Am I exiting because the review is genuinely complete, or because the current findings list looks complete enough?
+
+Completion-faking signals specific to code review — stop if any apply:
+
+- Layer 0-1 assessment was formed from the PR description alone without opening the primary changed files — the description explains intent, not whether the implementation achieves it
+- A finding meets the Critical definition (data loss, security, broken functionality, Layer 0/1 invalidation) but was labeled Important or Minor to avoid blocking the change
+- Feedback was given on a function's behavior without opening the function — the function name or the diff suggested the behavior, but the implementation was not read
+- The verdict is "Ready with fixes" when a Critical finding is present — Critical means must fix before merge, which is "Not ready"
+- For AI-generated code: external API calls were noted as "looks reasonable" without spot-checking the actual documentation or source — AI-generated code hallucinates plausible APIs that do not exist
 
 ---
 
