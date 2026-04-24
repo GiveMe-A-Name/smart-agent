@@ -88,6 +88,8 @@ See `examples/implicit-contract-break.md` for a case where a "safe" refactoring 
 - Caching and memoization: If the same computation is performed repeatedly with the same inputs, should it be cached? Conversely, does a cache introduced here create a stale-data risk that outweighs the performance gain?
 - The premature optimization trap: Not every path needs optimization. If performance impact is speculative, measure before acting. But if the change is on a known hot path or introduces a known anti-pattern (N+1, unbounded collection, blocking I/O in async context), flag it — that is not premature, it is informed.
 
+See `performance-dimensions.md` for deep guidance on each dimension: algorithmic fitness, I/O patterns (including latency reference tables), resource management, optimization judgment, frontend CWV, database query design, and async/concurrency bottlenecks.
+
 ## 8. Observability and Operability
 
 **Question**: When this code fails in production, will the person debugging it at 3am have the information they need?

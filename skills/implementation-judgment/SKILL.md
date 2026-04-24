@@ -58,6 +58,17 @@ This skill does not own:
 
 **State tracing**: Before any refactor that moves code across module boundaries, explicitly enumerate every piece of state the code reads or writes. Missing one creates a consistency window that did not exist before.
 
+**Performance anti-patterns** — Check these regardless of whether the code is on a hot path; they are structural mistakes, not optimization choices:
+- Query, HTTP call, or file read inside a loop → confirm a batch alternative exists or is not applicable before accepting [N+1 is the single most common performance regression and is always fixable without profiling]
+- Collection loaded entirely into memory without a size bound → confirm it is bounded at production scale [unbounded loads cause OOM incidents, not slow responses]
+- New external call (HTTP, database, subprocess) with no timeout → a timeout is required [no timeout converts one slow dependency into an indefinite caller freeze]
+
+If the code is on a hot path (request handlers, event processors, or any path that scales with data volume):
+- Nested loops over a collection whose production size is unknown → flag as O(n²) risk and confirm n is bounded
+- Sequential independent I/O calls → confirm they cannot be parallelized [sequential A→B→C when they are independent: latency = A+B+C; parallel: max(A,B,C)]
+
+For detailed guidance per dimension, see `references/performance-dimensions.md`.
+
 **Scope trigger**: If one judgment dimension raises a concern — scope a focused improvement. If multiple dimensions conflict — pause and make the conflict explicit. If none fire — narrow patch. For detailed scope decision support, see `references/risk-triage.md`.
 
 ## Completion Criteria
@@ -68,6 +79,7 @@ This skill does not own:
 - [ ] If invoked after receiving code review, the reviewer's intent was implemented without damaging design integrity.
 - [ ] If the change makes an existing capability path unreachable, that impact was surfaced explicitly before implementation.
 - [ ] If implementing toward a goal identified by a reviewer, that goal was confirmed by the user rather than only inferred.
+- [ ] Performance anti-patterns checked: no query/call-per-loop-item without confirming batching is not applicable, no collection loaded into memory without a confirmed production-scale bound, no new external call missing a timeout.
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
@@ -92,14 +104,6 @@ Completion-faking signals specific to implementation — stop if any apply:
 - A parameter or conditional was added to an existing abstraction instead of questioning whether the abstraction is still the right boundary
 - The diff is scoped to what was asked without checking whether the ask itself points to the wrong layer
 
-## Scope Decision
-
-After working through the relevant judgment dimensions:
-
-- **Narrow local patch**: change is well-bounded, existing structure supports it cleanly, no judgment dimension raised a concern.
-- **Focused structural improvement**: a purely local patch would deepen a problem identified by one or more judgment dimensions. Scope tightly to that concern — do not broaden into redesign.
-- **Explicit pause**: you do not yet understand why the code is shaped the way it is, OR multiple dimensions point in conflicting directions.
-
 For detailed scope decision heuristics, see `references/risk-triage.md`.
 
 ## Self-Correction Signals
@@ -116,6 +120,9 @@ Stop and revise when:
 - you are making changes to adjacent code not required by the task rather than noting them for later
 - you are using an external API, function signature, or library behavior from memory without verifying against actual source or documentation
 - you have worked through multiple judgment dimensions on a small change without reaching a clear decision — stop analysis, pick the simpler option, and write the code
+- you see a new query or external call inside a loop without confirming that batching is not possible
+- you see a collection loaded entirely into memory without confirming its production-scale size bound
+- you add a new external call without a timeout
 
 ---
 
