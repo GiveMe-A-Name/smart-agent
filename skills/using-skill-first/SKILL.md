@@ -11,6 +11,8 @@ Skill misses happen when an agent starts a task it can do, not knowing a better 
 
 ## When to Check
 
+These categories share a common property: each involves methodology choices that shape all subsequent work — the wrong method chosen early cannot be patched without restarting [by the time the method proves wrong, the work built on it is already compromised].
+
 Scan available-skills before any task involving:
 
 - **Understanding** — reading unfamiliar code, forming assumptions about a system
@@ -22,22 +24,28 @@ Scan available-skills before any task involving:
 
 *Boundary case*: a mechanical step with no analysis or judgment (e.g., renaming a variable) does not require a scan.
 
+## Examples
+
+**Positive**: task is to debug a test failure. Before reading the error or forming a hypothesis, scan available-skills — finds `systematic-debugging`. Invoke it, then begin investigation. Without the scan, the agent reads the error, spots a plausible fix, and patches a symptom while the root cause remains.
+
+**Boundary**: task is to rename a variable from `x` to `count` across a file. No methodology choice involved, outcome is deterministic. No scan required.
+
 ## Boundary
 
-Owns: recognizing when a scan is warranted and invoking the best match.  
+Owns: recognizing when a scan is warranted and identifying which available capability best fits the task.  
 Does not own: executing the invoked skill's methodology.
 
 ## Invariants
 
 - Scan before starting, not after an approach is set [a skill that changes approach must precede the commitment]
 - "I already know how to do this" is a rationalization signal, not a skip reason [capability ≠ best method]
-- The stronger the confidence in your approach, the more important the check — confidence is the most common mask for an unexamined assumption [you cannot evaluate what you haven't noticed]
+- If you have already identified an approach but have not yet scanned available-skills, stop — the check is overdue [an approach already in mind is the most common reason the check gets skipped, not the most valid one]
 - The check applies per action, not per session — session start does not discharge the obligation for subsequent steps
 - Skip a candidate only with a specific, action-concrete reason — "not relevant" does not qualify [vague reasons can rationalize away any check; specificity makes the skip defensible]
 
 ## Completion Criteria
 
-- [ ] Before each task in the six categories: was available-skills scanned?
+- [ ] Before starting each task: internally confirm which of the six categories it falls into, or that it qualifies as the mechanical-only exception — if the former, was available-skills scanned?
 - [ ] Any skipped candidate: was a specific, action-concrete reason stated?
 
 ## Verification
