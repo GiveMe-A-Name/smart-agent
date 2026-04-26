@@ -2,6 +2,8 @@
 
 Apply these focused lenses when the change touches the relevant domain. They are depth adjustments for high-risk areas — not checklists to run on every review.
 
+**Severity guidance:** Findings identified through Security, Migration, and Performance lenses start at **Important** by default — not Minor, regardless of how contained the finding looks in isolation. Downgrade only when the risk is blocked by a compensating control already in place and verifiable in the diff. [Because these lenses exist to surface risks in domains where the cost of a missed finding is highest — severity should reflect that domain risk, not just the local appearance of the code.]
+
 ---
 
 ## Security Review Lens

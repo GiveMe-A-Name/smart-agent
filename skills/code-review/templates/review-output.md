@@ -6,11 +6,11 @@ Use this as the default structure when it helps. You may adapt section names or 
 
 ## Change Assessment
 
-[Summarize what this change does in 1-2 sentences, in your own words. Then state your assessment of the change at Layers 0-1.]
+[Summarize what this change does in 1-2 sentences, in your own words. Write from the PR description, commit messages, and file list — before deep implementation reading. Layer 0 and Layer 1 assessments here are gates: if they reveal a blocking problem, stop and surface it before recording implementation findings.]
 
-**Change justification (Layer 0):** [Does this change solve a real problem? Is the direction correct? Is the scope appropriate? If there are concerns at this level, state them here — they are likely the most important findings in the review.]
+**Change justification (Layer 0):** [Does this change solve a real problem? Is the direction correct? Is the scope appropriate? If there are concerns at this level, state them here — they are likely the most important findings in the review. Written before opening implementation files.]
 
-**Design and approach (Layer 1):** [Is this the right solution? Are there simpler alternatives? Is it over/under-engineered? What are the second-order effects? Does it improve or degrade overall system health?]
+**Design and approach (Layer 1):** [Is this the right solution? Are there simpler alternatives? Is it over/under-engineered? What are the second-order effects? Does it improve or degrade overall system health? Written after reading the main design file, before cataloging Layer 2-3 findings.]
 
 ## Strengths
 

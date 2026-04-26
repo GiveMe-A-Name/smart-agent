@@ -68,7 +68,11 @@ Don't read every diff hunk top-to-bottom. Navigate deliberately.
 
 **Step 1 (Layer 0):** Read the PR description, linked issues, commit messages. Restate the goal in your own words. If you can't, ask for clarification before reviewing code. Scan the file list — is it focused? A change touching 30 files across 5 subsystems is a red flag for scope creep. **If the change shouldn't exist, stop and say so.**
 
+**Write your Layer 0 conclusion before opening any implementation file.** This step is a gate, not a warmup: if you have not recorded a Layer 0 assessment — even "direction is correct, scope is appropriate" — you have not completed Step 1 and should not proceed. Layer 0 conclusions formed after reading implementation code are anchored to what the code does, not whether the direction is right; that anchoring is exactly the bias this step exists to counteract.
+
 **Step 2 (Layer 1):** Find the files that represent the "main" part of the change — usually the file with the most logical changes, not the most lines. Read the core design first. **Surface major design problems immediately** — the author may be building more work on top of this.
+
+**Write your Layer 1 conclusion before recording Layer 2-3 findings.** If the design has a fundamental problem, that problem is the review — continuing to catalog implementation details signals implicit approval of the approach.
 
 **Step 3 (Layers 2–3):** Once design is confirmed sound, review remaining files in logical order. For each changed function, read enough context to understand what the code does in the broader system.
 

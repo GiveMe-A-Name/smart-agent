@@ -55,11 +55,11 @@ A review that satisfies the checklist structurally is not necessarily complete. 
 Apply review depth and lenses from stable change signals, not from habit.
 
 - Start at Layer 0, then Layer 1, then Layer 2, then Layer 3. If Layer 0 or Layer 1 contains a merge-blocking issue, surface it before cataloging lower-layer issues.
-- Apply the Security lens if the diff touches auth, permissions, secrets, crypto, user data access, payments, or deletion paths.
-- Apply the Performance lens if the diff changes query shape, caching, concurrency, batching, iteration over variable-size data, or request/response hot paths.
-- Apply the Migration lens if the diff changes schema, persisted data shape, rollout ordering, compatibility across versions, or backfill behavior.
-- Apply the Dependency lens if the diff adds, removes, or bumps packages, SDKs, build tooling, or external service clients.
-- Apply the API Design lens if the diff changes public endpoints, RPCs, events, CLI flags, config schema, exported functions, or exported types.
+- **Security lens** triggers when the diff touches auth, permissions, secrets, crypto, user data access, payments, or deletion paths.
+- **Performance lens** triggers when the diff changes query shape, caching, concurrency, batching, iteration over variable-size data, or request/response hot paths.
+- **Migration lens** triggers when the diff changes schema, persisted data shape, rollout ordering, compatibility across versions, or backfill behavior.
+- **Dependency lens** triggers when the diff adds, removes, or bumps packages, SDKs, build tooling, or external service clients.
+- **API Design lens** triggers when the diff changes public endpoints, RPCs, events, CLI flags, config schema, exported functions, or exported types.
 - Apply user-defined review standards only when a concrete finding maps to one of those dimensions; name the dimension when you use it.
 - Apply AI-generated-code checks if the diff contains generated markers, large repetitive edits, mechanically repeated patterns, or machine-produced comments/prose.
 
@@ -83,7 +83,7 @@ Stop and reassess if:
 - [ ] For every function, method, query, or module cited in findings or verdict reasoning, surrounding context was opened; if a public interface, signature, schema, or call pattern changed, at least one caller or consumer was inspected.
 - [ ] Every issue includes layer, file:line, what is wrong, and why it matters; severity labels match the severity table.
 - [ ] Any issue whose reasoning depends on a specialized lens or user-defined standard names that lens or standard explicitly.
-- [ ] Each specialized lens whose change trigger was present was applied, and any finding that relies on a specialized lens or user-defined standard names it.
+- [ ] Each triggered lens leaves a trace in the review — either a named finding from that domain, or an explicit note covering what was examined and found clean. A triggered lens domain absent from the review entirely is unexecuted coverage, not clean coverage.
 - [ ] AI-generated-code checks were applied when generated markers or machine-like edit patterns were present.
 - [ ] Merge-gating or touched-area automated checks are listed with pass/fail/not-run status when such checks exist, and the review ends with exactly one verdict: `Ready to merge`, `Not ready`, or `Ready with fixes`.
 
