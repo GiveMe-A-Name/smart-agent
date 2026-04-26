@@ -8,8 +8,7 @@ When reasoning about how a change should land, work through these dimensions. No
 
 **Key signals**:
 - If an abstraction requires parameters and conditional branches to handle different cases, it may be the wrong abstraction. The fastest way forward is often back — inline the abstraction, let the callers diverge, then see what new pattern emerges.
-- If code is duplicated in 2 places and the copies are diverging, keep them separate. Premature unification creates a coupling point that makes both cases harder to change.
-- If code is duplicated in 3+ places with identical semantics and the same rate of change, extraction is likely warranted.
+- Before extracting any duplication, ask: "What event would require me to modify each copy?" If every copy has the same answer, extraction reduces drift risk. If any copy has a different answer, extraction creates a coupling point that makes both cases harder to change independently. Occurrence count is a proxy for this question — at 3+ copies the change drivers are usually shared; at 2 copies they often diverge — but the change-driver answer takes precedence over the count when it is clear.
 - If you're about to "clean up" repetition, ask: are these cases truly the same, or do they just look the same right now? Code that looks similar but changes for different reasons should not share an abstraction.
 - If an existing shared abstraction has accumulated conditionals to handle special cases, consider whether inlining it back would make each caller simpler and more honest about what it actually does.
 
@@ -119,6 +118,7 @@ See `performance-dimensions.md` for deep guidance on each dimension: algorithmic
 
 **Key signals**:
 - **Shared mutable state is the most common source of subtle bugs in refactoring.** When moving code between components, trace every piece of state the code reads or writes. If a refactor splits a function that previously managed state atomically into two functions that now manage it across a boundary, you have created a consistency window that didn't exist before.
+- **In long-running processes, also ask whether state accumulates over time.** Persistent mutable state (deduplication sets, caches, counters, buffers) that grows with each unit of processed work and has no eviction or size bound will exhaust memory in proportion to total work processed. This is invisible in tests — it surfaces only under sustained production load. When reviewing state in an event consumer, server, or daemon, confirm that each piece of persistent mutable state either has a bounded key space by design or has an explicit eviction/rotation mechanism.
 - **Identify the source of truth.** For every piece of state this code touches, there should be exactly one authoritative source. If data is denormalized or cached, the code must handle staleness explicitly — not assume freshness. When the same data exists in two places, ask which one wins on conflict and what happens when they disagree.
 - **State transitions should be explicit and enforceable.** If an entity can be in states A, B, C, the valid transitions (A→B, B→C, but not A→C) should be enforced in code, not implied by call ordering. The question is not "does the current code path follow the right order?" but "what prevents a future caller from violating the order?"
 - **Crash recovery determines real data integrity.** If the system fails mid-operation, what state is persisted? Any operation that modifies persistent state in multiple steps either needs atomicity (transaction) or idempotent recovery (can be safely re-run).

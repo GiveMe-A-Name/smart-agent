@@ -44,3 +44,21 @@ When a test fails, the first question is not "how do I make this test pass?" but
 ## Implementing Toward an Unverified Goal
 
 A reviewer's statement that "the goal hasn't been achieved" contains two claims: that the current code doesn't do X, and that X is the correct goal. The first is verifiable from code. The second must trace to the user's confirmed intent. If X was never explicitly confirmed by the user, implementing further toward it deepens the wrong objective.
+
+## Framing Anchoring
+
+When a request is framed as simple — "one-liner," "quick fix," "pretty straightforward" — the tendency is to treat that framing as structural evidence and anchor subsequent analysis to the implied level of complexity. This causes the agent to underweight code evidence that contradicts the framing and to present concerns as secondary rather than as blockers.
+
+The correct posture: request framing communicates priority and intent, not structural complexity. The structural analysis is independent of the framing. When the framing says "simple" and the code evidence says "breaking change affecting three callers with different intent," the gap between them is a risk signal — it means the requester's model of the change is incomplete. Name the gap explicitly rather than implementing at the framing's complexity level.
+
+## Surfacing Conflict Alongside Implementation
+
+When structural analysis reveals a conflict — a contract that would be silently broken, state whose ownership is ambiguous, a responsibility being pushed into the wrong layer — the failure pattern is to produce the implementation and mention the concern in the same response. This converts a decision point into a fait accompli: once code exists, there is pressure to make it work rather than to question the approach.
+
+The correct sequence is: surface the conflict → wait for a resolution decision → implement only after the approach is agreed. "Here is the implementation, and also here is the concern" is not equivalent to "here is the concern — how do you want to proceed?" The latter leaves the decision to the person who owns it.
+
+## Snapshot Analysis in a Persistent Process
+
+When reviewing code that runs in a long-running process (event consumer, server, daemon), the tendency is to evaluate correctness and performance within a single execution — "does this function return the right value?", "is there an N+1 query?" — without asking what happens over the process's lifetime under sustained load.
+
+This misses a class of problems that are invisible in single-execution analysis: persistent mutable state that accumulates with each unit of processed work. A deduplication set, an in-memory cache without eviction, a buffer that appends without rotation — all of these are correct in any single execution and fail only when the process has been running long enough for memory to exhaust. When code runs in a persistent process, apply a second lens: for each piece of persistent mutable state, does it have a mechanism that prevents unbounded growth over the process lifetime?

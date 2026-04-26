@@ -43,10 +43,14 @@ This skill does not own:
 - **The minimum viable change is only correct when it does not deepen a structural concern** — a patch that compounds a bad boundary is cumulative damage, not conservatism.
 - **Never use theoretical justification as evidence** — "this supports testability," "this could be useful," "this is clean design" are arguments. Evidence is: who calls this, who depends on this, what breaks if this is removed.
 - **Never treat duplication removal as inherently correct** — duplication is cheaper than the wrong abstraction.
+- **Never produce implementation while a structural conflict is unresolved** — surface the conflict and wait for a resolution decision before writing any code [once code exists, pressure shifts toward making it work rather than questioning the approach; the correct sequence is surface → resolve → implement, not implement → mention].
+- **Request framing describes intent, not structural complexity** — "one-liner," "straightforward refactor," and "quick fix" are descriptions of priority, not of structural analysis. When framing suggests simplicity and code evidence reveals complexity, that gap is a risk signal: the requester's model of the change is incomplete [acting on framing rather than evidence is how structural regressions get introduced under authority pressure].
 
 ## Decision Signals
 
-**Abstraction threshold**: Extract when logic appears in 3+ places with identical semantics AND the same rate of change. Keep separate when 2 places exist or the copies are diverging — shared code that changes for different reasons creates a coupling point that makes both cases harder to change.
+**Abstraction threshold**: The primary question is not how many times the code appears, but what would cause it to change — and whether that cause is shared across all copies. Ask: "What event would require me to modify this code?" If every copy has the same answer, extraction reduces drift risk. If any copy has a different answer, extraction creates a coupling point that makes both cases harder to change independently.
+
+Occurrence count is a proxy for this question: at 3+ copies the change drivers are usually shared; at 2 copies they often diverge. Apply the count as a starting signal — if the change-driver answer is clear and unambiguous, it takes precedence over the count. A pure utility with no domain semantics shared across 2 call sites may justify extraction; domain logic appearing in 3 places but changing for different product reasons does not.
 
 **Complexity placement**: If callers must know implementation details to use a function correctly, the abstraction boundary is in the wrong place — pull complexity downward into the module.
 
@@ -62,6 +66,7 @@ This skill does not own:
 - Query, HTTP call, or file read inside a loop → confirm a batch alternative exists or is not applicable before accepting [N+1 is the single most common performance regression and is always fixable without profiling]
 - Collection loaded entirely into memory without a size bound → confirm it is bounded at production scale [unbounded loads cause OOM incidents, not slow responses]
 - New external call (HTTP, database, subprocess) with no timeout → a timeout is required [no timeout converts one slow dependency into an indefinite caller freeze]
+- Persistent mutable state in a long-running process that accumulates with each unit of work and has no eviction, rotation, or size bound → confirm the accumulated key space is bounded by design, or surface as unbounded memory growth [a continuously running process will exhaust memory in proportion to total work processed — this passes all tests and fails only under sustained production load]
 
 If the code is on a hot path (request handlers, event processors, or any path that scales with data volume):
 - Nested loops over a collection whose production size is unknown → flag as O(n²) risk and confirm n is bounded
@@ -80,6 +85,7 @@ For detailed guidance per dimension, see `references/performance-dimensions.md`.
 - [ ] If the change makes an existing capability path unreachable, that impact was surfaced explicitly before implementation.
 - [ ] If implementing toward a goal identified by a reviewer, that goal was confirmed by the user rather than only inferred.
 - [ ] Performance anti-patterns checked: no query/call-per-loop-item without confirming batching is not applicable, no collection loaded into memory without a confirmed production-scale bound, no new external call missing a timeout.
+- [ ] If the code runs in a persistent process (server, event consumer, daemon), any persistent mutable state that grows with work volume has a confirmed bound or eviction mechanism, or the risk is surfaced explicitly.
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
@@ -123,6 +129,9 @@ Stop and revise when:
 - you see a new query or external call inside a loop without confirming that batching is not possible
 - you see a collection loaded entirely into memory without confirming its production-scale size bound
 - you add a new external call without a timeout
+- you identified a structural conflict (broken contract, state ownership ambiguity, wrong responsibility layer) and are producing code alongside the concern rather than stopping until the conflict is resolved
+- the request uses simplicity framing ("one-liner," "quick fix," "straightforward") and you have not verified that framing against the code evidence — the framing is the requester's prior, not your conclusion
+- you are reviewing code in a long-running process and have not asked whether any persistent mutable state accumulates with work volume without a bound or eviction mechanism
 
 ---
 

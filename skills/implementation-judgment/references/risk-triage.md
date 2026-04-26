@@ -23,9 +23,9 @@ A limited structural improvement is warranted when the Judgment Dimensions
 surface one of these specific patterns:
 
 **Abstraction Correctness signals:**
-- The same logic appears in 3+ places with identical semantics → extract
+- The same logic appears in multiple places and change-driver analysis confirms the copies change for the same reason → extract
 - A shared abstraction has accumulated 3+ conditional parameters → consider inlining and re-extracting
-- Two duplicates are diverging (different change reasons, different rates of change) → keep separate
+- Two copies have different change drivers (different reasons to modify each) → keep separate regardless of how similar they look today
 
 **Complexity Placement signals:**
 - A concern (validation, error handling, transformation) is scattered across 3+ layers with no single layer owning it completely → consolidate into the natural owning layer
@@ -60,7 +60,7 @@ matters, and what understanding is missing.
 
 **Stronger intervention more likely justified:**
 - change touches shared contracts or default behavior
-- same logic is repeated in 3+ places with identical semantics
+- same logic is repeated across multiple places with confirmed shared change drivers
 - a wrong abstraction has accumulated 3+ conditional parameters
 - ownership boundaries between modules are unclear and the change affects them
 - error handling is scattered with no clear owner
@@ -68,7 +68,7 @@ matters, and what understanding is missing.
 
 **Stronger intervention less likely justified:**
 - change is truly local and single-purpose
-- duplication exists in only 2 places and the copies are diverging
+- duplication exists in 2 places and change-driver analysis shows the copies diverge
 - existing structure already supports the new behavior cleanly
 - the alternative to patching is a broad redesign that goes beyond what this change needs
 
