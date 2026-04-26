@@ -152,7 +152,20 @@ Regardless of size, a usable plan is concrete:
 
 ## Review Loop
 
-For medium/large plans only: dispatch a plan-document-reviewer subagent (see `plan-document-reviewer-prompt.md`). Skip for tiny/small — overhead exceeds value.
+Dispatch a plan-document-reviewer subagent (see `plan-document-reviewer-prompt.md`) according to these rules:
+
+**Large — always dispatch.** Large plans carry multi-component impact and hidden dependencies that warrant independent review.
+
+**Medium — dispatch if any of the following hold:**
+- Any primary risk is rated High [because a High-rated risk signals an unverified assumption on the critical path — exactly where reviewers find design flaws]
+- The plan contains ≥2 contingencies [because ≥2 contingencies mean the planner already anticipates multiple failure paths; reviewers find genuine issues where uncertainty is already acknowledged]
+- The plan spans ≥3 modules, services, or system boundaries [because cross-boundary count is a structural property the planner cannot easily misreport — it shows up regardless of planner quality]
+
+Otherwise skip — a clear-requirement, low-risk, single-domain Medium plan has near-zero marginal review value.
+
+**Tiny/Small — skip.** Overhead exceeds value.
+
+When dispatching, pass the plan size — it determines the blocking threshold (see `plan-document-reviewer-prompt.md`).
 
 ## Human Review Section
 
