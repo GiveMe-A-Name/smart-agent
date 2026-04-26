@@ -65,6 +65,7 @@ If you can't name the files involved or state how to verify completion, you have
 - [ ] For medium/large: at least one explicit exclusion stated — what is deliberately out of scope.
 - [ ] For medium/large: stop signals listed in the plan document — conditions under which the agent must pause and ask before continuing.
 - [ ] For medium/large with multiple competing goals: conflict priority stated.
+- [ ] **Progressive refinement (large only):** Tasks whose specific steps depend on outcomes from earlier tasks not yet done are written at goal level — one short paragraph stating what the task achieves and what it depends on. They do NOT have step-by-step checklists. Typically only the first 2–3 tasks are fully detailed; if more than 3 tasks have detailed checklists, verify whether the far tasks' steps could change once early tasks complete — if yes, revise them to goal-level [because planning steps in detail before you know the inputs is planning for a future that does not exist yet].
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
@@ -87,6 +88,8 @@ Completion-faking signals specific to plan writing — stop if any apply:
 - Verification steps are written as prose ("run the tests") rather than executable commands with expected output — prose is not a verification step
 - Reading the first task requires the planning conversation for context — the plan is not self-contained
 - The Human Review Section would require domain knowledge to understand — it has not passed the product-manager readability test
+- For large plans: read the last task in isolation — if its detailed steps depend on specific outcomes from earlier tasks not yet done, progressive refinement was not applied; convert tasks whose content depends on uncertain earlier outcomes to goal-level descriptions
+- For large plans: count tasks with step-by-step checklists — if more than 3 have them, verify whether the far tasks' steps could change once early tasks complete; if yes, revise to goal-level
 
 ---
 
@@ -115,6 +118,7 @@ Regardless of size, a usable plan is concrete:
 - **Explicit exclusions** — for medium/large: state what the plan does NOT cover; without this, an agent will extrapolate scope at execution time
 - **Conflict priority** — for medium/large with competing goals: name which wins when they conflict (e.g., "correctness over performance; security before schedule")
 - **Stop signals** — for medium/large: name conditions that require pausing and asking before continuing; see `references/planning-methodology.md`
+- **Uncertainty surfaced, not buried** — if the user expressed doubt about a premise ("I think X works this way", "not sure if", "maybe"), treat it as unverified; name it as an explicit assumption and add a verification step before any task that depends on it [because an unverified assumption embedded in a plan propagates into every dependent task — if the premise is wrong, all downstream work is built on a false foundation]
 
 ## Failure Signals
 
@@ -124,6 +128,7 @@ Regardless of size, a usable plan is concrete:
 - Running a review loop on a tiny/small task
 - Planning tasks 6+ in full detail when tasks 1-3 haven't been done yet [because early tasks will change the shape of later tasks — detailed planning beyond the next 2-3 tasks is planning for a future that does not exist yet]
 - Specifying implementation details (library choice, algorithm, code structure) rather than the behavioral contract
+- A suggestion the user hedged ("probably", "maybe", "idk", "or something", "should we also?") became a committed task — hedged suggestions require an explicit decision (ask, exclude with a note, or flag as pending); do not silently absorb them as confirmed scope
 
 **Under-planning** — stop if:
 - Starting medium/large work without a file map
@@ -147,6 +152,7 @@ Regardless of size, a usable plan is concrete:
 - You started writing before reading the relevant code
 - You don't know which files are involved
 - You haven't stated the decomposition strategy
+- The plan states as confirmed something the user expressed uncertainty about ("I think", "not sure", "maybe"), with no verification step [because an unverified assumption embedded in a plan propagates into every dependent task — if wrong, all downstream work is built on a false premise]
 
 ---
 
