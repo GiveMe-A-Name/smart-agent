@@ -17,6 +17,7 @@ Different tasks have different optimal starting points. Choose the strategy that
 3. Trace the data flow for a similar feature end to end
 4. Identify the extension points where your feature plugs in
 5. Check: what shared utilities or base classes should you use?
+6. Check build configuration and test infrastructure: read the project's build config (e.g. `pyproject.toml`, `Cargo.toml`, `package.json`) for package discovery rules and linting constraints; read the test infrastructure (e.g. `conftest.py`, fixture files) for the test pattern new code must follow.
 
 ## Understanding for Refactoring
 

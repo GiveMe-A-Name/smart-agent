@@ -57,7 +57,13 @@ This skill does not own:
 
 **When to consult git history**: when code cannot be explained from its structure alone — two paths appear to handle the same case, naming gives no signal about purpose (e.g., `handle`, `process`, `doWork`), or the code is more complex than the behavior it produces can account for. `git blame` plus the commit message often explains what application code alone cannot.
 
-**When to read infrastructure/config**: when deployment constraints, environment variables, or build system shape could affect the answer — not as a default first step.
+**When to read infrastructure/config**: when deployment constraints, environment variables, or build system shape could affect the answer. For add-a-feature investigations, read the project's build configuration (the file that defines package structure, tooling, and linting — e.g. `pyproject.toml`, `Cargo.toml`, `package.json`) and test infrastructure (fixture files, test configuration) by default — "could this affect the answer?" resolves to yes for nearly all feature additions [because these files define package discovery, linting gates, and testing patterns that new code must comply with; reading only source files produces a technically correct but practically incomplete picture of what adding the feature correctly requires].
+
+**When to check for runtime overrides**: when reading a value that determines behavior — a path, threshold, mode, or feature flag — check whether it can be overridden at runtime via environment variable, CLI argument, config file, or feature toggle. Document both the default AND the override mechanism; the override name is as important as the default value. A value that looks fixed in source code may be configurable in deployment — reporting only the hardcoded default produces a factually incomplete description.
+
+**When the answer is a guide, not an audit**: if the question is "how do I add X", "how do I replicate X", or "what should I know before doing X" — each evidence item must state its practical implication, not just the mechanism. Not "discovery uses importlib" but "discovery uses importlib, therefore no registration step is needed." Stop before responding: can the user take the correct action from this output without reading the source files themselves?
+
+**How much P/H/U to write**: proportional to code ambiguity. A single linear call chain with no branching warrants one sentence of Unknown. Multiple paths, design tradeoffs, or implicit dependencies warrant fully expanded P/H/U — this is where the structure earns its cost.
 
 **When a hypothesis is not new**: a new hypothesis changes *what* you are looking for, not just *where*. If the second lookup tests the same absence in a different location, it is not a new hypothesis — stop and report the gap. See `examples/fake-new-hypothesis.md`.
 
@@ -68,9 +74,10 @@ This skill does not own:
 - [ ] The call flow relevant to the question is traced.
 - [ ] The conventions the codebase uses for similar work are identified.
 - [ ] Candidate change points are identified with evidence for why they are correct.
-- [ ] What is proven, hypothesized, and still unknown is separated explicitly.
+- [ ] What is still uncertain is stated explicitly. For broad questions (architecture, end-to-end flow, cross-module behavior), separate proven/hypothesized/unknown in full. For focused questions (single bug trace, single function behavior), one sentence naming what cannot be confirmed from code is sufficient.
 - [ ] For large codebases, exploration was scoped to the task-relevant slice, not an exhaustive sweep.
-- [ ] Infrastructure and config files were checked if deployment constraints or implicit dependencies are relevant.
+- [ ] Infrastructure and config files were checked if deployment constraints or implicit dependencies are relevant. For add-a-feature questions, build configuration and test infrastructure were read — not just source files.
+- [ ] **Actionability (action-oriented questions only)**: if the question is "add X", "replicate X", or "what should I know before doing X" — each evidence item names its practical implication for the reader's task. Stop if evidence items appear without a practical implication.
 
 If you still need intuition to bridge the answer, keep investigating.
 
@@ -108,6 +115,8 @@ Stop and revise when:
 - you are doing undirected exploration without a hypothesis to test [because exploration without a hypothesis produces context about the codebase, not answers to the question — and context without answers is a stopping condition, not progress]
 - you are drifting into planning or still exploring after the question is already grounded
 - you are trying to understand the entire codebase before acting on a localized task
+- you read a configurable value and reported only the default, without noting the override mechanism in the same assignment [because a value with a runtime override is not a fixed value — reporting only the default produces a description that is wrong for any non-default deployment]
+- you are listing "all files that use X" when the question is "how is X set up" or "how do I replicate X" — before reading the next consumer file, ask: if this file confirms it uses X the same way I expect, will the user's question be better answered? If no — skip [because consumer enumeration answers "who depends on X", not "how X works"; conflating the two expands scope without closing the evidence gap]
 
 ---
 
