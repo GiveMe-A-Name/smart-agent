@@ -28,7 +28,7 @@ If none: omit this section.]
 - **Layer:** [0: Repo Alignment / 1: Design & Scope / 2: Internal Consistency / 3: Executability]
 - **Location:** `plan-file.md:line`
 - **What:** [Specific description of what the plan does or assumes that is wrong]
-- **Why:** [What specifically breaks during implementation — not "may cause issues" but "will permanently skip partial-write days" or "violates the convention in AGENTS.md:42"]
+- **Why:** [What breaks in production if the plan proceeds — not "may cause issues" but "will permanently skip partial-write days" or "a bug here fails every API endpoint simultaneously with no partial rollback." The constraint citation belongs in Location or What as evidence, not here: "violates AGENTS.md:42" is not a Why.]
 - **Fix:** [How to address it — for Layer 0 issues this often means changing the approach, not adding a note]
 
 ### Important (Should Fix)
@@ -40,7 +40,7 @@ If none: omit this section.]
 - **Layer:** [0 / 1 / 2 / 3]
 - **Location:** `plan-file.md:line`
 - **What:** [Specific description]
-- **Why:** [Impact on correctness, reliability, or ability to verify completion]
+- **Why:** [What fails, becomes unreliable, or cannot be verified if this goes unfixed — a concrete consequence, not "may cause issues"]
 - **Fix:** [Suggestion, if not obvious]
 
 ### Minor (Nice to Have)
@@ -81,8 +81,8 @@ This plan builds an incremental factor computation pipeline that reads price dat
 **1. CLI architecture violates repo convention**
 - **Layer:** 0: Repo Alignment
 - **Location:** `docs/plans/2026-04-21-factor-builder.md:83`, `AGENTS.md:42`
-- **What:** The plan introduces a standalone `factor_builder/cli.py` and `python -m factor_builder build` entry point.
-- **Why:** This directly violates the hard constraint at AGENTS.md:42. The module will be unmanageable through the unified scheduling framework and inconsistent with every other builder in the repo.
+- **What:** The plan introduces a standalone `factor_builder/cli.py` and `python -m factor_builder build` entry point. (AGENTS.md:42 requires all batch jobs to use `build_range_cli`.)
+- **Why:** This job will be invisible to the scheduler — it cannot be triggered, monitored, or retried by ops tooling. Every other builder in the repo participates in scheduling and alerting; this one runs silently outside that infrastructure. Failures go undetected.
 - **Fix:** Replace with a `build_range_cli` subclass. Remove the standalone `factor_builder/__main__.py`.
 
 **2. Incremental completeness check has partial-write blind spot**

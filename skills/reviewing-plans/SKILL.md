@@ -25,8 +25,12 @@ This skill owns: reading plan documents against repo constraints and plan qualit
 
 It does NOT:
 - rewrite or fix the plan
-- review code implementation — only the plan document
+- review code implementation — only the plan document (for illustrative code snippets inside the plan itself, see Artifact boundary below)
 - approve implementation details that belong to execution judgment
+
+**Artifact boundary:** A plan is a design intent document. Its reviewable substance is the design decisions it makes — the approach, task sequence, stated assumptions, and architectural choices. Material inside the plan that is not itself a design decision (illustrative code, example commands, reference snippets) is context for understanding the design, not a claim to evaluate. The test: is this finding about a decision the plan is making? If not, it is not a plan-level finding. [Because plan review and code review have different objects — conflating them produces findings that belong to implementation, not to whether the approach is sound.]
+
+**Reviewer independence:** This review is an independent assessment of the plan against repo constraints and quality criteria. What the requester emphasizes in the prompt, what the plan's author considers the primary risk, and what feels most salient in the moment are inputs — not conclusions. Findings emerge from the layered review of the plan document, not from the framing that arrived with it. [Because a reviewer who adopts the requester's prioritization is not an independent assessor — it is validating a frame rather than evaluating a plan.]
 
 ## Invariants
 
@@ -34,7 +38,7 @@ It does NOT:
 
 **Upper-layer problems outweigh lower-layer problems.** A plan that violates repo constraints does not become acceptable because its tasks are well-sequenced. Work top-down — if a Layer 0 problem is severe enough to block implementation, surface it immediately rather than cataloging Layer 3 issues in a plan that may need to be rewritten. [Because detailed executability polish on a misaligned plan sends implementers confidently in the wrong direction.]
 
-**Every issue needs: plan location, what is wrong, why it matters.** Findings like "the plan should verify this" or "this could cause problems" are not actionable. Name the specific section or line, the specific problem, and the specific consequence. [Because an implementer cannot evaluate whether to accept a fix — or how urgent it is — without knowing where the issue is and what specifically breaks if it isn't addressed.]
+**Every issue needs: plan location, what is wrong, why it matters.** Findings like "the plan should verify this" or "this could cause problems" are not actionable. Name the specific section or line, the specific problem, and the production consequence — what breaks if the plan proceeds, at what scale, and whether recovery is possible. Constraint citations ("violates AGENTS.md:4") are evidence for "what is wrong" — put them there. "Why it matters" must state the consequence: what fails in production, at what scale. "A bug in this shared base class fails every API endpoint simultaneously with no partial rollback path" is a consequence; "violates AGENTS.md:4" is not. [Because an implementer cannot evaluate the severity or urgency of a finding without knowing where the issue is and what specifically breaks if it isn't addressed.]
 
 **Severity must reflect actual implementation risk.** Critical means the plan would implement the wrong thing, violate a documented constraint, or have a fundamental flaw that invalidates the approach — not style, not missing detail. Inflating severity makes all feedback untrustworthy. [Because when everything is Critical, implementers start discounting all findings — the signal is destroyed by the noise.]
 
@@ -47,7 +51,7 @@ Work from the most consequential question down.
 | Layer | Key question | Critical signals |
 |-------|-------------|-----------------|
 | **0: Repo Alignment** | Does this plan conflict with documented constraints? | CLAUDE.md, AGENTS.md, architecture docs, existing conventions — any violation here means wrong implementation. |
-| **1: Intent & Design** | Does the plan know why it exists, and is this the right approach? | Explicit intent statement present (why, not just what). Scope matches claims. Cliff-edge risks identified — tasks where failure invalidates the whole approach, not just delays it. Constraint conflicts have a stated priority. Technical assumptions stated and plausible. No silently larger change than advertised. |
+| **1: Intent & Design** | Does the plan know why it exists, and is this the right approach? | Explicit intent statement present (why, not just what). Scope matches claims. Cliff-edge risks identified — tasks where failure invalidates the whole approach, not just delays it. Blast-radius of shared infrastructure changes stated — components outside the plan's scope that could be affected are named. Constraint conflicts have a stated priority. Technical assumptions stated and plausible. No silently larger change than advertised. |
 | **2: Internal Consistency** | Do the tasks cohere, and do they collectively achieve the stated goal? | No contradictions between tasks. Dependencies respected. Verification criteria achievable at the point claimed. Interfaces/types consistent. Sub-tasks collectively derive the stated goal — not just look related. No vague terms ("flexible", "scalable") used without an operational definition. |
 | **3: Executability** | Can an implementer follow this without getting stuck? | Verification steps are commands with expected outputs. Tasks don't depend on later tasks. File paths accurate. Each task leaves the codebase in a working state. Revision triggers stated — conditions under which the approach should change. |
 | **4: Completeness** | Are there gaps the plan doesn't acknowledge? | Key decisions carry explicit reasoning: alternatives considered and why rejected. Counter-intuitive edge cases or failure modes that the plan's approach must survive. |
@@ -87,6 +91,8 @@ Work from the most consequential question down.
 
 **Constraint conflict priority:** List the plan's stated constraints. If any two can conflict (e.g., "must not break existing API" and "must extend the same endpoint"), check whether the plan states which wins. An unstated priority forces the implementer to decide at execution time.
 
+**Blast-radius check:** When a plan modifies shared infrastructure — base classes, middleware, shared schemas, global configuration, or any code used by components outside the plan's stated scope — explicitly answer: if this task has a subtle bug, what fails beyond this feature and at what scale? A targeted change where a bug only breaks the feature being built has blast-radius 0. A change to a shared base class where a bug takes down every consumer simultaneously has blast-radius proportional to the number of dependents. State the scale in the finding's Why field. Do not let a constraint citation substitute for this — "violates AGENTS.md:4" describes the rule; the blast-radius describes the stakes.
+
 **Decision traceability:** For each major design choice, does the plan name the alternatives considered and why they were rejected? If not, the reviewer cannot assess whether the reasoning still holds. Flag as Important for any architectural or interface decision with no stated rationale.
 
 **Revision trigger check:** Does the plan state conditions under which the approach should be revisited? (e.g., "if Task 2 reveals X, redesign the query path"). For medium/large plans, absence of revision triggers is an Important finding — the plan assumes perfect foresight.
@@ -122,6 +128,7 @@ Stop and reassess if:
 - a Critical finding lacks a named source (specific file:line in repo docs) — a Critical finding without evidence is speculation
 - all findings are labeled Critical — severity inflation makes all feedback untrustworthy
 - findings are described as "could cause issues" or "may be a problem" without naming the specific consequence — vague risk statements are not actionable
+- a Critical finding's Why field contains only a constraint citation ("violates AGENTS.md:4", "not permitted by CLAUDE.md:12") — a constraint citation is evidence for What, not a consequence for Why; state what breaks in production if the plan proceeds [because an implementer who reads only a constraint citation cannot assess the severity or urgency of the finding without knowing what specifically fails and at what scale]
 - the review ends without a verdict — an open-ended summary is not a review
 - you are reviewing plan structure and style while ignoring whether the plan would build the right thing
 - the plan has no intent statement and you did not flag its absence [because a plan that only states "what" without "why" cannot be evaluated for alignment with actual need — and silently accepting the absence makes the review an evaluation of internal consistency on a plan that may be solving the wrong problem]
@@ -131,6 +138,7 @@ Stop and reassess if:
 - [ ] CLAUDE.md, architecture docs, and plan-referenced code files were read before reviewing.
 - [ ] The review covers repo alignment (Layer 0) and intent/design (Layer 1) — not just internal structure and format.
 - [ ] Every Critical finding cites a specific repo constraint (file:line) that the plan violates.
+- [ ] Every Critical finding states the production consequence — what breaks if the plan proceeds, at what scale. A constraint citation alone does not satisfy this criterion.
 - [ ] Every issue includes plan location, what is wrong, and why it matters, with honest severity calibration.
 - [ ] Intent is present: the plan states why the change is being made, not just what tasks to do. If absent, flagged.
 - [ ] Key decisions were checked for decision traceability — alternatives named and reasoning present.
@@ -156,5 +164,6 @@ Completion-faking signals specific to plan review — stop if any apply:
 - All findings are Layer 3 (executability) and nothing surfaced at Layers 0–1, not because the plan is genuinely sound at those layers, but because checking Layer 0 requires reading repo docs and that work was skipped
 - A Critical finding is present but labeled Important or Minor to appear balanced — severity was softened to avoid delivering a harsh conclusion
 - Findings use hedged language ("could cause issues", "may be a problem") without naming the specific consequence — they look like findings but cannot be acted on
+- A Critical finding's Why contains only a constraint citation ("violates X:N") and no production consequence — the rule was cited but the stakes were not described; what breaks in production and at what scale is missing
 - The verdict is "Approved with fixes" when a Critical finding is present — a Critical finding means the approach or a documented constraint is violated, which qualifies as Blocked
 - The plan has no intent statement and it wasn't flagged — the review evaluated internal consistency on a plan that may be solving the wrong problem
