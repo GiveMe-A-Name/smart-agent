@@ -4,10 +4,13 @@
 
 Reviewer A says "extract this into a service." Reviewer B says "keep this co-located for simplicity." This is a design disagreement — not a vote to tally.
 
+**The key insight:** reviewer disagreements live at the solution level; resolution often exists at the goal level. Two suggestions that appear mutually exclusive frequently optimize for dimensions that are not in conflict — they only clash at the implementation path chosen. Identify the goal each reviewer is optimizing for before treating their suggestions as incompatible.
+
 **How to handle:**
 - Identify what each reviewer is optimizing for. Contradictions often arise from different implicit priorities: performance vs. readability, flexibility vs. simplicity, consistency with area X vs. area Y.
 - Check whether both suggestions address the same concern from different angles, or different concerns entirely. If the latter, both may be valid and the apparent contradiction is an illusion.
-- When the contradiction is genuine: state both positions clearly, explain which aligns with the design intent and why, and ask for resolution from the reviewers or escalate to the human partner.
+- When the contradiction appears genuine: check whether the underlying goals are compatible. If a synthesis path exists that satisfies both, propose it rather than defaulting to "list options and wait."
+- When the goals themselves conflict: state both positions clearly, explain which aligns with the design intent and why, and ask for resolution from the reviewers or escalate to the human partner.
 - Never implement contradictory suggestions in different parts of the same change. Inconsistency within a single PR is worse than either option alone.
 
 ## Overlapping Feedback

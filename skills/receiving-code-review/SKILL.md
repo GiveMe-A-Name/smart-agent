@@ -29,6 +29,10 @@ It does NOT:
 - Write the implementation itself
 - Decide how accepted changes should land structurally — evaluation ends at whether and what to change, not at how to structure the change once accepted
 
+## How to Read This Skill
+
+Each rule below is a guard against a specific failure mode, stated in [brackets]. The purpose is primary — the rule is a heuristic for when that purpose applies. Before invoking a rule, check whether its stated failure mode is present in your situation. When a rule produces an obviously wrong result, re-read the [because] and ask whether the purpose applies here — that is the actual check, not surface compliance with the rule's phrasing.
+
 ## Invariants
 
 **Verify before implementing.** Never implement a suggestion without first checking it is technically sound for this codebase and aligned with the design intent. [Because a reviewer sees the diff only — you hold the constraints, prior decisions, and tradeoffs that shaped the approach. Their characterization of what the code should do may be wrong even when their observation about what the code currently does is correct. Implementing before verifying conflates two independent claims.]
@@ -37,7 +41,7 @@ It does NOT:
 
 **No performative agreement.** Never say "You're absolutely right!", "Great point!", "Thanks for catching that!", or any expression of gratitude. Actions speak — fix it and show the change. [Because agreement-signaling without evaluation is noise that masks whether the feedback was actually assessed. If the reviewer is right, show the fix. If they are wrong, state why. Anything in between obscures the actual judgment.]
 
-**Clarify all before implementing any.** If any item in multi-item feedback is unclear, stop and ask before touching anything. Items may be related; partial understanding leads to wrong implementation. [Because in multi-item feedback, a design-level clarification in item 1 may invalidate the implementation-level items below it. Implementing item 3 before understanding item 1 creates churn — you fix item 3 and then discover item 1 requires rewriting it.]
+**Clarify before implementing dependent items.** For each item in multi-item feedback, check whether implementing it depends on the outcome of any unclear item. An item is dependent if the clarification's outcome would change where the fix lands, what interface it touches, or whether the fix applies at all. If dependent → stop and clarify first. If independently correct under all possible clarification outcomes → proceed, but state the independence explicitly. [The actual risk is churn: fixing item 3 then discovering item 1 requires rewriting it. The guard against churn is dependency tracking, not blanket suspension. A bug fix that holds under any architectural outcome has no dependency on the architectural clarification.]
 
 
 ## Completion Criteria
@@ -45,9 +49,9 @@ It does NOT:
 - [ ] Each comment was evaluated with the design intent in mind, not in isolation.
 - [ ] Comments that challenge correctness were distinguished from comments that challenge design.
 - [ ] Decisions were supported by evidence, not just arguments.
-- [ ] All invariants were followed: verify before implementing, hold authoritative context, no performative agreement, clarify all first.
+- [ ] All invariants were followed: verify before implementing, hold authoritative context, no performative agreement, clarified before implementing dependent items.
 - [ ] No reviewer's characterization of the goal was accepted without tracing it to your own implementation intent.
-- [ ] If feedback came from multiple reviewers, contradictions were surfaced instead of being silently resolved, and severity was triaged before processing linearly.
+- [ ] If feedback came from multiple reviewers, contradictions were surfaced instead of being silently resolved; if a synthesis path was possible, it was attempted before defaulting to escalation; severity was triaged before processing linearly.
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
@@ -125,13 +129,15 @@ Ask a specific question. "Can you clarify?" is useless. "Are you suggesting we m
 
 ## Handling Multi-Reviewer Feedback
 
+**Triage serves two purposes: priority ordering** prevents high-severity items from being processed after low-severity ones they could invalidate; **interaction detection** prevents churn from fixing an item that a pending design decision will require rewriting. Priority ordering requires multiple items spanning different severity levels or layers. Interaction detection requires items that could invalidate each other. If neither condition holds, proceed directly without a triage pass.
+
 Triage before processing linearly. Priority order:
 1. **Blocking / critical** — bugs, security, correctness
 2. **Design-level (Layer 0–1)** — evaluate before lower-layer fixes; acceptance may invalidate downstream feedback
 3. **Implementation (Layer 2–3)** — group related comments; multiple related issues may resolve with one structural fix
 4. **Style / preference** — batch last; author's call unless mandated
 
-Surface contradictions — do not silently pick one side. If design-level rework is accepted, state that lower-layer feedback will be addressed in the reworked code.
+Surface contradictions — do not silently pick one side. Reviewer disagreements exist at the solution level; resolution often exists at the goal level. When suggestions appear contradictory, check whether the underlying goals are compatible before defaulting to "list options and wait." If a synthesis path exists that satisfies both goals, propose it. If the goals genuinely conflict, state both positions, explain which aligns with design intent, and escalate for resolution. If design-level rework is accepted, state that lower-layer feedback will be addressed in the reworked code.
 
 See `references/multi-reviewer.md` for extended handling of contradictions, overlapping feedback, and volume management.
 
@@ -145,7 +151,7 @@ See `references/response-language.md` for phrasing: correct feedback, pushback, 
 
 Stop and reorient if:
 - You are about to write "you're right", "great point", "thanks", or any variant — delete it, state the fix instead
-- You are implementing any item before understanding all items in the feedback
+- You are implementing an item that depends on an unresolved clarification elsewhere in the feedback
 - You are implementing a suggestion without having verified it against both the codebase and the design intent
 - You are accepting a design suggestion without being able to articulate how it serves the original design goals
 - You accepted a reviewer's characterization of what the goal is, or what the code should achieve, without tracing it to your own implementation intent — the reviewer's premise about the goal may be wrong even when their observation about the current code is correct
@@ -153,7 +159,7 @@ Stop and reorient if:
 - You are implementing feedback that contradicts the design intent without explicitly acknowledging the intent change and getting confirmation
 - A suggestion is technically wrong but social pressure makes direct pushback feel impossible — state the technical finding anyway. If you genuinely cannot raise it in context, flag it to your human partner with "Strange things are afoot at the Circle K." This is a signal to escalate, not permission to defer.
 - You are about to implement non-trivial structural changes from review feedback without first deciding how they should land structurally
-- Two reviewers gave contradictory suggestions and you silently picked one without surfacing the conflict
+- Two reviewers gave contradictory suggestions and you silently picked one — without surfacing the conflict and without checking whether their underlying goals are compatible
 - You are processing 20+ comments linearly instead of triaging by severity and layer first
 - You are fixing style issues in code that design-level feedback may require rewriting
 
