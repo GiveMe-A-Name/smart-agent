@@ -73,4 +73,4 @@ If you can't make the bug happen on demand, you don't understand it yet.
 - **Consistent reproduction** means you've identified the triggering conditions.
 - **Minimizing the reproduction** reveals what the bug depends on. If a 1000-line test triggers it, can a 10-line test? Each piece you remove and the bug survives tells you what the bug does NOT depend on. A truly small reproduction often makes the cause obvious.
 - **Fast reproduction** enables rapid iteration. If each attempt takes 3 minutes, invest time upfront to make it take 10 seconds. This pays for itself within a few cycles.
-- **Intermittent failures** mean there's an uncontrolled variable — timing, ordering, external state. That variable IS the bug. Find it.
+- **Confirmed intermittent failures** mean there's an uncontrolled variable — timing, ordering, external state. That variable IS the bug. Find it. If the failure is consistent across repeated runs, it is a deterministic bug — do not apply timing or async fixes.

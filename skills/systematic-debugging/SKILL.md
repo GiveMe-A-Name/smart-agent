@@ -84,14 +84,14 @@ Stop and reassess immediately when:
 
 ## Reading the Situation
 
-Reach for the mental model that fits the observable signal. After each action, ask: *"Did this shrink my search space?"* If not, change approach.
+Reach for the mental model that fits the observable signal. Treat each row below as an entry point, not a conclusion — the way a failure presents is a hypothesis about its class, not a confirmed classification. Verify the appearance before committing to a direction. After each action, ask: *"Did this shrink my search space?"* If not, change approach.
 
 | What you're seeing | What it suggests | Reach for |
 |---|---|---|
 | Clear error message pointing to a specific location | May be a direct hit, but verify — could be symptom site, not owner | **Symptom site ≠ Owning layer** — trace backward before editing |
 | "It used to work" / something changed recently | Likely a regression | `git log`, `git bisect` — **divide and conquer through time** |
-| Fails in full suite, passes in isolation | Test pollution or ordering dependency | bisection — run tests in halves to isolate the polluter — **reproduction** |
-| Intermittent / flaky | Uncontrolled variable: timing, state, ordering | **Reproduction** — find the variable, see `references/condition-based-waiting.md` |
+| Fails in full suite, passes in isolation | Test pollution or ordering dependency | The cause is in what the suite introduces that isolation does not (shared setup, global state, order-dependent mutation). Bisect to locate the source — **reproduction** |
+| Intermittent / flaky | Uncontrolled variable: timing, state, ordering | Run multiple times first. Consistent failure → deterministic bug, not flaky — switch model. Variable failure → **Reproduction** — find the uncontrolled variable, see `references/condition-based-waiting.md` |
 | Multi-component system, unclear which layer | Need to isolate the broken layer | **Observation** — instrument boundaries, check data at each crossing |
 | You've formed a theory but haven't tested it | Risk of confirmation bias | **Search problem** — design an experiment that could DISPROVE your theory |
 | 2+ failed hypotheses, feeling stuck | Assumptions may be wrong | **Check the plug**, question assumptions, get a fresh view — explain the problem aloud |
