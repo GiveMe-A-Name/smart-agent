@@ -85,6 +85,35 @@ export const config = {
 
 ---
 
+## Case 6: Tests Written From the Implementation's Perspective — Wrong TDD
+
+**Scenario:** Agent implements a checkout validator. Before writing any code, it writes three tests:
+
+```typescript
+test('rejects empty cart', () => {
+  expect(validator.validate([])).toEqual({ valid: false });
+});
+test('checks each item for stock via InventoryService', () => {
+  validator.validate([item1]);
+  expect(inventoryService.checkStock).toHaveBeenCalledWith(item1.id);
+});
+test('calls PaymentService.validate before confirming', () => {
+  validator.validate(cart);
+  expect(paymentService.validate).toHaveBeenCalled();
+});
+```
+
+**Judgment:** Test 1 asserts on what a caller observes (return value) — valid. Tests 2 and 3 assert on which internal services were called — the agent already knew the implementation and designed the tests *from* that implementation, not from the caller's perspective.
+
+**Gate (from testing-anti-patterns.md):** "Could this test remain identical if I completely rewrote the implementation while keeping the external behavior the same?" For tests 2 and 3: no. If the stock check is moved to a different service call or the payment validation is restructured, these tests break without any observable behavior changing.
+
+**Wrong:** "I wrote all three tests before writing any implementation — TDD is satisfied."
+**Correct:** Apply the caller-perspective gate to each assertion. Tests 2 and 3 need rewriting: assert on `result.valid`, `result.errors`, or other caller-observable outcomes — not on internal call sequences.
+
+**Note:** Batch mode is not the problem here. Tests written from the caller's perspective can be written in batch. The problem is tests written from implementation knowledge, regardless of when they were written.
+
+---
+
 ## Pattern: How to Name a Skip
 
 When skipping TDD, the explanation must identify a no-behavior criterion:

@@ -25,7 +25,7 @@ Run the test. Confirm:
 - Failure message matches the expected failure
 - Fails because the feature is missing, not due to a typo or broken import
 
-**Test passes immediately?** Either you are testing already-existing behavior (confirm this explicitly, then keep the test as documentation), or the test is wrong and not actually testing what you think. Do not proceed until you understand which.
+**Test passes immediately?** Two cases: (1) **Characterization test for existing code** — correct; characterization tests document what callers currently observe and are expected to pass immediately; confirm this explicitly, then keep the test. (2) **Test for new behavior** — the test is wrong and not actually testing what you think; do not proceed until you fix it. Identify which case this is before continuing.
 
 **Test errors on import/syntax?** Fix the compilation error — it is not a valid RED state.
 
@@ -93,6 +93,10 @@ Triangulation is the mechanical process of forcing generalization without guessi
 ### One Cycle at a Time
 
 Resist writing multiple failing tests before implementing. The discipline of one cycle (RED → GREEN → REFACTOR) at a time keeps each step small enough that failures are instantly diagnosable. The moment you have two failing tests, you lose the clean signal that tells you exactly what broke.
+
+**When strict cycle discipline is most critical**: when the design is still being discovered — each test asks a question the implementation hasn't yet answered, and what you learn in GREEN may change what you write in the next RED. Batching tests before implementing in this case bypasses the feedback loop that makes TDD a design technique.
+
+**When batching is acceptable**: when all behaviors are fully specified before any implementation begins — stated explicitly in Orientation — and no behavior depends on seeing how earlier implementation choices unfold. The batch must still be written before any implementation (all tests RED first, then implement). Even then, the caller-perspective invariant applies to each test individually: each assertion must describe what a caller observes, not how the implementation works.
 
 **Signs you are testing too much in a single cycle:**
 - The test name contains "and"

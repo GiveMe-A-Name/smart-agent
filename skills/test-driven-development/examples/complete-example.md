@@ -10,7 +10,11 @@ This example shows: orientation decision, fake-it technique, triangulation, a re
 
 *Before writing the first test.*
 
-The algorithm is the hard part — the discount rules, thresholds, and tiers. There are no unclear interface boundaries or layers to navigate. Collaborators don't exist yet. This calls for **inside-out (Chicago school)**: start with the core domain logic, get it working in isolation, then integrate.
+**Design question audit**: what does this task leave open that writing the first test will force a decision on? In this case: none. The discount rules are fully specified (>$100 → 10%, >$200 → 20%), the function signature is clear (`calculateDiscount(total) → number`), and there are no dependency injection decisions or interface seams to discover. Design is fully pre-decided — stated explicitly here.
+
+This means each test will confirm a pre-known behavior rather than discover a new design constraint. Strict cycle-by-cycle is used below (not batch) to show incremental RED verification; batch would be acceptable here since all behaviors are enumerable upfront.
+
+The algorithm is the hard part — the discount rules, thresholds, and tiers. This calls for **inside-out (Chicago school)**: start with the core domain logic, get it working in isolation, then integrate.
 
 Starting point: a function `calculateDiscount(orderTotal: number): number`.
 
@@ -137,11 +141,9 @@ test('applies no discount to orders of exactly $100', () => {
 
 Run: **PASS immediately.**
 
-Stop. A test passing immediately means one of two things:
-1. The behavior already exists and the test correctly documents a boundary.
-2. The test is wrong and not actually testing what you think.
+Stop. This is not a characterization test (those apply to legacy code before changes). This is a boundary confirmation: the implementation written in Cycle 1 (`total > 100`) incidentally covers exactly $100. The test passed because the behavior was already present, not because the test is wrong.
 
-Check: the rule says "over $100", so exactly $100 should get no discount. `total > 100` means `100` returns `0`. The test is correct and the behavior already exists.
+Verify intent before keeping: does the rule intend "over $100" to exclude exactly $100? Yes — the spec says "over $100". `total > 100` returns `0` for `total === 100`. The test is correct.
 
 Verdict: keep the test as documentation of the boundary condition. Add a comment:
 

@@ -43,7 +43,8 @@ TDD is a design technique, not a testing technique. Writing the test first force
 ## Invariants
 
 - A test must exist before production code is written — no exceptions [because implementation without a prior failing test means the design was never used before it was built; structural problems surface at integration, not at design time]
-- Every test must be watched to fail *for the right reason* before implementing [because a test that fails for the wrong reason may pass after implementation without actually covering the intended behavior]
+- Every test assertion must come from the caller's perspective — what a caller observes (return values, visible side effects, errors thrown), not the implementation's internal state [because a test written with the implementation already in mind confirms what you decided to build rather than specifying what the caller needs; design pressure only arises when the test asks a question the implementation has not yet answered]
+- Every test for new behavior must be watched to fail *for the right reason* before implementing [because a test that fails for the wrong reason may pass after implementation without actually covering the intended behavior; characterization tests for existing code are an exception — they are expected to pass immediately, see Failure Signals]
 - Failing for the wrong reason means the test is wrong — fix the test before proceeding
 - Implementation is the minimum code to pass the test — nothing more [because over-implementation bypasses the next test, losing design signal and leaving behavior untested]
 - Refactoring happens only after green — never add behavior during refactor [because behavior added during refactor has no prior failing test, silently violating the first invariant]
@@ -52,7 +53,11 @@ TDD is a design technique, not a testing technique. Writing the test first force
 
 ## Orientation
 
-Before the first test, decide:
+Before the first test, answer: what design questions in this task can only be resolved by writing the test before the implementation? If none — the design is fully clear upfront — state that explicitly.
+
+If you already know exactly what code you are about to write — stop. Write the test first. A test written to confirm an answer you already have is documentation, not design.
+
+Then decide:
 - **Outside-in**: Start at the public interface, use test doubles for absent collaborators, work inward. *Use when interface design is the hard problem.*
 - **Inside-out**: Start from core domain logic, integrate outward. *Use when the algorithm is the hard problem.*
 
@@ -69,7 +74,7 @@ RED → GREEN → REFACTOR. One behavior per cycle.
 
 See `references/tdd-cycle.md` for cycle mechanics, triangulation, design pressure signals, and stuck-on-red patterns.
 See `references/tdd-orientation.md` for London/Chicago school detail and trade-offs.
-See `references/testing-anti-patterns.md` for mock discipline — read before writing any test infrastructure.
+See `references/testing-anti-patterns.md` for mock discipline and caller-perspective gate — read before writing any test.
 See `references/advanced-testing-strategies.md` for property-based, contract, and mutation testing.
 See `references/practical-testing-challenges.md` for legacy code, async/concurrent code, and flaky tests.
 See `examples/complete-example.md` for a full worked walkthrough.
@@ -77,6 +82,7 @@ See `examples/complete-example.md` for a full worked walkthrough.
 ## Completion Criteria
 
 - [ ] Every behavior added during this task has a corresponding test that was written and seen to fail before implementation began (verifiable from conversation history)
+- [ ] Did writing any test during this task reveal something about the API, behavior contract, or design that you had not specified before writing it? If yes: name it. If no: confirm that design was fully specified before the first test and that this was stated in Orientation. (verifiable from conversation history — an unclaimed 'no' signals that tests confirmed a pre-decided implementation rather than driving design)
 - [ ] All tests pass
 - [ ] Every TDD skip names a specific no-behavior criterion — not "it's simple", "I'll add tests after", or "this is different" (verifiable from conversation history)
 - [ ] No refactor pass introduced new behavior — tests were already green before each refactor began (verifiable from conversation history)
@@ -92,7 +98,7 @@ This skill is artifact-type: completion is self-checked against the Completion C
 
 Stop and revise when:
 - code was written before a test exists
-- a test passed immediately without any implementation (either it documents existing behavior — confirm explicitly — or the test is wrong and not testing what you think)
+- a test passed immediately without any implementation — two cases: (1) **characterization test for existing code**: correct; characterization tests pin what callers currently observe and are expected to pass immediately; confirm this explicitly, then keep the test; (2) **test for new behavior**: the test is wrong and not actually testing what you think; do not proceed until you fix it
 - you cannot explain why the test failed [the test may not be exercising the intended path; implementation may pass the test without covering the real behavior]
 - a test asserts on mock internals instead of real behavior [mocks verify call sequences, not outcomes — the test can pass while the actual behavior is wrong]
 - you skipped TDD and named "it's simple" or "I'll add tests after" as the reason
@@ -100,7 +106,7 @@ Stop and revise when:
 - you are mocking a chain of three or more calls [chained mocks test your mock setup, not your code; any refactor of the chain breaks the test without catching a real bug]
 - you are using `sleep()` as synchronization in async tests [sleep-based synchronization is timing-dependent, creating flaky tests that mask real concurrency bugs behind noise]
 - a test is flaky and you are re-running it instead of diagnosing the cause [flaky tests erode trust in the suite and can mask real failures; re-running treats the symptom, not the cause]
-- you are modifying legacy code without writing characterization tests first [without characterization tests, existing behavior cannot be verified as preserved; regressions become invisible]
+- you are modifying legacy code without writing characterization tests first [characterization tests serve a different purpose than new-behavior tests: they pin what callers currently observe before you change anything, so regressions become visible; they are expected to pass immediately because their purpose is to document existing caller-observable behavior, not specify new behavior]
 - test fixtures are copied and pasted with minor variations instead of using factories/builders [duplicated fixtures diverge silently; a change to one copy does not propagate, making tests misrepresent what they cover]
 
 ## Anti-Rationalization Check

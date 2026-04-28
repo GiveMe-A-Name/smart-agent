@@ -1,12 +1,16 @@
 # Testing Anti-Patterns
 
-**Load this reference when:** writing or changing tests, adding mocks or test utilities, or tempted to add test-only methods to production code.
+**Load this reference when:** writing or reviewing any test.
 
 ---
 
 ## Core Principle
 
-Every assertion must reveal something about the code under test. The subject of every test is the code — not the mocks, not the infrastructure, not the test utilities.
+Every assertion must be written from the caller's perspective: what a caller observes (return values, visible side effects, errors thrown), not the implementation's internal state. **Gate:** could this assertion remain identical if you completely rewrote the implementation while keeping the external behavior the same? If not, the test is testing implementation details, not caller-observable behavior.
+
+Every assertion must also reveal something about the code under test — not the mocks, not the infrastructure, not the test utilities.
+
+**TDD prevents most of these anti-patterns**: writing the test first forces you to see what the test actually needs before adding mocks or infrastructure. If you find yourself writing tests that hit these patterns, check whether the test was written before or after the implementation — and whether it was written from the caller's perspective or from inside knowledge of the implementation.
 
 ---
 
@@ -140,8 +144,3 @@ Warning signs:
 
 These are symptoms of over-coupled production code, not limitations of testing. Consider: integration tests against real components are often simpler than elaborate mock setups for the same reason that the underlying code is too tangled.
 
----
-
-## TDD Prevents These Anti-Patterns
-
-Writing tests first forces you to see what the test actually needs before you add mocks. If you are testing mock behavior, you added mocks before watching the test fail against real code — a TDD violation. The discipline of watching the test fail first reveals what needs to be real and what can safely be replaced.

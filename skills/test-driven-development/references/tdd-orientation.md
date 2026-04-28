@@ -4,6 +4,17 @@
 
 ---
 
+## Before Choosing Orientation
+
+Answer this question first: what design questions in this task can only be resolved by writing the test before the implementation?
+
+- If there are open questions (API shape, where a responsibility lives, how dependencies connect) — the first test must ask those questions. Your choice of outside-in vs. inside-out follows from which question is hardest.
+- If there are no open questions — the design is fully pre-decided — state this explicitly. The ordering invariant (tests before implementation) and the caller-perspective invariant still apply; batch TDD is acceptable when all behaviors are enumerable upfront. See `tdd-cycle.md` One Cycle at a Time for when batch is and isn't appropriate.
+
+A common failure: treating "I know what to build" as permission to write tests from the implementation's perspective. The caller-perspective invariant still holds regardless — every assertion must describe what a caller observes, not how the implementation works internally.
+
+---
+
 ## Outside-In (London School)
 
 Start at the outermost interface the caller will use. Test the public behavior, use test doubles for collaborators that don't yet exist. Work inward layer by layer.
