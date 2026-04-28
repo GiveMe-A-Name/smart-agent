@@ -79,7 +79,7 @@ Work through these dimensions for each artifact. The first two must be answered 
 - Commit messages: if a reader of the subject line would ask "but why?", add a body. "fix", "WIP", "address comments" have negative value — they occupy space where useful context belongs.
 - Include a link to the issue, design doc, or incident that motivated the change; the link costs seconds and saves hours when someone traces the decision six months later.
 
-See `references/judgment-dimensions.md` for expanded guidance on all dimensions including visual communication.
+See `references/judgment-dimensions.md` for expanded guidance on all dimensions including visual communication. See `examples/artifact-examples.md` for positive and negative examples.
 
 ## Failure Signals
 
@@ -98,7 +98,7 @@ Stop and reassess if:
 
 ## Completion Criteria
 
-- [ ] The primary reader and their required action were named before drafting, and the vehicle matches that need.
+- [ ] The artifact's content is calibrated for a specific, nameable reader type performing a specific action; the vehicle matches that need.
 - [ ] The opening follows the artifact type rule: recommendation/change intent in paragraph 1 for decision/proposal/review artifacts, or an opening section with entry conditions plus first check/command for operable/reference artifacts.
 - [ ] Claims that justify urgency, risk, correctness, or priority include evidence or are explicitly labeled as assumptions.
 - [ ] Each heading names a question, decision, or action a reader could search for; no heading is a generic label such as "Background" or "Overview" where a more specific heading is available.

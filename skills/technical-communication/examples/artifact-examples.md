@@ -54,6 +54,58 @@ This is implementation-level documentation handled by code documentation judgmen
 
 ---
 
+## Everyday Technical Writing: PR Description
+
+**Negative — describes the diff instead of supplying context:**
+
+> Added Redis caching layer. Updated UserController to call CacheService before hitting the database. Added cache invalidation on profile update.
+
+This is a summary of the diff. The reviewer can read the diff. It provides no motivation, no risk signal, and no review focus — the reviewer must reconstruct intent from the code.
+
+**Positive — supplies what the diff cannot:**
+
+> Adds Redis caching (5-min TTL) to GET /users/:id to reduce database load at peak. User profile queries account for 38% of database CPU at peak (Datadog, past 30 days). Without this we cannot meet the Q3 latency SLA. Main risk: profiles remain stale for up to 5 minutes after update — product confirmed this is acceptable (Slack #eng-product, 2024-06-12). Review focus: cache key construction at `user_cache.go:42` — must scope by `tenant_id` to avoid cross-tenant leakage.
+
+The reviewer knows why this change was made, what the risk is and who accepted it, and where to focus — before reading a single line of code.
+
+---
+
+## Code Documentation: API Docs
+
+**Negative — documents the implementation, not the contract:**
+
+```python
+def create_payment(amount: float, currency: str) -> dict:
+    """
+    Calls the Stripe API with the given amount and currency,
+    converts currency to the Stripe format (e.g., USD → usd),
+    and stores the transaction in the payments table.
+    Returns the Stripe response as a dict.
+    """
+```
+
+This describes how the function works internally. When the implementation changes (different payment processor, different storage), this comment lies. A caller has no information about what inputs are valid or what errors to handle.
+
+**Positive — documents the contract a caller depends on:**
+
+```python
+def create_payment(amount: float, currency: str) -> dict:
+    """
+    Creates a payment intent for the given amount.
+
+    amount: positive number in major units (e.g., 10.00 for $10.00)
+    currency: ISO 4217 code (e.g., "USD", "EUR")
+
+    Returns: {"id": str, "status": "pending"|"succeeded"|"failed", "amount": float}
+    Raises: PaymentValidationError if amount <= 0 or currency is unrecognized.
+    Raises: PaymentGatewayError if the payment processor is unreachable.
+    """
+```
+
+The implementation can be rewritten entirely without this comment becoming false. A caller knows exactly what to pass, what to expect, and what errors to handle.
+
+---
+
 ## Living vs. Point-in-Time Artifact
 
 **Point-in-time (ADR) — correct handling:**
