@@ -114,6 +114,69 @@ test('calls PaymentService.validate before confirming', () => {
 
 ---
 
+## Case 7: Small Change — Size Is Not the Criterion
+
+Two one-line changes. One skips TDD; the other does not. The difference is not size.
+
+**Change A — Correct Skip:**
+```python
+# Before
+raise ValueError("Invlaid input: value must be positive")
+# After
+raise ValueError("Invalid input: value must be positive")
+```
+No test asserts on this message string. The caller-observable behavior (exception type, when it fires) is unchanged. No new execution path.
+
+**Correct:** Skip TDD. State: "Typo fix in error message — no caller-observable behavior change."
+
+---
+
+**Change B — TDD Required:**
+```python
+# Before
+if age > 18:
+    allow_access()
+# After
+if age >= 18:
+    allow_access()
+```
+One character, but a caller passing `age=18` now observes a different outcome. The behavior contract changed.
+
+**Wrong:** "It's just one character, I'll skip TDD."
+**Correct:** Apply TDD. Test needed: `age == 18` now grants access (boundary case).
+
+---
+
+**The criterion:** Does this change modify what any caller can observe? Yes → TDD. No → skip, and name why.
+
+---
+
+## Case 9: Both TDD Values Absent — Correct Skip
+
+**The rule:** Skip TDD when both core values are simultaneously absent:
+- **Design feedback = 0** — no API contract being designed for callers; writing the test first surfaces no design questions
+- **Regression protection = 0** — no system depends on this behavior long-term; lifecycle is uncertain or finite
+
+When only one is absent, TDD may still apply. Both must be absent to skip.
+
+**Example:**
+```python
+# backfill_missing_user_avatars.py
+def run():
+    users = db.query("SELECT id FROM users WHERE avatar_url IS NULL")
+    for user in users:
+        avatar_url = generate_default_avatar(user.id)
+        db.execute("UPDATE users SET avatar_url = ? WHERE id = ?", avatar_url, user.id)
+```
+Run once to fix a data gap, then discarded. No other code calls `run()`. No system observes or depends on its behavior.
+
+- Design feedback = 0: there is no API contract being shaped — no caller will ever use this interface
+- Regression protection = 0: once run, it will never be executed again; no dependent will break if the logic changes
+
+**Correct:** Skip TDD. State: "No API contract being designed, no system depends on this behavior — design feedback and regression protection both N/A."
+
+---
+
 ## Pattern: How to Name a Skip
 
 When skipping TDD, the explanation must identify a no-behavior criterion:
@@ -123,4 +186,5 @@ When skipping TDD, the explanation must identify a no-behavior criterion:
 | "Pure config — JSON file, no logic" | "Simple" |
 | "Trivial forwarding — single delegation, no branching" | "I'll test after" |
 | "Type declaration only — no runtime behavior" | "Already mentally tested it" |
-| "Throwaway exploration in tmp/ — not reaching production" | "This is different because..." |
+| "Both TDD values absent — no API contract being designed, no system depends on this behavior long-term" | "This is different because..." |
+| "No behavior contract change — typo fix in log message, no test asserts on string, existing tests cover the path" | "It's a small change" |

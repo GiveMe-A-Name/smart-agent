@@ -16,7 +16,7 @@ Skip when the code genuinely has no testable behavior:
 - **Type/interface declarations** — shapes data only, no runtime execution
 - **Structural change only** — file move, import reorder, rename with no behavioral effect
 - **Trivial forwarding** — a one-liner delegating to a single well-tested function, no branching
-- **Throwaway exploration** — code in `tmp/`, `poc/`, `scratch/` that will not reach production
+- **Both TDD values absent** — no API contract being designed for callers (design feedback N/A) AND no system depends on this behavior long-term (regression protection N/A); e.g., one-off operational scripts, exploratory strategies under evaluation, throwaway prototypes, temporary debug tooling
 - **Generated/scaffolded output** — auto-generated code, not hand-written logic
 
 If uncertain: default to TDD. See `examples/low-value-judgment.md` for contrast cases.
@@ -38,7 +38,9 @@ This skill does not own:
 
 TDD is a design technique, not a testing technique. Writing the test first forces you to use the API before building it — you become the first consumer of your own design. Design feedback arrives before any code is committed.
 
-**Core judgment**: Can this code have a bug a test would catch? Yes → TDD. No → name the specific no-behavior criterion. "It's simple" is not a criterion.
+**Core judgment**: Can this code have a bug a test would catch? Yes → TDD. No → name the specific no-behavior criterion. "It's simple" and "it's a small change" are not criteria.
+
+For changes to existing code: ask whether the change modifies what any caller can observe. A one-character change to a comparison operator is a behavior change; fixing a typo in a log message (where no test asserts on that string) is not. See `examples/low-value-judgment.md` for small-change contrast cases.
 
 ## Invariants
 
