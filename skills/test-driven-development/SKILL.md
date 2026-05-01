@@ -16,7 +16,8 @@ Skip when the code genuinely has no testable behavior:
 - **Type/interface declarations** — shapes data only, no runtime execution
 - **Structural change only** — file move, import reorder, rename with no behavioral effect
 - **Trivial forwarding** — a one-liner delegating to a single well-tested function, no branching
-- **Both TDD values absent** — no API contract being designed for callers (design feedback N/A) AND no system depends on this behavior long-term (regression protection N/A); e.g., one-off operational scripts, exploratory strategies under evaluation, throwaway prototypes, temporary debug tooling
+- **One-off scripts and throwaway code** — operational scripts, temporary debug tooling, or throwaway prototypes that will not be maintained or reused; no caller will depend on the behavior long-term
+- **Both TDD values absent** — no API contract being designed for callers (design feedback N/A) AND no system depends on this behavior long-term (regression protection N/A); e.g., exploratory strategies under evaluation
 - **Generated/scaffolded output** — auto-generated code, not hand-written logic
 
 If uncertain: default to TDD. See `examples/low-value-judgment.md` for contrast cases.
