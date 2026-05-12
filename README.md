@@ -42,7 +42,6 @@ The repository already contains skills covering common engineering workflows, in
 - `systematic-debugging`: finding root causes instead of patching symptoms
 - `technical-communication`: writing technical documents that are clear and actionable
 - `understanding-codebases`: building code-backed understanding before making changes
-- `test-driven-development`: using tests to guide implementation and protect behavior
 - `code-review`: performing structured review of code changes
 
 ## Getting Started
