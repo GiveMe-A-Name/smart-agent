@@ -31,7 +31,7 @@ This skill does not own:
 
 ## Invariants
 
-- Before drafting body text, name the primary reader and the action they need to take. If either is missing, stop [because every structural choice — detail level, ordering, vocabulary — depends on who reads and what they must do; drafting without this locks in the wrong choices before the first sentence].
+- Before drafting body text, identify who will read the artifact and what action they need to take. If either is missing, stop [because every structural choice — detail level, ordering, vocabulary — depends on who reads and what they must do; drafting without this locks in the wrong choices before the first sentence].
 - Decision, proposal, review, and change-summary artifacts must state the decision, recommendation, or change intent in the first paragraph [because most readers stop at paragraph 1; context buried below will not reach decision-makers]. Operable and reference artifacts must begin with an opening section that states when to use the artifact, required prerequisites, and the first check or command [because an operator working under pressure will act on the first visible instruction; if that is preamble, they act on the wrong thing].
 - Any claim used to justify a decision, priority, risk, or action must include at least one supporting anchor: a number, a concrete condition, an example, a link, or observed evidence. If it has none, mark it as an assumption or revise it [because an unjustified claim cannot be challenged or verified, making the artifact untrustworthy].
 - Any artifact expected to remain current as the system, interface, or operating procedure changes is a living artifact. Every living artifact (runbook, API docs, architecture overview, README) must name an update owner or source of truth before publishing [because a document without an update owner will become stale and mislead the next reader who trusts it].
@@ -41,7 +41,7 @@ This skill does not own:
 Work through these dimensions for each artifact. The first two must be answered before writing begins. See `references/judgment-dimensions.md` for detailed signals in each dimension.
 
 **Audience** — Who reads this and what action do they need to take?
-- If you cannot name the primary reader and their required action in one sentence, stop before drafting.
+- If the artifact's primary reader or required action is unclear, stop before drafting.
 - If the primary reader approves or rejects rather than implements, the opening must contain outcomes, tradeoffs, and risks, not step-by-step implementation.
 - If the primary reader will implement or operate the change, include the concrete material they act on: file paths, code examples, interface contracts, or exact commands.
 - Mixed audiences require layered structure: a summary section before implementation detail.
@@ -85,7 +85,7 @@ See `references/judgment-dimensions.md` for expanded guidance on all dimensions 
 
 Stop and reassess if:
 
-- you cannot name the primary reader and their required action before drafting [every section will be miscalibrated; the artifact will be written for the author, not the reader]
+- the artifact's primary reader or required action is unclear before drafting [every section will be miscalibrated; the artifact will be written for the author, not the reader]
 - a decision/proposal/review artifact reaches paragraph 2 without stating the recommendation, change intent, or ask [most readers stop at paragraph 1; if the key point is not there, decision-makers will not reach it]
 - an operable/reference artifact begins without an opening section stating when to use it, prerequisites, or the first check or command [an operator under pressure acts on the first visible instruction; preamble at the top means they act on the wrong thing]
 - you are writing implementation detail for a leadership audience, or high-level summaries for the implementation team [mismatched detail ensures the artifact cannot be used: leadership cannot approve from implementation steps; engineers cannot implement from summaries]
@@ -98,7 +98,7 @@ Stop and reassess if:
 
 ## Completion Criteria
 
-- [ ] The artifact's content is calibrated for a specific, nameable reader type performing a specific action; the vehicle matches that need.
+- [ ] The artifact's structure, level of detail, and opening match its reader, required action, and vehicle.
 - [ ] The opening follows the artifact type rule: recommendation/change intent in paragraph 1 for decision/proposal/review artifacts, or an opening section with entry conditions plus first check/command for operable/reference artifacts.
 - [ ] Claims that justify urgency, risk, correctness, or priority include evidence or are explicitly labeled as assumptions.
 - [ ] Each heading names a question, decision, or action a reader could search for; no heading is a generic label such as "Background" or "Overview" where a more specific heading is available.
