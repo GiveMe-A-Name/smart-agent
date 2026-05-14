@@ -9,6 +9,30 @@ Write skills as reusable capability guides that teach judgment — not SOPs, pro
 
 A skill is evaluated for judgment quality, not format compliance. The value is in the boundary: understanding what the skill owns, what must not happen, what signals should shape decisions, and where the capability ends. A well-written skill still guides an agent when followed out of order, partially read, or applied to a case its author never imagined. A well-written SOP is not a failure — the failure is forcing judgment tasks into SOPs, or dressing up SOPs as capability skills.
 
+## The Reader Is an Agent
+
+A SKILL.md is read and executed by another agent — not a human. This single fact constrains every language choice. Two consequences follow, and most of the invariants below are downstream applications of these two.
+
+**Agents do not judge by atmosphere.**
+
+Words like "ensure", "be thorough", "carefully consider", "as appropriate", "well-understood" delegate the check back to the reading agent's own judgment. But the reason the skill exists is that the agent's self-judgment is unreliable in exactly this situation — otherwise no skill would be needed. Atmosphere language asks the agent to exercise the very capability the skill was written to compensate for, which is why it silently fails.
+
+Every condition the agent must verify — invariants, decision signals, completion criteria, failure signals — must be confirmable from observable evidence already seen: call sites read, tests run, files opened, user statements made.
+
+Test: can the reading agent answer yes/no to this condition without exercising the very judgment the skill is meant to protect?
+- Pass: "Stop if you have not traced the call chain to a behavior-changing function" — checkable against actions taken.
+- Fail: "Ensure the code is well-understood" — only the unreliable self-judgment can answer.
+
+**Agents generalize from causal models, not from rules or examples alone.**
+
+A skill is invoked in situations its author never imagined. An agent that knows a rule but not the mechanism behind it will fail to apply it in a structurally identical case that does not match the surface pattern — and will rationalize its way around the rule when the surface pattern looks different enough.
+
+Every trigger condition, invariant, and failure mode that could plausibly meet a novel scenario must include the mechanism — the chain from "if this happens" to "this specific kind of downstream harm follows". Examples illustrate the mechanism; they do not substitute for it.
+
+Test: shown only the rule and its stated reason, could the reading agent derive the right action in a scenario the author never imagined? If the right action requires "getting the spirit" of the rule, the causal model is missing — write it inline.
+
+These two consequences are why the verifiable-language and inline-rationale rules below exist. When in doubt about a specific phrasing, return here.
+
 ## Trigger Logic
 
 **Invocation default**: The cost of running this skill unnecessarily is a short review pass. The cost of skipping it is a skill that silently triggers at the wrong time, encodes routing instead of capability, or teaches the wrong thing while looking complete. When skill quality or structure is in question, invoke.
