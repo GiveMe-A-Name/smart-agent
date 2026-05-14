@@ -1,6 +1,6 @@
 ---
 name: technical-communication
-description: "Write durable technical communication artifacts that others will read, decide from, review from, or operate from — design docs, RFCs, ADRs, postmortems, runbooks, READMEs, API docs, PR descriptions. TRIGGER when: writing a persistent artifact that must carry context without the author present. DO NOT TRIGGER when: writing inline code comments or informal, ephemeral messages."
+description: "Improve reader-facing technical artifacts when the primary problem is communication quality — structure, clarity, evidence, audience fit, or operational usability. Covers design docs, RFCs, ADRs, postmortems, runbooks, READMEs, API docs, and PR descriptions. DO NOT TRIGGER for implementation planning: scope, files, sequencing, verification, or execution handoff."
 ---
 
 # Technical Communication
