@@ -1,95 +1,78 @@
 ---
 name: brainstorming
-description: "Explore an open idea or problem until a clear direction is agreed. TRIGGER when: user opens a topic for collaborative exploration, describes a goal without naming a solution, asks 'how should we approach X' or 'should we do X or Y', or presents alternatives without choosing."
+description: "Explore an open idea or problem to surface options, assumptions, and decision factors — let the user's thinking become clearer. TRIGGER when: user opens a topic for collaborative exploration, describes a goal without naming a solution, asks 'how should we approach X' or 'should we do X or Y', or presents alternatives without choosing."
 ---
 
-# Brainstorming Ideas Into Designs
+# Brainstorming
 
-Explores design options through open dialogue until the user has confirmed a direction. The output is a clear, agreed design — not a spec, not code.
-
-<HARD-GATE>
-Do NOT write code, scaffold a project, or begin any implementation work until the user has explicitly confirmed the design direction in conversation.
-</HARD-GATE>
+Explores an open idea through dialogue. The output is clearer thinking — surfaced options, assumptions, and decision factors. The user decides when to stop and what to do next.
 
 ## Trigger Signals
 
-**Invocation default**: Skipping design when it is needed converts unresolved questions into implementation mistakes — wrong interfaces, missing constraints, or structure that has to be undone. The cost of an unnecessary design session is a short conversation. The cost of missing it is building the wrong thing. Invoke this skill whenever no committed spec exists and the work involves decisions about what to build or how it should work.
+**Invocation default**: Skipping exploration when it is needed converts unresolved questions into implementation mistakes — wrong interfaces, missing constraints, or structure that has to be undone. The cost of an unnecessary exploration is a short conversation. The cost of missing it is building the wrong thing. Invoke this skill whenever the topic is open and at least one decision about shape, scope, tradeoff, or approach remains unexamined.
 
-Invoke when: no committed spec or agreed design exists, and at least one decision about shape, scope, tradeoff, or approach remains open.
+Invoke when: the topic is open and at least one decision about shape, scope, tradeoff, or approach remains unexamined.
 
 Do not use this skill when:
-- a committed spec already exists, the approach and interfaces are decided, and the remaining step is writing code against that spec
-- the question is a factual lookup or a clarification with no open design decisions
+- the approach and interfaces are already decided and the remaining step is writing code against that decision
+- the question is a factual lookup or a clarification with no open decisions
 
 ## Capability Boundary
 
-This skill covers design exploration: understanding the problem, surfacing options, comparing tradeoffs, and reaching a confirmed direction.
+This skill covers divergent exploration: grounding the problem, surfacing options, making assumptions visible, naming decision factors, and introducing perspectives outside the user's frame.
 
 This skill does NOT own:
-- Spec writing or spec review
-- Committing design documents to git
-- Implementation planning or test design — out of scope for this skill even after design is confirmed
-- Sub-project decomposition beyond identifying that it's needed
-- Designing a scope the user hasn't yet agreed to decompose
+- Choosing a direction on the user's behalf
+- Spec writing or implementation planning
+- Sub-project decomposition
+
+The user owns convergence. When the user signals they are ready to stop exploring and move on (e.g. "let's go with X", "let's plan this out", "start implementing"), exit this skill — do not continue to diverge.
 
 ## Invariants
 
 - One question per message — no exceptions
-- Always surface 2–3 genuinely different directions before converging — unless the user has explicitly named an approach and said they do not need alternatives
-- Every design gets explored — simple ones get a short session, not no session
-- No unrelated refactoring — only improvements that directly serve the current goal
+- Actively introduce perspectives, options, and questions from outside the user's original frame — divergence is the core motion of this skill
+- Every exploration matters — short topics get a short session, not no session
+- No unrelated refactoring — only directions that serve the current goal
 
-## What Good Looks Like
+## What Good Brainstorming Looks Like
 
-Use this section to assess where the session is. These are not steps to execute — they are states to evaluate against.
+A session is going well when one or more of these outputs are emerging. None is mandatory — produce the ones the user's situation calls for. The session is complete when the user says so, not when this list is filled.
 
-**The problem is grounded**
+**Reframed problem statement**
+- *What it is*: the user's original framing rewritten with embedded assumptions named and the underlying need stated explicitly
+- *Why it matters*: original framings often prescribe a solution shape that hides the real problem (e.g. "we need to refactor X" hides "X is hard to maintain"). Without reframing, every option that follows solves the wrong problem.
+- *Produce when*: the user's opening statement is a verb-object that prescribes a solution ("refactor X", "switch to Y", "add Z") rather than a description of a need or constraint
 
-The session is anchored to the root problem, not the surface framing. The user's original statement contains embedded assumptions — "we need to refactor the code" assumes structural change is the solution; the root problem is likely "code is hard to maintain." Grounded means those assumptions have been named and the underlying need is explicit.
+**Distinct options on the table**
+- *What it is*: two or more approaches placed side by side that lead to materially different designs — not variants of one idea
+- *Why it matters*: a single option is not a choice. The user cannot reason about tradeoffs without alternatives to compare against.
+- *Produce when*: the user has named one approach without stating they only want that one; or has described a goal without naming any approach
+- *Watch for*: options that share the same underlying assumption are not distinct — keep diverging
 
-Not grounded: the discussion is organized around the user's original description without questioning what it assumes.
+**Surfaced assumptions**
+- *What it is*: implicit constraints or beliefs the user was treating as fixed, made explicit so they can be questioned
+- *Why it matters*: assumptions left implicit silently exclude entire option spaces. Making them visible expands what the user can consider — even if the user re-confirms the assumption afterward, the confirmation is now deliberate.
+- *Produce when*: the user uses absolute language ("we have to", "we can't", "obviously"), references a system/tool/constraint as fixed without justifying it, or treats a prior decision as non-negotiable
 
-**Divergence is genuine**
+**Decision factors**
+- *What it is*: the axes along which options differ — e.g. reversibility, blast radius, maintenance cost, time-to-first-value, coupling
+- *Why it matters*: without explicit factors, choosing between options collapses to gut feel. With them, the user can match options to their actual constraints, and can defer the choice on principled grounds.
+- *Produce when*: two or more options are on the table and comparison talk has begun
 
-Divergence is happening when:
-- Information has surfaced that was absent from the original prompt — new constraints, user needs, or technical realities the user hadn't stated
-- The options on the table are fundamentally different, not variants of the same approach — they lead to materially different designs with different tradeoffs
-- The user's cognitive frame has been actively challenged — perspectives they would not reach on their own have been introduced (see `references/blind-spots.md`)
+**Open questions**
+- *What it is*: what would need to be answered before a confident choice is possible — facts to gather, people to ask, experiments to run
+- *Why it matters*: brainstorming exposes uncertainty. Making the uncertainty itself an output prevents premature commitment and gives the user a legitimate next step that is not "decide now".
+- *Produce when*: a comparison hits a question neither party can answer in the conversation
 
-Divergence is not happening when the agent is only asking clarifying questions within the user's original frame, or when all options cluster around the user's opening assumption.
-
-**Convergence is real**
-
-Convergence is real when:
-- The chosen direction carries explicit reasoning — "because X, not Y" — not just a stated preference
-- Rejected alternatives were consciously set aside with understood reasons, not quietly dropped
-- The direction that emerged is traceable to the dialogue itself — not a position either party held at the start
-
-Convergence is not real when the user agrees with the agent's recommendation without the reasoning being examined, or when the final direction is identical to the user's opening assumption.
-
-## Completion Criteria
-
-- [ ] The problem was grounded — root problem named, embedded assumptions surfaced
-- [ ] Divergence was genuine — new information surfaced, fundamentally different directions explored, cognitive frame challenged
-- [ ] Convergence is real — chosen direction has explicit reasoning, rejected alternatives understood, direction traceable to dialogue
-- [ ] The user has explicitly confirmed the direction in conversation
-
-**If any criterion is not met, return to the relevant section before exiting.**
-
-## Anti-Rationalization Check
-
-Pause before exiting.
-
-Do not treat this section as another checklist to clear. Use it to challenge whether the apparent completeness of the design is real.
-
-Did I ignore any failure signals because the design now feels settled?
-
-Am I exiting because the design is genuinely complete and approved, or because the structure now looks finished enough?
+**Blind spots introduced**
+- *What it is*: perspectives the user is unlikely to reach alone — failure modes, frame locks, etc. (see `references/blind-spots.md`)
+- *Why it matters*: the agent's asymmetric value in brainstorming is breaking the user's cognitive frame. Without injected perspectives, the conversation only reorganizes what the user already thought.
+- *Produce when*: detect signals in `references/blind-spots.md` match the current conversation state
 
 ## Failure Signals
 
 Stop and reassess if:
 - You are discussing implementation details (library choices, file organization, syntax) before the root problem is grounded
-- Major design decisions are still unresolved but implementation work is about to begin
-- You surfaced 2–3 directions but they are variants of the same idea rather than genuinely different approaches
-- The user wants to go straight to code without confirming a direction — hold the HARD-GATE; explain why a confirmed direction matters before implementation
+- The "options" you have surfaced are variants of the same idea rather than genuinely different approaches — you are not actually diverging
+- You are pushing the user toward a decision they have not asked to make — convergence is the user's call, not yours
