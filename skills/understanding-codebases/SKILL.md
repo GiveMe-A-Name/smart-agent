@@ -15,7 +15,7 @@ Build grounded, task-relevant understanding of the code before suggesting implem
 
 Use this skill when:
 - answering safely requires tracing behavior across multiple files or layers
-- the question is concrete, but current repository evidence is too thin to answer confidently
+- the question is concrete, but you cannot yet point to source files or traced behavior that answer it
 - proceeding would require guessing about code structure, ownership, or behavior
 
 Do not use this skill when:
@@ -53,23 +53,23 @@ This skill does not own:
 
 **When to widen scope**: expand beyond the initial slice only when a current lookup reveals dependencies that block answering the question — not by default.
 
-**When to stop exploring**: stop when the last two file reads or searches produced no new information about ownership, call flow, or candidate change points. Remaining unknowns will surface during implementation; that is normal.
+**When to stop exploring**: stop when the last two file reads or searches produced no new call edge, behavior-changing function, ownership clue, convention example, or candidate change point. Remaining unknowns will surface during implementation; that is normal.
 
-**When to consult git history**: when code cannot be explained from its structure alone — two paths appear to handle the same case, naming gives no signal about purpose (e.g., `handle`, `process`, `doWork`), or the code is more complex than the behavior it produces can account for. `git blame` plus the commit message often explains what application code alone cannot.
+**When to consult git history**: when two behavior paths appear to handle the same case, names do not distinguish responsibilities (e.g., `handle`, `process`, `doWork`), or a behavior-changing branch has no local comment, test, or caller explaining why it exists. `git blame` plus the commit message often explains what application code alone cannot.
 
 **When to read infrastructure/config**: when deployment constraints, environment variables, or build system shape could affect the answer. For add-a-feature investigations, read the project's build configuration (the file that defines package structure, tooling, and linting — e.g. `pyproject.toml`, `Cargo.toml`, `package.json`) and test infrastructure (fixture files, test configuration) by default — "could this affect the answer?" resolves to yes for nearly all feature additions [because these files define package discovery, linting gates, and testing patterns that new code must comply with; reading only source files produces a technically correct but practically incomplete picture of what adding the feature correctly requires].
 
 **When to check for runtime overrides**: when reading a value that determines behavior — a path, threshold, mode, or feature flag — check whether it can be overridden at runtime via environment variable, CLI argument, config file, or feature toggle. Document both the default AND the override mechanism; the override name is as important as the default value. A value that looks fixed in source code may be configurable in deployment — reporting only the hardcoded default produces a factually incomplete description.
 
-**When the answer is a guide, not an audit**: if the question is "how do I add X", "how do I replicate X", or "what should I know before doing X" — each evidence item must state its practical implication, not just the mechanism. Not "discovery uses importlib" but "discovery uses importlib, therefore no registration step is needed." Stop before responding: can the user take the correct action from this output without reading the source files themselves?
+**When the answer is a guide, not an audit**: if the question is "how do I add X", "how do I replicate X", or "what should I know before doing X" — each evidence item must state its practical implication, not just the mechanism. Not "discovery uses importlib" but "discovery uses importlib, therefore no registration step is needed." Stop before responding if any evidence item lacks a task-specific implication.
 
-**How much P/H/U to write**: proportional to code ambiguity. A single linear call chain with no branching warrants one sentence of Unknown. Multiple paths, design tradeoffs, or implicit dependencies warrant fully expanded P/H/U — this is where the structure earns its cost.
+**How much P/H/U to write**: use one Unknown sentence when the traced path is single-entry, single-exit, and has no unresolved branch relevant to the question. Use fully expanded P/H/U when multiple paths, unresolved ownership, configuration overrides, or tradeoffs remain.
 
 **When a hypothesis is not new**: a new hypothesis changes *what* you are looking for, not just *where*. If the second lookup tests the same absence in a different location, it is not a new hypothesis — stop and report the gap. See `examples/fake-new-hypothesis.md`.
 
 ## Completion Criteria
 
-- [ ] Conclusions are grounded in code evidence, not assumptions or prior knowledge.
+- [ ] Every conclusion names at least one source file, line, command result, or traced call path that supports it.
 - [ ] Which files matter and the role each plays is stated — not just listed.
 - [ ] The call flow relevant to the question is traced.
 - [ ] The conventions the codebase uses for similar work are identified.
@@ -79,7 +79,7 @@ This skill does not own:
 - [ ] Infrastructure and config files were checked if deployment constraints or implicit dependencies are relevant. For add-a-feature questions, build configuration and test infrastructure were read — not just source files.
 - [ ] **Actionability (action-oriented questions only)**: if the question is "add X", "replicate X", or "what should I know before doing X" — each evidence item names its practical implication for the reader's task. Stop if evidence items appear without a practical implication.
 
-If you still need intuition to bridge the answer, keep investigating.
+If any conclusion cannot be backed by a file, line, command result, or traced call path already read, keep investigating or mark it as unknown.
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
