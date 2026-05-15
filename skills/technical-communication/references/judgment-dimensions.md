@@ -82,7 +82,7 @@ When facing a communication task, use this table to identify which dimensions ne
 **Question**: Will this document still be useful in 6 months? Should it be?
 
 - If the document records a decision (ADR) or an incident (postmortem), it should be treated as immutable — a snapshot of understanding at a point in time. Do not update it; supersede it. Adding "Update (March 2025): we changed this because..." corrupts the historical record.
-- If the document describes a living system (runbook, API docs, architecture overview), it *will* become stale. Build in explicit update expectations: who owns updates, what triggers a review, where the source of truth lives. A document without an update owner is a document that will eventually lie.
+- If the document describes a living system (runbook, API docs, architecture overview), it *will* become stale. Resolve update expectations before finalizing: who owns updates, what triggers a review, or where the source of truth lives. A document without a maintenance path is a document that will eventually lie.
 - If the document references specific versions, dates, people, or system states, mark it as point-in-time or ensure those references will be maintained. "The current architecture" becomes meaningless in 6 months without a date or version.
 - If the document is a proposal (RFC), state its expected lifecycle: does it become an ADR when accepted? Does it become obsolete once implemented? Documents with unclear lifecycles accumulate and confuse.
 - If you're unsure whether the document should be updated or replaced, default to immutable with supersession. It is easier to write a new document with current context than to correctly update an old document without introducing contradictions.

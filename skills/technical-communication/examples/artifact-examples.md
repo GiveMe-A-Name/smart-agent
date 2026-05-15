@@ -112,15 +112,13 @@ The implementation can be rewritten entirely without this comment becoming false
 
 The ADR records the decision as it was made. When the decision changes, a new ADR is written that supersedes this one. Do not append corrections or update history inline — that corrupts the historical record.
 
-**Living artifact (Runbook) — missing update owner:**
+**Living artifact (Runbook) — unresolved maintenance path:**
 
 > Runbook: Restarting the Payment Service
 > Last updated: 2024-01-15
 
-No owner named. When the restart procedure changes (it will), nobody knows they are responsible for updating this. Future operators follow stale commands.
+The source material, repository conventions, and conversation provide no maintenance path. When the restart procedure changes (it will), the agent has no way to tell who should keep it current. Future operators may follow stale commands.
 
-**Living artifact — correct:**
+**Living artifact — maintenance path resolved before publishing:**
 
-> Runbook: Restarting the Payment Service  
-> Owner: Platform On-Call (rotation lead)  
-> Source of truth: this file; update before closing any incident that required a procedure change
+The repository has a `CODEOWNERS` rule for runbooks and an existing docs convention that procedure changes are reviewed by the platform on-call rotation. The agent can treat the maintenance path as resolved while preserving the artifact's existing format.
