@@ -6,15 +6,15 @@ Reference material for the writing-plans skill. Contains detailed guidance on ho
 
 ## Understand Before You Decompose
 
-Before breaking anything down, reason about what you're facing — not fill in fields.
+Before breaking work into tasks, produce an assessment from observable evidence. If any required item below is missing, continue assessment instead of writing the plan.
 
-**How big is this?** Not in hours — in uncertainty and blast radius. See the Task Sizing table in SKILL.md for calibration. A change inside one function with no interface impact is fundamentally different from a change that introduces a new concept across multiple modules.
+**Size evidence:** State the size using uncertainty and blast radius, not time. Evidence must name affected functions, modules, interfaces, services, or domains. A one-function change with no interface impact is different from a change that introduces a concept across modules.
 
-**What kind of work is this?** A bug fix without a known root cause is not ready for planning — it's still investigation. A feature needs awareness of existing patterns so you extend rather than reinvent. A refactor needs a map of what touches what before you move anything. An architecture change needs constraints and trade-offs surfaced, not just tasks listed. Let the nature of the work shape how you think, not which template you reach for.
+**Work nature:** State whether the work is bug fix, feature, refactor, migration, or architecture change. Bug fixes require a named root cause before planning. Features require at least one existing pattern read or an explicit note that no precedent exists. Refactors require a caller/dependency map. Architecture changes require named constraints and trade-offs.
 
-**What exists today?** Which files are involved? What patterns does the codebase already use? What constraints are immovable? If you don't know this, your plan will collide with reality. Go read the code first.
+**Current state:** List the files read, the relevant behavior observed in each, existing patterns to copy, and constraints that cannot move. If the plan names a file or pattern not yet read, mark it as an assumption and verify before dependent tasks.
 
-**What does done look like?** Before decomposing, state the exact verification command and what passing looks like. This is the overall acceptance criterion — it anchors the entire decomposition. Each task also needs its own verification signal. A task with no independently testable output is a horizontal slice in disguise, even if the final task has a clean integration test.
+**Done state:** State the exact verification command and expected output before decomposing. This is the overall acceptance criterion. Each task also needs its own verification signal. A task with no independently testable output is a horizontal slice in disguise, even if the final task has a clean integration test.
 
 ---
 
@@ -22,21 +22,21 @@ Before breaking anything down, reason about what you're facing — not fill in f
 
 There is no single "correct method" — the right decomposition emerges from reasoning about your specific situation.
 
-**Each step should teach you something.** When you break work into pieces, every piece should either deliver value or resolve uncertainty. If a piece does neither — if it's "set up some structures nothing uses yet" — it's wasted motion.
+**Each step must either deliver behavior or resolve named uncertainty.** For every task, write one sentence that names the behavior delivered or the uncertainty resolved. If the sentence only says "set up" or "create structure" without a verification signal, the task is a horizontal slice.
 
-**Get something working end-to-end as early as possible.** A hardcoded, simplified, ugly version that actually runs tells you more than a perfectly architected set of pieces that have never been connected. This is why experienced engineers instinctively avoid layer-by-layer work ("first all the models, then all the endpoints") — each layer alone teaches you nothing about whether the system works. You only discover real problems when things connect, and you want that discovery to happen early.
+**Create an end-to-end behavior before expanding layers.** The first or second task should connect the smallest usable path through the system, even with hardcoded data, when the feature spans multiple components. If all early tasks create models, infrastructure, or schemas without a runnable behavior, the plan delays discovery until too late.
 
-**Tackle what scares you first.** If there's a part you're uncertain about — an integration you haven't done, a constraint you're unsure you can meet — that should come early. If that part fails, everything built on top of it is wasted. The comfortable, well-understood parts can wait.
+**Move critical uncertainty early.** Put a task near the front when it depends on an unverified integration, an API capability not yet observed, a performance/security constraint, or a user decision. If that task fails, downstream tasks built on the assumption would be wasted.
 
-**Think about what blocks what.** Some tasks can't start until others finish. Some are completely independent. Don't force sequential work that could be parallel, and don't plan parallel work that actually has hidden dependencies.
+**Name dependency edges.** For each task, state what prior task or artifact it depends on. Mark tasks as parallel only when they do not modify the same files, do not depend on each other's output, and share a defined interface.
 
-**Boundaries between tasks should be points where things work.** After finishing a task, you should be able to stop, run the tests, and everything passes. If a task leaves the codebase broken mid-flight, you're cutting the work by technical layer instead of by behavior.
+**Task boundaries must be working states.** Each task ends with a verification command or observable check. If a task intentionally leaves tests failing or a behavior path broken, split it or move the boundary.
 
-**When components need to talk to each other, define the contract first.** If the work crosses module or service boundaries, agreeing on the interface between them lets each side be built and tested independently.
+**Define contracts before parallel cross-boundary work.** If the plan crosses module, service, or team boundaries, add an interface/contract task before work that depends on both sides. The contract must name inputs, outputs, errors, and ownership/handoff point.
 
-**Plan detail should match your certainty.** You know a lot about the immediate next step. You know less about step 5. You know almost nothing about step 10 — and whatever you think you know will shift after earlier steps. Put detail where it matters: the near work. For later tasks, a goal and rough scope is enough.
+**Match detail to known inputs.** Give step-by-step detail only for tasks whose required inputs are already known from assessment or earlier completed tasks. Later tasks whose steps depend on unresolved findings should be goal-level with a revision trigger.
 
-**Granularity is judgment, not formula.** The right size for a task is: small enough to hold in your head while doing it, large enough that completing it produces a meaningful result. If a task feels too big to think about clearly, split it. If it's trivial, merge it.
+**Split or merge by verification size.** Split a task if it has multiple independent verification commands, modifies unrelated behavior paths, or cannot be summarized by one purpose sentence. Merge tasks when each one has no independent behavior, uncertainty reduction, or verification signal.
 
 ---
 

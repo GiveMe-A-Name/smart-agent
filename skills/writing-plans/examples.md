@@ -90,13 +90,13 @@ Verify: `python cli/export.py --dry-run output/` prints paths, no files created;
 > Build incrementally starting with the riskiest part — integrating with the job completion event system. Three steps:
 > 1. Get a hardcoded webhook firing end-to-end on job completion (proves the approach works)
 > 2. Make the webhook URL configurable (straightforward, low risk)
-> 3. Add retry with exponential backoff (well-understood pattern)
+> 3. Add retry with exponential backoff (existing retry behavior or test patterns can be copied from the codebase)
 >
 > Main risk: the job completion event might not carry enough context to construct a useful payload. We find out in step 1 before investing in config and retry logic.
 
 **Decomposition strategy:**
 - **Walking skeleton first** — get the simplest POST working end-to-end before adding config, retries, or error handling
-- **Risk-first ordering** — the riskiest part is integrating with `job_runner.py`'s event system, so do that first; retry logic and config are well-understood and can come later
+- **Risk-first ordering** — the riskiest part is integrating with `job_runner.py`'s event system, so do that first; retry logic and config come later because the assessment found existing config parsing and retry test patterns to copy
 - **Vertical slicing** — each task delivers a new testable behavior, not a layer
 
 **Risk analysis:** The main uncertainty is whether `on_complete` provides enough context to construct the webhook payload. We find out in Task 1.
@@ -142,7 +142,7 @@ Files: Modify `config.yaml`, the notifier created in Task 1, `job_runner.py`
 - [ ] Commit point: tests green, webhook is config-driven
 
 ### Task 3: Add retry logic
-*Routine work, well-understood patterns.*
+*Lower-risk work because the assessment found existing retry tests and config patterns to copy.*
 
 Files: Modify the notifier and its tests (created in Task 1)
 

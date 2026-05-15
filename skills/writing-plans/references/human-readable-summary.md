@@ -1,6 +1,6 @@
 # Human Review Section
 
-Plan documents serve two audiences: **agents** (who execute) and **humans** (who approve and understand). These audiences need different things from the same document.
+Plan documents serve two audiences: **agents** (who execute) and **humans** (who approve intent, scope, and strategy). These audiences need different things from the same document.
 
 The Human Review Section is the human's surface. It is written once, approved once, and then **frozen for the life of the plan**. Agents read it for context but never modify it. This freeze is what makes review meaningful — a human can trust that what they approved is still what the agent is executing against.
 
@@ -10,7 +10,7 @@ The execution detail (task checklists, file paths, verification commands) lives 
 
 ## Intent Statement (1-second read)
 
-The very first line of the Human Review Section. One sentence stating what the agent understands the user's intent to be — framed from the user's perspective, not the agent's task list.
+The very first line of the Human Review Section. One sentence stating the user's requested outcome — framed from the user's perspective, not the agent's task list.
 
 > **Intent:** [One sentence — what the user wants to achieve, in their terms]
 
@@ -32,9 +32,9 @@ A short block that lets a human decide "direction correct or not" at a glance:
 
 ## Layer 2: Approach Overview (30-second read)
 
-A short paragraph or bullet list that describes **how** in human terms — the strategy, key steps, and important design decisions. Use domain concepts ("add retry logic to webhook sender"), not code-level references ("modify `notifications/webhook.py:send()`"). Include trade-offs or alternatives considered if they matter for approval.
+A short paragraph or bullet list that describes **how** in human terms — the strategy, key steps, and important design decisions. Use domain concepts ("add retry logic to webhook sender"), not code-level references ("modify `notifications/webhook.py:send()`"). Include trade-offs or alternatives considered if they affect scope, user-visible behavior, risk, or dependencies.
 
-If the human reads Layer 1 and still can't judge whether the direction is correct, Layer 2 gives enough strategic detail to make that call without reading file paths or task checklists.
+Layer 2 passes when it states ordering logic and major trade-offs without file paths or task checklists. If it only lists code edits, rewrite it as strategy: what happens first, why that order reduces risk, and what decision the human is approving.
 
 ## Task Overview (medium/large only)
 
@@ -43,7 +43,7 @@ One sentence per task, in plain English, explaining what each task achieves and 
 Example:
 > - Task 1: Prove the approach works end-to-end before investing in configuration or retry logic
 > - Task 2: Make the webhook URL configurable — low risk, builds on the proven skeleton
-> - Task 3: Add retry on failure — well-understood pattern, comes last because it depends on the working base
+> - Task 3: Add retry on failure — comes last because the assessment found existing retry test patterns to copy and it depends on the working base
 
 No file paths. No method names. If a task's purpose can't be stated in one human sentence, the task needs rethinking.
 
@@ -78,7 +78,7 @@ The Human Review Section is frozen at approval. Mark it with `[APPROVED — READ
 
 - Use **human concepts**, not code concepts — "notification system" not "`notifications/webhook.py`"
 - Use **outcome language**, not implementation language — "users receive webhook calls when jobs complete" not "POST request is sent in `on_complete` handler"
-- Keep it **short** — Layer 1 should be 5 lines; Layer 2 should be 3-5 bullet points or a short paragraph
+- Keep it bounded — Layer 1 has exactly the five fields listed above; Layer 2 is either 3-5 bullets or one paragraph under 120 words
 - **No file paths** in the summary — that's what the technical plan is for
 
 ---
@@ -103,7 +103,7 @@ The Human Review Section is frozen at approval. Mark it with `[APPROVED — READ
 > - **Impact scope:** Authentication middleware only
 > - **Size:** Tiny
 
-**Why this works:** A PM can read it, understand what was wrong, and judge whether the fix is the right call — without knowing anything about the codebase.
+**Why this works:** It names the user-visible error, the corrected behavior, and the affected product area without file paths, function names, or implementation mechanics.
 
 ---
 
@@ -120,7 +120,7 @@ The Human Review Section is frozen at approval. Mark it with `[APPROVED — READ
 > Build incrementally, tackling the riskiest part first — wiring into the job completion event. Three steps:
 > 1. Get a hardcoded webhook firing end-to-end (proves the approach works before investing in config or retry)
 > 2. Make the URL configurable (low risk, straightforward)
-> 3. Add retry on failure (well-understood pattern)
+> 3. Add retry on failure (existing retry test patterns are available to copy)
 >
 > Main risk: the job completion event might not carry enough context for a useful payload. We find out in step 1, before committing to the rest.
 

@@ -52,7 +52,7 @@ If you can't name the files involved or state how to verify completion, you have
 
 - [ ] The Human Review Section opens with a standalone **Intent** statement — one sentence stating what the user wants to achieve in their terms. This appears before Layer 1 and before all other fields.
 - [ ] The plan starts with a Human Review Section (Layer 1 for all sizes; Layer 2 + Task Overview + Key Decisions also for medium/large).
-- [ ] **Human readability litmus test:** Read the Human Review Section aloud. If a product manager who doesn't know this codebase couldn't understand it, rewrite. Zero file paths, zero method names, zero code references anywhere in this section.
+- [ ] **Human Review Section language check:** It contains zero file paths, line numbers, function names, method names, implementation-only class/module names, or non-user-visible CLI flags. Each bullet names a user-visible or domain-level outcome. If a sentence needs codebase knowledge to understand, rewrite it by replacing implementation detail with the user problem, system behavior, or product/domain concept it represents.
 - [ ] **Task Overview present (medium/large):** Each task has one plain-English sentence in the Human Review Section explaining what it achieves and why it comes at this point in the sequence.
 - [ ] **Key Decisions present (medium/large):** Every design choice requiring human ratification is listed with alternatives considered and reasoning.
 - [ ] The plan states task size, nature, current state, and decomposition strategy.
@@ -61,7 +61,7 @@ If you can't name the files involved or state how to verify completion, you have
 - [ ] For existing files being modified: paths are exact. For new files in medium/large work: module and direction are clear, exact names are execution-time judgment. Planned changes are concrete, not vague.
 - [ ] For medium/large: contingencies for the riskiest assumptions and plan revision triggers identified.
 - [ ] For cross-boundary work: interfaces and handoffs are explicit.
-- [ ] **Execution cold-start test:** Read the first task in isolation, without any conversation context. An agent should be able to identify the specific files to open and the first concrete change to make. If the first task requires inferring context from a prior message, revise it.
+- [ ] **Execution cold-start test:** Read the first task in isolation, without any conversation context. The task must name the specific existing files to open or the module/directory where new files belong, and the first behavior-changing action. If the first task requires inferring context from a prior message, revise it.
 - [ ] For medium/large: at least one explicit exclusion stated — what is deliberately out of scope.
 - [ ] For medium/large: stop signals listed in the plan document — conditions under which the agent must pause and ask before continuing.
 - [ ] For medium/large with multiple competing goals: conflict priority stated.
@@ -87,7 +87,8 @@ Completion-faking signals specific to plan writing — stop if any apply:
 - Task why-sentences restate the task name rather than explain why the task exists at this point in the sequence
 - Verification steps are written as prose ("run the tests") rather than executable commands with expected output — prose is not a verification step
 - Reading the first task requires the planning conversation for context — the plan is not self-contained
-- The Human Review Section would require domain knowledge to understand — it has not passed the product-manager readability test
+- The Human Review Section contains file paths, line numbers, function names, method names, implementation-only class/module names, or non-user-visible CLI flags
+- A Human Review Section sentence explains implementation mechanics without naming the user problem, system behavior, or product/domain concept it represents
 - For large plans: read the last task in isolation — if its detailed steps depend on specific outcomes from earlier tasks not yet done, progressive refinement was not applied; convert tasks whose content depends on uncertain earlier outcomes to goal-level descriptions
 - For large plans: count tasks with step-by-step checklists — if more than 3 have them, verify whether the far tasks' steps could change once early tasks complete; if yes, revise to goal-level
 
@@ -156,22 +157,26 @@ Regardless of size, a usable plan is concrete:
 
 ---
 
-## Review Loop
+## Independent Review
 
-Dispatch a plan-document-reviewer subagent (see `plan-document-reviewer-prompt.md`) according to these rules:
+Use independent review only when the plan has evidence of coordination risk. The review exists to catch gaps the planner is least likely to notice: unverified assumptions on the critical path, cross-boundary contract mismatches, and plans that look complete but cannot be executed cold.
 
-**Large — always dispatch.** Large plans carry multi-component impact and hidden dependencies that warrant independent review.
+**Large — review required.** Large plans affect multiple components or architectural boundaries, so a single planner is likely to overweight the path they just designed and miss downstream coupling.
 
-**Medium — dispatch if any of the following hold:**
-- Any primary risk is rated High [because a High-rated risk signals an unverified assumption on the critical path — exactly where reviewers find design flaws]
-- The plan contains ≥2 contingencies [because ≥2 contingencies mean the planner already anticipates multiple failure paths; reviewers find genuine issues where uncertainty is already acknowledged]
-- The plan spans ≥3 modules, services, or system boundaries [because cross-boundary count is a structural property the planner cannot easily misreport — it shows up regardless of planner quality]
+**Medium — review required if any evidence below is present:**
+- Any primary risk is rated High [because a High-rated risk marks an unverified assumption on the critical path]
+- The plan contains ≥2 contingencies [because multiple contingencies mean the planner already found multiple plausible failure paths]
+- The plan spans ≥3 modules, services, teams, or system boundaries [because cross-boundary count is observable evidence that interface mismatch can break the plan]
 
-Otherwise skip — a clear-requirement, low-risk, single-domain Medium plan has near-zero marginal review value.
+**Medium — review skipped only when all evidence below is present:**
+- exactly one domain or module boundary is affected
+- no primary risk is rated High
+- fewer than 2 contingencies are listed
+- the plan names an existing codebase pattern already verified in the assessment
 
-**Tiny/Small — skip.** Overhead exceeds value.
+**Tiny/Small — review skipped.** The review overhead exceeds value when the plan changes one known behavior path, uses exact files, and has a single verification command.
 
-When dispatching, pass the plan size — it determines the blocking threshold (see `plan-document-reviewer-prompt.md`).
+When review is required, use the independent-review guidance in `plan-document-reviewer-prompt.md`. The blocking threshold depends on plan size: Large fixes Critical and Important issues before handoff; Medium fixes Critical issues before handoff and surfaces Important issues to the human reviewer.
 
 ## Human Review Section
 
