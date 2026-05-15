@@ -4,19 +4,19 @@ When this skill is invoked after receiving code review — meaning feedback has 
 
 ## Implement the Reviewer's Intent, Not Their Literal Suggestion
 
-A reviewer may correctly identify a problem but suggest the wrong fix. When the feedback is "this validation should be centralized," the reviewer's intent is eliminating scattered validation — not necessarily the specific refactoring they proposed. Find the implementation that addresses the reviewer's concern while preserving the design integrity of the original code.
+A reviewer may correctly identify a problem but suggest the wrong fix. Before applying accepted feedback, identify the reviewer's stated concern, the suggested code location if any, the current responsibility owner implied by the code, and whether the suggested location changes public behavior, dependency direction, or ownership. If any of those cannot be identified from code or user statements, surface the gap before writing code.
 
-## Preserve Design Integrity Under Accepted Feedback
+## Preserve Structure Under Accepted Feedback
 
-Accepted review feedback can still damage structure if implemented carelessly. Before writing code:
+Accepted review feedback can still damage structure if implemented as a literal patch. Before writing code:
 
-1. **Does the accepted change fit within the original design direction?** If yes, implement it as a natural extension. If the accepted change requires altering the design direction, state this explicitly — the design intent shift should be a conscious decision, not a side effect of review response.
-2. **Does the reviewer's suggested implementation location align with where this responsibility should live?** The reviewer may be right about the *what* (this needs to change) but wrong about the *where* (it belongs in a different layer than they suggested).
-3. **Are there ripple effects the reviewer didn't anticipate?** A change that looks local in the diff may have contract implications for callers, test changes, or compatibility concerns. Surface these before implementing.
+1. **Check current design direction from evidence.** Name the existing responsibility owner, dependency direction, and public contract affected by the feedback. If the accepted change alters any of them, surface that shift before implementation.
+2. **Check the suggested location against responsibility ownership.** The reviewer may be right about the *what* but wrong about the *where*. If the suggested location would move validation, recovery, state ownership, or domain logic into a layer that does not currently own it, do not implement there without surfacing the ownership change.
+3. **Check downstream effects from callers and tests.** If the feedback changes return values, side effects, error types, test expectations, or compatibility behavior, treat it as a contract change and surface it before implementation.
 
-## Don't Let Review Feedback Override Structural Judgment
+## Don't Let Review Feedback Override Structural Signals
 
-The fact that a change was suggested by a reviewer does not exempt it from the same structural judgment applied to any other change. All judgment dimensions still apply. Review feedback that introduces the wrong abstraction is still the wrong abstraction. Review feedback that scatters complexity is still scattered complexity.
+The fact that a change was suggested by a reviewer does not exempt it from the same structural checks applied to any other change. Stop before implementation if the accepted feedback introduces an abstraction without a second concrete caller, scatters one concern across layers, changes behavior under an existing name, or reverses dependency direction.
 
 ## Scope the Response Appropriately
 

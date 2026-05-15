@@ -9,8 +9,8 @@ When reasoning about how a change should land, work through these dimensions. No
 **Key signals**:
 - If an abstraction requires parameters and conditional branches to handle different cases, it may be the wrong abstraction. The fastest way forward is often back — inline the abstraction, let the callers diverge, then see what new pattern emerges.
 - Before extracting any duplication, ask: "What event would require me to modify each copy?" If every copy has the same answer, extraction reduces drift risk. If any copy has a different answer, extraction creates a coupling point that makes both cases harder to change independently. Occurrence count is a proxy for this question — at 3+ copies the change drivers are usually shared; at 2 copies they often diverge — but the change-driver answer takes precedence over the count when it is clear.
-- If you're about to "clean up" repetition, ask: are these cases truly the same, or do they just look the same right now? Code that looks similar but changes for different reasons should not share an abstraction.
-- If an existing shared abstraction has accumulated conditionals to handle special cases, consider whether inlining it back would make each caller simpler and more honest about what it actually does.
+- Before "cleaning up" repetition, identify the change driver for each repeated block. If any block changes for a different reason, keep them separate even when the code looks similar today.
+- If an existing shared abstraction has accumulated conditionals to handle special cases, compare the abstraction against inlining at each caller: count caller-specific branches, options used by only one caller, and behavior differences hidden behind the shared name.
 
 See `examples/wrong-abstraction.md` for a case where eagerly extracting surface-similar code creates a worse outcome than tolerating duplication. See `examples/security-review-duplicate-helper.md` for the opposite case — where 3+ identical copies of security logic should be consolidated into a shared helper.
 
@@ -23,8 +23,8 @@ See `examples/wrong-abstraction.md` for a case where eagerly extracting surface-
 - Deep modules are better than shallow modules. A module with a simple interface that hides complex implementation is more valuable than one with a complex interface and trivial implementation.
 - If callers need to know implementation details to use a function correctly, the abstraction boundary is in the wrong place. A self-explanatory interface means the name and signature alone communicate what the function does and what constraints apply — no source-reading required. Example: `cache.get_or_compute(key, fn, ttl)` is self-explanatory; `cache.get(key)` followed by manual set/expire logic is not.
 - Pull complexity downward: if you can make 5 callers simpler by making 1 implementation more complex, do it. The net cognitive load decreases.
-- When adding a configuration parameter or flag, ask: could this decision be made automatically inside the module instead of pushed to every caller? Each configuration parameter is complexity exported to every user.
-- Validation, transformation, and error handling for a particular concern should live together in one layer, not be scattered across multiple layers with each layer doing a partial job.
+- Before adding a configuration parameter or flag, check whether the module already has the information needed to choose the behavior internally. If yes, keep the decision inside the module; each exported configuration parameter becomes caller-owned complexity.
+- If validation, transformation, or error handling for one concern appears in multiple layers, identify the layer that has enough context to own the whole concern; scattered partial handling creates inconsistent behavior.
 
 See `examples/complexity-misplacement.md` for a case where partial validation spread across layers creates a false sense of safety.
 
@@ -35,9 +35,9 @@ See `examples/complexity-misplacement.md` for a case where partial validation sp
 **Key signals**:
 - Error handling is most effective at the ends (end-to-end principle). If every intermediate layer handles errors partially, you end up with duplicated, inconsistent recovery logic and errors that get swallowed or transformed beyond recognition.
 - When adding error handling, ask: who is the right party to make the recovery decision? Often it is the outermost caller who has the full context, not the inner function that detected the problem.
-- Distinguish between errors that should be retried, errors that should be surfaced to the user, and errors that indicate programmer mistakes. These require different handling strategies — conflating them leads to both swallowed bugs and noisy false alarms.
+- Classify each new or changed error path as retryable, user-facing, or programmer-error. If one handler treats multiple classes the same way, it can both swallow bugs and create noisy false alarms.
 - When a function can fail in ways the caller doesn't check, the code has an implicit failure path. Make failure paths explicit, even if the handling is "propagate to the caller."
-- Consider partial failure: if this operation does steps A, B, C and fails at B, what state is the system in? Is that state recoverable?
+- For any operation with multiple state-changing steps, enumerate the persisted state after each possible failure point. If a failure leaves state that cannot be retried, rolled back, or surfaced to a recovery owner, the failure path is unresolved.
 
 ## 4. Deletability and Replaceability
 
@@ -68,11 +68,11 @@ See `examples/implicit-contract-break.md` for a case where a "safe" refactoring 
 **Question**: Does this change make the dependency graph simpler or more complex? Are dependencies flowing in the right direction?
 
 **Key signals**:
-- Dependencies should flow from unstable (frequently changing) code toward stable (rarely changing) code. If stable infrastructure code depends on volatile business logic, the direction is wrong.
+- Check the dependency direction: unstable, frequently changing code may depend on stable code; stable infrastructure depending on volatile business logic is the wrong direction.
 - A new import or dependency crossing a package/module boundary is a stronger signal than one within the same module. Cross-boundary dependencies are harder to undo.
 - Circular dependencies are a structural problem, not just a lint warning. They mean two modules cannot be understood, tested, or deployed independently.
-- When tempted to add a dependency "just for one function," consider the transitive cost: you're also depending on everything that function depends on.
-- If two modules keep needing to change together, they are coupled regardless of whether there is an explicit dependency between them. Consider whether they should be merged or whether a missing abstraction needs to be introduced between them.
+- Before adding a dependency "just for one function," inspect the target function's imports or package dependencies; the new dependency includes that transitive surface, not only the called function.
+- If two modules changed together in this task or must be edited together to preserve behavior, treat them as coupled even without an import edge; either keep the change local or surface the missing boundary decision.
 
 ## 7. Performance Awareness
 
@@ -84,7 +84,7 @@ See `examples/implicit-contract-break.md` for a case where a "safe" refactoring 
 - I/O on the critical path: Does the change add database queries, network calls, or disk I/O to a path that was previously CPU-only? Every I/O call is a potential latency cliff.
 - N+1 patterns: Does the change query a resource per item in a collection when a batch query would serve? This is the single most common performance regression in database-backed systems.
 - Memory allocation patterns: Does the change create objects in a tight loop, build unbounded collections, or hold references that prevent garbage collection?
-- Caching and memoization: If the same computation is performed repeatedly with the same inputs, should it be cached? Conversely, does a cache introduced here create a stale-data risk that outweighs the performance gain?
+- Caching and memoization: If the same computation is performed repeatedly with the same inputs, compare the saved work against stale-data risk. Do not add caching unless invalidation, TTL, or data freshness expectations are visible in code or requirements.
 - The premature optimization trap: Not every path needs optimization. If performance impact is speculative, measure before acting. But if the change is on a known hot path or introduces a known anti-pattern (N+1, unbounded collection, blocking I/O in async context), flag it — that is not premature, it is informed.
 
 See `performance-dimensions.md` for deep guidance on each dimension: algorithmic fitness, I/O patterns (including latency reference tables), resource management, optimization judgment, frontend CWV, database query design, and async/concurrency bottlenecks.
@@ -133,5 +133,5 @@ See `performance-dimensions.md` for deep guidance on each dimension: algorithmic
 - Schema migrations that rename or remove columns while the application is running will break queries in the old code. Safe migrations add first, backfill, deploy new code, then remove old columns in a subsequent migration. A single migration that both adds and removes is a production risk.
 - API changes that modify response shapes, remove fields, or change error formats break existing consumers. Even "internal" APIs may have consumers you don't know about — scripts, cron jobs, partner integrations. Treat all API changes as potentially breaking unless proven otherwise.
 - Configuration changes that rename environment variables, change default values, or alter config file structure can break deployments silently. The application starts, but behaves differently in ways that won't surface until a specific code path is hit.
-- Feature flags and gradual rollout reduce blast radius. When the change is risky or affects a large user base, consider a flag that allows rolling back without a deploy.
+- Feature flags and gradual rollout reduce blast radius. When the change is risky or affects a large user base, identify whether rollback without a deploy exists; if not, surface the release risk.
 - Deployment ordering matters. If this change requires "deploy service A before service B," document that explicitly. Implicit deployment ordering is a deployment outage waiting to happen.

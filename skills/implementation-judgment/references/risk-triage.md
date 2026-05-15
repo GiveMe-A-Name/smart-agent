@@ -24,7 +24,7 @@ surface one of these specific patterns:
 
 **Abstraction Correctness signals:**
 - The same logic appears in multiple places and change-driver analysis confirms the copies change for the same reason → extract
-- A shared abstraction has accumulated 3+ conditional parameters → consider inlining and re-extracting
+- A shared abstraction has accumulated 3+ conditional parameters → compare each caller's behavior after inlining, then re-extract only the behavior that remains shared
 - Two copies have different change drivers (different reasons to modify each) → keep separate regardless of how similar they look today
 
 **Complexity Placement signals:**
@@ -38,7 +38,7 @@ surface one of these specific patterns:
 
 **Dependency Direction signals:**
 - A stable module is importing a volatile one → reverse the dependency or introduce an interface between them
-- Two modules change together but have no explicit dependency → consider merging or introducing a shared abstraction
+- Two modules change together but have no explicit dependency → surface the hidden coupling; merge only if they share one owner, or introduce a boundary only if callers need a stable contract
 
 The improvement should stay tightly coupled to the current change. Do not
 broaden the work just because a cleaner architecture is imaginable.

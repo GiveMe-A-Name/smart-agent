@@ -80,8 +80,8 @@ For detailed guidance per dimension, see `references/performance-dimensions.md`.
 
 - [ ] The diff is scoped to what the task requires — no files, functions, or abstractions added beyond direct necessity.
 - [ ] If the change touches shared state, reads and writes were traced across all affected boundaries.
-- [ ] If the change requires migration (schema, API, config), the migration path is safe for production.
-- [ ] If invoked after receiving code review, the reviewer's intent was implemented without damaging design integrity.
+- [ ] If the change requires migration (schema, API, config), deployment ordering, backward-compatible read/write behavior during rollout, and rollback or fallback impact were identified; any unknown was surfaced before implementation.
+- [ ] If invoked after receiving code review, the implemented change addresses the review concern while preserving the existing responsibility owner, public contract, and dependency direction; any change to those was surfaced before implementation.
 - [ ] If the change makes an existing capability path unreachable, that impact was surfaced explicitly before implementation.
 - [ ] If implementing toward a goal identified by a reviewer, that goal was confirmed by the user rather than only inferred.
 - [ ] Performance anti-patterns checked: no query/call-per-loop-item without confirming batching is not applicable, no collection loaded into memory without a confirmed production-scale bound, no new external call missing a timeout.
@@ -101,7 +101,7 @@ Pause before exiting.
 
 Did I add anything justified only by "this supports testability," "this could be useful," or "this is clean design" — without a concrete caller or usage evidence in the existing code?
 
-Am I exiting because the implementation is genuinely sound, or because the patch looks tidy enough?
+Before exiting, name the evidence used for soundness: affected callers checked, contracts preserved or surfaced, state touched traced, and verification run or intentionally skipped with reason. If no concrete evidence exists, do not treat the tidy diff as sufficient.
 
 Completion-faking signals specific to implementation — stop if any apply:
 - Tests were modified to make the change pass rather than because the behavioral contract changed — passing tests are not evidence of correctness if the tests were adjusted to fit the implementation
@@ -116,22 +116,22 @@ For detailed scope decision heuristics, see `references/risk-triage.md`.
 
 Stop and revise when:
 
-- you are implementing directly from the request without understanding the surrounding code
+- you are implementing directly from the request before reading the affected function, its callers, and the module boundary it belongs to
 - you are treating the first editable location as the right implementation location
-- you are adding parameters or conditionals to an existing abstraction instead of questioning whether the abstraction is still right
+- you are adding parameters or conditionals to an existing abstraction before checking whether each branch maps to a distinct caller-specific behavior
 - you are introducing an abstraction without a second concrete caller that demonstrates the need
-- you are implementing accepted review feedback by copying the reviewer's suggestion literally without applying structural judgment to how it should land
+- you are implementing accepted review feedback by copying the reviewer's suggested code or location without checking responsibility ownership, dependency direction, and public-contract impact
 - you are treating unconfirmed scope or acceptance criteria as settled — if the user did not state it, it requires confirmation before implementing, not inference from the request wording
 - you are skipping this skill because codebase investigation or root-cause analysis is complete — prior investigation confirms where to change, not whether the implementation is structurally sound
 - you are making changes to adjacent code not required by the task rather than noting them for later
 - you are using an external API, function signature, or library behavior from memory without verifying against actual source or documentation
-- you have worked through multiple judgment dimensions on a small change without reaching a clear decision — stop analysis, pick the simpler option, and write the code
+- you have checked at least two applicable dimensions on a small change and found no observable contract, ownership, state, dependency, or performance blocker — stop analysis, pick the simpler local edit, and write the code
 - you see a new query or external call inside a loop without confirming that batching is not possible
 - you see a collection loaded entirely into memory without confirming its production-scale size bound
 - you add a new external call without a timeout
 - you identified a structural conflict (broken contract, state ownership ambiguity, wrong responsibility layer) and are producing code alongside the concern rather than stopping until the conflict is resolved
-- the request uses simplicity framing ("one-liner," "quick fix," "straightforward") and you have not verified that framing against the code evidence — the framing is the requester's prior, not your conclusion
-- you are reviewing code in a long-running process and have not asked whether any persistent mutable state accumulates with work volume without a bound or eviction mechanism
+- the request uses simplicity framing ("one-liner," "quick fix," "straightforward") and you have not checked the affected call sites and contracts for evidence that contradicts that framing — the framing is the requester's prior, not your conclusion
+- you are reviewing code in a long-running process and have not checked whether any persistent mutable state accumulates with work volume without a bound or eviction mechanism
 
 ---
 

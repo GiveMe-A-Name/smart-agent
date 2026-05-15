@@ -139,7 +139,7 @@ More performance problems are caused by premature complexity than by unoptimized
 
 **DO optimize when**:
 - Profiling shows this code is a significant contributor to latency or resource usage
-- The code is on a hot path AND the fix is well-understood (e.g., batching N+1 queries) — safe even without profiling because cost/benefit is unambiguous
+- The code is on a hot path AND the fix removes a directly observable structural anti-pattern, such as replacing one query per item with one batch query over the same key set — safe even without profiling because the before/after cost model is visible in the code
 - Performance requirements exist and are not being met
 - The optimization improves both performance and readability
 
@@ -161,7 +161,7 @@ Frontend performance is measured in time-to-interactive, visual stability, and r
 - **Bundle size matters only on the critical path**: every kilobyte of JavaScript on the initial load must be downloaded, parsed, and executed before the page becomes interactive — code-split at route boundaries; audit new dependencies against the bundle budget for the critical-path bundle only
 - **Rendering performance is structural, not memoization**: unnecessary re-renders are the primary performance problem in component-based frameworks; the fix is almost always structural (lifting state, splitting components, stabilizing references) not sprinkling `React.memo` or `useMemo` — profile first with framework devtools
 - **Core Web Vitals are the metrics that matter**: LCP < 2.5s, INP < 200ms, CLS < 0.1 — if a change degrades CWV on affected pages, it needs attention regardless of code cleanliness
-- **Images are often the largest payload**: use appropriate formats (WebP/AVIF), serve responsive sizes, and lazy-load below-the-fold images
+- **Images are often the largest payload**: for newly added images, use WebP/AVIF when supported, serve responsive sizes, and lazy-load below-the-fold images
 - **Layout shifts destroy perceived quality**: always set explicit dimensions on images and embeds
 
 ---
