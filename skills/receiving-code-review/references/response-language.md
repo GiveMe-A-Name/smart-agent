@@ -8,7 +8,7 @@
 
 **Clarification request:** Ask a specific question, not an open-ended one. The question should name the two interpretations and state what changes based on the answer. Example: `"Are you suggesting we validate inputs at the middleware layer (which changes the error contract for all callers), or just add validation before the specific database call at line 42? The two approaches have different tradeoffs and I want to implement the right one."` — Not: `"Can you clarify what you mean?"` A clarification request that doesn't name what you need to evaluate gives the reviewer no information about how to help.
 
-**If you pushed back and were wrong:** `"You were right — I checked [X] and it does [Y]. Fixing."` No apology, no defense. State the correction and move on.
+**If you pushed back and were wrong:** `"Confirmed: I checked [X] and it does [Y]. Fixing."` No apology, no defense, no performative agreement. State the correction and move on.
 
 **If the reviewer misunderstood:** Don't say "you misunderstood." Instead: `"I think the disconnect is [X]. The code does [Y] because [Z]. I'll add a comment to make this clearer."` Fix the code clarity even when the suggestion is wrong — the confusion is real and will affect future readers.
 

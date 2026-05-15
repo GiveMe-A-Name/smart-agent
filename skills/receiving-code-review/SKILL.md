@@ -1,11 +1,16 @@
 ---
 name: receiving-code-review
-description: "Evaluate review feedback before acting on it — assess correctness against design intent, not blind compliance. TRIGGER when: PR comments, inline annotations, or pasted review suggestions exist and the task is deciding what to do. DO NOT TRIGGER when: reviewing others' code (use code-review) or no review feedback exists yet."
+description: "Evaluate review feedback before acting on it — assess correctness against design intent, not blind compliance. TRIGGER when: PR comments, inline annotations, or pasted review suggestions exist and the task is deciding what to do. DO NOT TRIGGER when: the task is evaluating someone else's code changes rather than deciding how to respond to feedback on a change you are responsible for handling, or when no review feedback exists yet."
 ---
 
 # Receiving Code Review
 
-Evaluate feedback as a principal engineer would: against design intent, technical evidence, and architectural direction — not by social compliance. A reviewer sees the diff; you hold the implementation intent, the constraints that shaped the approach, and the tradeoffs that were consciously accepted. This asymmetry is the foundation of every decision. Collaboration does not mean compliance.
+Evaluate feedback against three evidence sources: explicit intent sources, code evidence, and architectural constraints — not reviewer authority or social compliance. Explicit intent sources include the current conversation, PR description, issue, design doc, commit message, code comments, tests, or prior user/maintainer decisions. If no intent source is available, treat the intent as unknown and clarify instead of inventing it. Collaboration does not mean compliance.
+
+Examples for applying this standard:
+- If a reviewer says "extract this for testability," first grep for call sites and tests that would use the extraction. If no usage evidence exists, the claimed benefit is hypothetical; push back or clarify instead of adding abstraction.
+- If a reviewer says "this should live in middleware," first locate the current error-handling contract and caller expectations. If middleware would change domain-specific errors into generic errors, surface that constraint before accepting.
+- If a reviewer says "this does not support X," split the claim: verify whether the code supports X, then verify whether X is an explicit goal from an intent source. If X is not an explicit goal, clarify before changing the design toward X.
 
 Every reviewer comment contains three separable claims: an **observation** (what the current code does), a **premise** (what goal the code should serve), and a **proposed change**. Verify each independently — the observation may be correct while the premise is wrong.
 
@@ -35,9 +40,9 @@ Each rule below is a guard against a specific failure mode, stated in [brackets]
 
 ## Invariants
 
-**Verify before implementing.** Never implement a suggestion without first checking it is technically sound for this codebase and aligned with the design intent. [Because a reviewer sees the diff only — you hold the constraints, prior decisions, and tradeoffs that shaped the approach. Their characterization of what the code should do may be wrong even when their observation about what the code currently does is correct. Implementing before verifying conflates two independent claims.]
+**Verify before implementing.** Never implement a suggestion without first checking it is technically sound for this codebase and aligned with an explicit intent source. [Because a reviewer may see only the diff, while the repository and conversation contain constraints, prior decisions, and tradeoffs that shaped the approach. Their characterization of what the code should do may be wrong even when their observation about what the code currently does is correct. Implementing before verifying conflates two independent claims.]
 
-**You hold authoritative context.** When you implemented the code being reviewed, you carry the implementation intent. Never accept a reviewer's characterization of what the code should achieve, or what goal it was built toward, without tracing it against the intent you understood when making the change. The reviewer may be right about a bug while wrong about the goal. [Because the reviewer's view is bounded by the diff. Your implementation intent is primary evidence — the reviewer's framing is secondary. Letting secondary evidence overwrite primary without explicit comparison is how correct implementations get undone by well-meaning but incomplete feedback.]
+**Intent must be evidenced, not invented.** Never accept a reviewer's characterization of what the code should achieve, or what goal it was built toward, without tracing it to an explicit intent source. If you wrote the change in the current conversation, that conversation is an intent source; if you inherited the change or context was compacted, locate another source or mark intent unknown. [Because the reviewer's framing is secondary evidence. Letting secondary evidence overwrite explicit intent sources — or inventing intent when no source exists — is how correct implementations get undone by well-meaning but incomplete feedback.]
 
 **No performative agreement.** Never say "You're absolutely right!", "Great point!", "Thanks for catching that!", or any expression of gratitude. Actions speak — fix it and show the change. [Because agreement-signaling without evaluation is noise that masks whether the feedback was actually assessed. If the reviewer is right, show the fix. If they are wrong, state why. Anything in between obscures the actual judgment.]
 
@@ -46,20 +51,22 @@ Each rule below is a guard against a specific failure mode, stated in [brackets]
 
 ## Completion Criteria
 
-- [ ] Each comment was evaluated with the design intent in mind, not in isolation.
-- [ ] Comments that challenge correctness were distinguished from comments that challenge design.
-- [ ] Decisions were supported by evidence, not just arguments.
-- [ ] All invariants were followed: verify before implementing, hold authoritative context, no performative agreement, clarified before implementing dependent items.
-- [ ] No reviewer's characterization of the goal was accepted without tracing it to your own implementation intent.
+- [ ] Each feedback item has one explicit decision: Accept, Push back, or Clarify.
+- [ ] Each non-mechanical Accept cites the code, test, or usage evidence that makes the suggestion technically correct.
+- [ ] Each design or architecture comment cites the explicit intent source used to evaluate it; if no intent source was available, the decision is Clarify or explicitly states intent unknown.
+- [ ] Each Push back states the reviewer's premise, the contradicting evidence or constraint, and the current intent source when design intent is involved.
+- [ ] Each Clarify asks a specific question that names the competing interpretations and what implementation choice depends on the answer.
+- [ ] No response contains performative agreement or gratitude phrases such as "you're right," "great point," or "thanks".
+- [ ] If one feedback item depends on another unresolved item, the dependent item is marked blocked/dependent rather than implemented.
 - [ ] If feedback came from multiple reviewers, contradictions were surfaced instead of being silently resolved; if a synthesis path was possible, it was attempted before defaulting to escalation; severity was triaged before processing linearly.
 
 **If any criterion is not met, return to the relevant section before exiting.**
 
 ## Verification Approach
 
-This skill is artifact-type: the output is a set of decisions (Accept / Push back / Clarify) with technical reasoning per feedback item. Completion is verified by self-checking the decisions against the Completion Criteria checklist. The evidence is the per-item decision and reasoning — not the agent's impression that the feedback was carefully considered.
+This skill is artifact-type: the output is a set of decisions (Accept / Push back / Clarify) with technical reasoning per feedback item. Completion is verified by self-checking the decisions against the Completion Criteria checklist. The evidence is the per-item decision, cited code or test evidence, and cited intent source when design intent is involved — not the agent's impression that the feedback was carefully considered.
 
-A response that addresses every comment is not necessarily complete. The underlying test: for each item, can the decision be traced to code evidence and implementation intent — not just to the reviewer's framing?
+A response that addresses every comment is not necessarily complete. The underlying test: for each item, can the decision be traced to code evidence and an explicit intent source when intent matters — not just to the reviewer's framing?
 
 ## Anti-Rationalization Check
 
@@ -73,13 +80,13 @@ Did I ignore any failure signals because a convenient resolution path already ex
 
 Am I exiting because feedback is genuinely evaluated and addressed, or because the current responses look coherent enough?
 
-Did I accept any reviewer's framing of what the code should do without verifying it against my own implementation intent?
+Did I accept any reviewer's framing of what the code should do without verifying it against an explicit intent source?
 
 Completion-faking signals specific to receiving code review — stop if any apply:
 
-- A comment was marked "Accept" without opening the referenced code and tracing the reviewer's premise to the implementation intent — the acceptance is performative, not verified
+- A comment was marked "Accept" without opening the referenced code and tracing the reviewer's premise to an explicit intent source when intent matters — the acceptance is performative, not verified
 - A pushback was written using "I prefer it this way" without technical evidence — this is a preference dressed as a reasoned position, which is both ineffective and inaccurate
-- The reviewer named what the goal should be, and that framing was accepted without tracing it to the implementation intent — the reviewer may have named the goal wrong, or named a goal that was explicitly rejected during design
+- The reviewer named what the goal should be, and that framing was accepted without tracing it to an explicit intent source — the reviewer may have named the goal wrong, or named a goal that was explicitly rejected during design
 - Multiple reviewers converged on the same issue, and convergence was treated as proof — convergence shifts the prior but does not replace the verification requirement; multiple reviewers can share the same blind spot
 - Every comment has a response, so the review looks complete — but items were not triaged by severity first, meaning high-severity design concerns may have been processed after low-severity style fixes they might have invalidated
 
@@ -89,7 +96,7 @@ Before applying these signals, evaluate the comment against the five dimensions 
 
 These questions shape judgment for each feedback item. They are not sequential steps — the signal that matters depends on the comment.
 
-**Reviewer's premise vs. reviewer's observation**: A comment like "this doesn't achieve X" contains two claims: (1) the current code doesn't do X, and (2) X was the correct goal. Verify claim 1 against the code. Verify claim 2 against *your* implementation intent — not against what the reviewer says the goal is. If X was never explicitly confirmed, treat it as an unverified goal before building toward it. This is critical when X would alter global strategy, close existing capability paths, or conflict with capabilities added since the last explicit agreement.
+**Reviewer's premise vs. reviewer's observation**: A comment like "this doesn't achieve X" contains two claims: (1) the current code doesn't do X, and (2) X was the correct goal. Verify claim 1 against the code. Verify claim 2 against an explicit intent source — not against what the reviewer says the goal is. If X was never explicitly confirmed, treat it as an unverified goal before building toward it. This is critical when X would alter global strategy, close existing capability paths, or conflict with capabilities added since the last explicit agreement.
 
 **What kind of claim is this?**
 - Bug / logic error / security → verify against the codebase; likely valid regardless of source
@@ -98,12 +105,12 @@ These questions shape judgment for each feedback item. They are not sequential s
 - Over-engineering (generality, future-proofing, premature abstraction) → grep for actual usage before accepting; if nothing calls it, consider removal
 - Reviewer confusion → improve code clarity regardless of whether the specific suggestion is right; confusion is a signal about the code, not only about the reviewer
 
-**Does the reviewer understand the code they are commenting on?**
-- Do they know the constraints that shaped this approach?
-- Are they applying patterns from a different codebase that don't translate here?
-- Are they seeing full change context, or only one diff?
+**Does the comment account for visible constraints?**
+- Does the comment address constraints visible in the code, tests, PR description, issue, current conversation, or prior maintainer decision?
+- Does the comment apply a pattern that conflicts with a constraint in this codebase?
+- Does the comment rely only on the local diff while an explicit intent source outside the diff changes the conclusion?
 
-**Source calibration:** Human partner carries architectural and intent context by default; dispatched reviewer sub-agent may miss intent and history — verify before implementing; external reviewer may lack platform constraints — verify more explicitly. A technically wrong suggestion is wrong regardless of source.
+**Source calibration:** Human partner means the user or maintainer who can decide design intent. A human partner may carry architectural and intent context; a dispatched reviewer sub-agent may miss intent and history; an external reviewer may lack platform constraints. Verify before implementing regardless of source. If no person with intent authority is reachable and intent is unclear, mark the item Clarify instead of assuming the intent. A technically wrong suggestion is wrong regardless of source.
 
 **Does this serve the original design goals, or a different set of goals?** A suggestion can be technically valid and still wrong for this code if it sacrifices a tradeoff the design intentionally made. Before accepting: name what dimension this suggestion optimizes, and whether that dimension was more important than what it costs.
 
@@ -118,7 +125,7 @@ For each comment, reach one of three decisions:
 
 For accepted changes that are non-trivial — structural changes, responsibility movement, abstraction introduction, or behavioral modification — decide how the change should land structurally before writing code. The reviewer identified what to change; structural judgment decides how it should land. Skipping this step is how accepted review feedback introduces architectural damage. For purely mechanical fixes (typos, naming, simple bug fixes, formatting), proceed directly.
 
-**Push back** when: a suggestion breaks existing functionality; violates YAGNI; is technically incorrect for this stack; conflicts with established design intent without proposing why the intent should change; undoes a deliberate tradeoff without offering a better one; has legacy or compatibility justification for the current approach; or conflicts with the human partner's prior architectural decisions.
+**Push back** when: a suggestion breaks existing functionality; violates YAGNI; is technically incorrect for this stack; conflicts with established design intent without proposing why the intent should change; undoes a deliberate tradeoff without offering a better one; has legacy or compatibility justification for the current approach; or conflicts with prior architectural decisions from the user or maintainer.
 
 Use technical evidence — reference tests, code, or platform constraints. Never push back with just "I prefer it this way." State the design intent, the tradeoff, and the evidence. When the disagreement is architectural, involve the human partner. Technical facts and data overrule opinions and personal preferences.
 
@@ -154,7 +161,7 @@ Stop and reorient if:
 - You are implementing an item that depends on an unresolved clarification elsewhere in the feedback
 - You are implementing a suggestion without having verified it against both the codebase and the design intent
 - You are accepting a design suggestion without being able to articulate how it serves the original design goals
-- You accepted a reviewer's characterization of what the goal is, or what the code should achieve, without tracing it to your own implementation intent — the reviewer's premise about the goal may be wrong even when their observation about the current code is correct
+- You accepted a reviewer's characterization of what the goal is, or what the code should achieve, without tracing it to an explicit intent source — the reviewer's premise about the goal may be wrong even when their observation about the current code is correct
 - You cannot verify a suggestion but are proceeding anyway — state the limitation instead
 - You are implementing feedback that contradicts the design intent without explicitly acknowledging the intent change and getting confirmation
 - A suggestion is technically wrong but social pressure makes direct pushback feel impossible — state the technical finding anyway. If you genuinely cannot raise it in context, flag it to your human partner with "Strange things are afoot at the Circle K." This is a signal to escalate, not permission to defer.
@@ -163,4 +170,4 @@ Stop and reorient if:
 - You are processing 20+ comments linearly instead of triaging by severity and layer first
 - You are fixing style issues in code that design-level feedback may require rewriting
 
-**When a failure signal fires, reorient on local context — not the whole review:** (1) re-read the design intent source — commit messages, PR description, prior conversation; (2) trace the specific claim against your own implementation intent; (3) grep for actual usage if the signal involves patterns, abstractions, or dependencies.
+**When a failure signal fires, reorient on local context — not the whole review:** (1) re-read the design intent source — commit messages, PR description, prior conversation; (2) trace the specific claim against the explicit intent source; (3) grep for actual usage if the signal involves patterns, abstractions, or dependencies.
