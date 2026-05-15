@@ -1,6 +1,6 @@
 # Epistemic Foundations
 
-The thinking disciplines that distinguish rigorous research from casual browsing. These are not sequential steps — they are concurrent mental habits that operate throughout the entire research process.
+Evidence-handling constraints that distinguish systematic research from casual browsing. These are not sequential steps; they are observable checks to apply throughout research: what hypothesis each lookup tests, whether a source is independent, whether a claim traces to a primary source, and whether confidence matches evidence quality.
 
 ---
 
@@ -10,7 +10,7 @@ The greatest threat to research quality is confirmation bias: the tendency to se
 
 The countermove is **active disconfirmation**: deliberately seek evidence that would disprove your emerging conclusion. The strength of a conclusion comes not from accumulating supporting evidence, but from surviving genuine attempts to falsify it. When you notice you are only finding confirming evidence, that is a warning signal, not a sign of progress.
 
-As Francis Bacon wrote: "The human understanding when it has once adopted an opinion draws all things else to support and agree with it." Your job is to resist this pull.
+As Francis Bacon wrote: "The human understanding when it has once adopted an opinion draws all things else to support and agree with it." Translate that risk into an action: before final synthesis, include at least one lookup or source check that would have weakened the leading conclusion if the contrary evidence existed.
 
 ---
 
@@ -60,11 +60,11 @@ The primary source may confirm, refute, or add critical nuance that the secondar
 
 ## Calibrate Confidence to Evidence Quality
 
-Your confidence in a conclusion must match the quality, independence, and recency of the evidence behind it. Never present a weakly-supported finding with the same certainty as a well-established one.
+Your confidence in a conclusion must match the quality, independence, and recency of the evidence behind it. Never present a weakly-supported finding with the same certainty as a claim supported by authoritative sources plus independent corroboration.
 
 **Source quality tiers** (treat as metadata on every conclusion):
 - **Authoritative**: official documentation, specifications, RFCs, changelogs, library source code, peer-reviewed research. These set the baseline for factual claims.
-- **Established Community**: maintainer-written posts, issues/discussions in the library's own repo, well-established Stack Overflow answers with verified solutions, reputable technical publications. These are strong but can contain errors or outdated information.
+- **Established Community**: maintainer-written posts; issues/discussions in the library's own repo; Stack Overflow answers only when the answer is accepted or has score ≥ 10, the answer date is compatible with the target version, comments do not report current breakage, and the answer links to official docs/source or includes reproducible evidence; technical publications only when they name an author or organization, include a publication/update date, cite primary docs/source or include reproducible data, and are not AI-generated summaries or aggregator pages. These are strong but can contain errors or outdated information.
 - **Secondary**: general blog posts, tutorials, AI-generated summaries, aggregator pages, forum discussions. These often point toward authoritative sources or reveal the right question to ask, but should not anchor conclusions on their own.
 
 When a conclusion rests mainly on secondary sources, state that explicitly. When authoritative sources contradict secondary ones, the authoritative source wins absent strong reason to doubt it.
@@ -83,7 +83,7 @@ Common biases that degrade research quality:
 - **Conservatism**: insufficiently updating your belief when new evidence contradicts your initial position.
 - **Completeness theater**: the appearance of thorough research — multiple lookups performed, sources cited, confidence labels attached — without the actual cross-validation those signals imply. A findings document that looks well-sourced is more persuasive than one acknowledged as partial, which is precisely why this failure mode is dangerous. The check: can you point to the primary source for each load-bearing claim? If not, the confidence label is borrowed from the structure of the output, not earned by the evidence behind it.
 
-When your research feels suspiciously smooth — everything confirming, no contradictions, no surprises — pause and consider whether you are genuinely finding truth or falling into a trap.
+When every source found so far supports the same conclusion and no query has targeted disconfirming evidence, stop before synthesis and run a falsifying or alternative-comparison lookup. Agreement without attempted disconfirmation is not evidence that no contradiction exists.
 
 ---
 
