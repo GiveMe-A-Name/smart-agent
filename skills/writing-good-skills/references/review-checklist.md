@@ -18,7 +18,7 @@ If the user points at one weak section, do not stay local by default. First chec
 
 ## Mandatory Audits
 
-Run both audits on every review, even if the user never mentioned these concerns.
+Run all audits on every review, even if the user never mentioned these concerns.
 
 ### Mandatory Boundary-Vs-Routing Audit
 
@@ -45,6 +45,18 @@ When found:
 - merge into the strongest existing section before creating a new one
 - compress or delete the repeats
 - move only the expanded support material to the correct support folder
+
+### Mandatory Inducement Audit
+
+Check for:
+- wording, examples, or workflow steps that make an unwanted behavior the obvious move
+- a counter-rule added while the text that induces the unwanted behavior remains in place
+- review feedback that names only the unwanted behavior without naming the source that teaches it
+
+When found:
+- name the exact phrase, example, or workflow step that induces the behavior
+- remove or neutralize that source first
+- add a negative boundary only if a real scope edge remains after the source is removed, and make that boundary observable
 
 ## Section Checks
 

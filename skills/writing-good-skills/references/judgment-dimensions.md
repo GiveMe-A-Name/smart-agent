@@ -9,7 +9,7 @@ Use this when a dimension fires during skill creation or review and you need the
 **Question**: Does this material need a capability skill, or would an SOP, a note, or local documentation serve it better?
 
 **Key signals**:
-- Procedural tasks have fixed steps and low variation — the same sequence applies every time regardless of context. These are fine as SOPs. Forcing them into the five-element capability framework adds ceremony without improving judgment.
+- Procedural tasks have fixed steps and low variation — the same sequence applies every time regardless of context. These are fine as SOPs. Forcing them into a capability-skill framework adds ceremony without improving judgment.
 - Judgment tasks have high variation, context-dependent paths, or decisions that only make sense after reading the situation. These need capability skills.
 - If the material is mostly repo-local context — team conventions, setup instructions, project-specific rules — it belongs in `AGENTS.md` or `README.md`, not in a reusable skill.
 - When input is raw notes or a workflow description, the most common failure is renumbering the notes into steps rather than extracting the underlying judgment. The invariants, boundary conditions, and decision signals are usually buried in the notes — extracting them is the work.
@@ -58,7 +58,7 @@ See `references/thinking-mode-considerations.md` for how these principles apply 
 **Question**: Is the main file calibrated between hollow (core law moved out) and bloated (too long to be reliably attended to)?
 
 **Hollow direction** — law was removed:
-- Lean means the main file contains all five core elements; support folders carry expanded examples, lookup tables, and templates.
+- Lean means the main file contains the seven core elements named in the main `SKILL.md`; support folders carry expanded examples, lookup tables, and templates.
 - Hollow means trigger logic, invariants, or core decision signals were moved to support files, leaving an agent who must hunt for the actual law.
 - Test: can the main file guide a first-pass decision without opening any support file? If not, something core was moved out.
 
