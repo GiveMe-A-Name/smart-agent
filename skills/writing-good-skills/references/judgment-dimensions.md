@@ -49,7 +49,6 @@ See `examples/routing-vs-boundary.md` for a contrast pair.
 
 See `references/skill-trigger-design-principles.md` for the full trigger design framework.
 See `references/description-patterns.md` for the description format: `[Capability]. TRIGGER when: [...]. DO NOT TRIGGER when: [...]`.
-See `references/thinking-mode-considerations.md` for how these principles apply in thinking-mode agents.
 
 ---
 
