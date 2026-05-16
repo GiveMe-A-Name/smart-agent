@@ -1,13 +1,15 @@
 ---
 name: writing-good-skills
-description: "Guide skill creation and modification — structure, trigger conditions, boundaries. TRIGGER when: creating a skill, modifying a SKILL.md, or a skill's behavior diverges from expectations. DO NOT TRIGGER when: using a skill normally or working on non-skill files."
+description: "Write capability skills that teach reusable agent judgment through boundaries, causal rules, and calibrated examples. TRIGGER when creating, revising, or evaluating a skill."
 ---
 
 # Writing Good Skills
 
-Write skills as reusable capability guides that teach judgment — not SOPs, procedure manuals, or hidden routing graphs.
+Write skills as reusable capability guides that teach judgment
 
-A skill is evaluated for judgment quality, not format compliance. The value is in the boundary: understanding what the skill owns, what must not happen, what signals should shape decisions, and where the capability ends. A well-written skill still guides an agent when followed out of order, partially read, or applied to a case its author never imagined. A well-written SOP is not a failure — the failure is forcing judgment tasks into SOPs, or dressing up SOPs as capability skills.
+A skill is evaluated for judgment quality, not format compliance. 
+The value is in the boundary: understanding what the skill owns, what must not happen, what signals should shape decisions, and where the capability ends. A well-written skill still guides an agent when followed out of order, partially read, or applied to a case its author never imagined. 
+A well-written SOP is not a failure. The failure is using SOPs for judgment tasks: a fixed workflow freezes the agent's choices before it has seen the case, replacing context-sensitive judgment with step execution and blocking simpler, more accurate, or more adaptive solutions.
 
 ## The Reader Is an Agent
 
