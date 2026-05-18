@@ -1,8 +1,8 @@
 # Intervention Triage
 
-Use this when the Judgment Dimensions in `SKILL.md` have raised concerns but
-the scope decision (narrow patch vs. focused improvement vs. pause) is not yet
-clear.
+Use this when the main skill or `references/judgment-dimensions.md` has raised
+concerns but the scope decision (narrow patch vs. focused improvement vs. pause)
+is not yet clear.
 
 ## Narrow Local Patch Is Usually Enough When
 

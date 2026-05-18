@@ -1,141 +1,87 @@
 ---
 name: implementation-judgment
-description: "Apply engineering judgment before writing behavior-affecting code — right layer, correct responsibility, contract integrity. TRIGGER when: about to write code that changes runtime behavior (bug fixes, features, patches, review-feedback implementation)."
+description: "Apply structural engineering judgment before behavior-affecting code. TRIGGER when about to implement a bug fix, feature, patch, refactor, or accepted review feedback that can change runtime behavior, contracts, state, dependencies, tests, or performance. DO NOT TRIGGER for confirmed non-behavioral edits such as formatting, comments, file moves, or exact renames."
 ---
 
 # Implementation Judgment
 
-Implement changes with engineering judgment, not just task completion.
+Choose how a code change should land before writing behavior-affecting code. The goal is not to make the requested diff smaller or larger by default; it is to avoid moving behavior into the wrong layer, breaking implicit contracts, adding coupling, or making verification pass by weakening what it proves.
 
-## Trigger Logic
+## Principles
 
-**Invocation default**: The trigger state is: any behavior-affecting code is about to be written. This applies to bug fixes, new features, review responses, and small patches equally — the structural questions this skill addresses (wrong layer, wrong responsibility owner, silently broken contract) are not proportional to change size. Do not gate this skill on perceived complexity. The cost of a missed invocation is a patch that weakens structure, introduces a subtle failure mode, or locks in a wrong abstraction — often invisibly.
+- **Treat the request as intent, not design.** The request names the desired outcome; code evidence determines the responsible layer, owner, and contract to preserve [because user wording, review suggestions, and issue text often point at symptoms rather than the boundary that owns the behavior].
+- **Keep the smallest change that is structurally honest.** A narrow patch is correct when it preserves ownership, contracts, dependency direction, and future changeability; a tiny patch that deepens a bad boundary is accumulated damage, not conservatism.
+- **Put each responsibility where the owner has full context.** Validation, recovery, state mutation, domain rules, and security checks should not be split across layers unless each layer owns a distinct, named concern [because partial ownership creates inconsistent behavior and makes future changes require tracing the whole stack].
+- **Preserve implicit contracts unless the task explicitly changes them.** Callers depend on observed behavior such as return defaults, error types, side effects, sync/async execution, ordering, caching, and reference identity; signatures and docs do not capture the full contract.
+- **Let change drivers decide abstraction.** Extract shared code only when current callers change for the same reason; keep surface-similar code separate when the cases have different product, security, lifecycle, or ownership drivers [because the wrong abstraction couples future changes that should remain independent].
+- **Treat verification as evidence, not a target.** A passing test suite supports the change only when the tests still assert the intended behavior; changing tests, snapshots, or type checks to match the new output can make the score green while preserving the bug.
 
-**Safe to skip**: only when the change has confirmed zero behavioral effect — a rename with no logic change, a file move, a comment fix, pure formatting. These must be observable facts already confirmed from the code, not impressions formed before reading it [because "this looks like a simple rename" is an impression, not evidence — skipping based on impressions converts unknown structural concerns into invisible debt].
+## Constraints
 
-**Prerequisites**: This skill requires code evidence and clarified intent. If code evidence is missing, build that understanding first. If intent is unclear, clarify it first. Both are sequencing dependencies — work to complete before this skill, not reasons to skip it.
+- Apply this skill only after the relevant code evidence and intent needed for the change are available. If the affected behavior, callers, or acceptance criteria are not yet known, gather evidence or clarify intent before choosing an implementation shape.
+- Skip this skill only when the edit has confirmed zero behavioral effect from observable evidence: formatting, comments, exact rename, or file move with no import/runtime behavior change. Do not skip because the request is framed as "simple", "quick", or "one-liner" [because simplicity framing is priority information, not structural evidence].
+- Before writing code, identify the behavior-changing function or module, the affected callers or public entry points, and the module boundary that currently owns the behavior. If any of these has not been read or traced, do not choose a change location yet.
+- If the change alters a default value, return shape, thrown error, side effect, persistence behavior, event emission, ordering, cache semantics, or sync/async execution, treat it as a contract change and surface that before implementation unless the user explicitly requested that contract change.
+- Before moving code across a module/package boundary, enumerate the state the code reads or writes and the new dependency direction. Stop if the move creates a dependency from stable infrastructure into volatile business logic, or if state ownership becomes ambiguous.
+- Before adding error handling, name the recovery owner. Inner layers may classify or propagate errors, but recovery belongs to the caller with enough context to decide retry, user response, rollback, or alerting.
+- Before introducing a shared abstraction, name at least two current callers and the shared change driver. A pure domain-neutral utility may be extracted with two callers when the utility behavior is stable and already conventional in the codebase; speculative interfaces, options objects, and "future use" abstractions do not qualify.
+- Before adding a parameter, option, or conditional to an existing abstraction, map each branch to its caller. If branches are caller-specific or encode different change drivers, split the abstraction or surface the boundary problem instead of adding the switch.
+- If accepted review feedback is being implemented, identify the reviewer's concern separately from their suggested code location. Implement the concern in the responsible layer; if the feedback implies a goal not confirmed by the user, surface that gap before coding.
+- If the implementation depends on an external API, library behavior, generated interface, CLI flag, or function signature not already verified in this session, verify it from local source, installed package types, or official documentation before coding.
+- Do not modify tests, snapshots, type suppressions, lint configuration, or verification scope merely to make checks pass. Change verification only when the intended behavior changed or the existing assertion is proven wrong from requirements or code evidence.
+- Do not include adjacent cleanup, opportunistic renames, broad refactors, or unrelated style fixes in the implementation. Note them separately unless they are required to keep the current change structurally coherent.
 
-## Boundary
+## Performance And Runtime Checks
 
-This skill owns:
-- reasoning from clarified intent and grounded code evidence to responsible implementation
-- judging whether candidate abstractions, patterns, and boundaries should be preserved, extended, corrected, or removed
-- deciding where complexity should live and who should own each responsibility
-- evaluating failure modes, edge cases, and implicit contracts before writing code
-- deciding whether a local patch is sufficient, a focused structural improvement is warranted, or an explicit pause is needed
-- balancing delivery speed, simplicity, system coherence, and future maintainability
-- deciding how accepted review feedback should land without introducing structural damage
+Check these red lines before accepting the implementation shape:
 
-This skill does not own:
-- product clarification from scratch
-- repository analysis as an end in itself
-- generic task planning
-- unrestricted refactoring beyond what the current change needs
-- final completion or release judgment
-- evaluating whether review feedback should be accepted
+- Query, HTTP call, subprocess call, or file read inside a loop: confirm a batch alternative exists or is not applicable.
+- Collection loaded entirely into memory: confirm the production-scale size is bounded or use streaming/pagination.
+- New external call: set a timeout or use the codebase's existing timeout wrapper.
+- Hot path with nested loops over production-sized data: confirm the size is bounded or change the algorithm.
+- Sequential independent I/O calls: parallelize or state why ordering/data dependency prevents it.
+- Persistent mutable state in a server, worker, daemon, event consumer, or browser session: confirm a bound, eviction, rotation, or reset path.
 
-## Invariants
+## Scope Decision
 
-- **Never treat the task description as the full implementation truth** — it names what to change, not whether that is the right layer or abstraction.
-- **Never assume existing code shape is arbitrary** without first tracing what it may be protecting — code shaped around implicit contracts, deployment ordering, or compatibility constraints is not arbitrary.
-- **Never infer unconfirmed product intent from code shape alone** — structure reflects past decisions, not current requirements.
-- **Never let deadline or delivery pressure justify moving responsibility into the wrong layer** — the compounding cost of a misplaced responsibility outlasts the deadline.
-- **The minimum viable change is only correct when it does not deepen a structural concern** — a patch that compounds a bad boundary is cumulative damage, not conservatism.
-- **Never use theoretical justification as evidence** — "this supports testability," "this could be useful," "this is clean design" are arguments. Evidence is: who calls this, who depends on this, what breaks if this is removed.
-- **Never treat duplication removal as inherently correct** — duplication is cheaper than the wrong abstraction.
-- **Never produce implementation while a structural conflict is unresolved** — surface the conflict and wait for a resolution decision before writing any code [once code exists, pressure shifts toward making it work rather than questioning the approach; the correct sequence is surface → resolve → implement, not implement → mention].
-- **Request framing describes intent, not structural complexity** — "one-liner," "straightforward refactor," and "quick fix" are descriptions of priority, not of structural analysis. When framing suggests simplicity and code evidence reveals complexity, that gap is a risk signal: the requester's model of the change is incomplete [acting on framing rather than evidence is how structural regressions get introduced under authority pressure].
+- Use a narrow local patch when the existing owner is clear, contracts are preserved, dependencies stay in the same direction, no shared state boundary moves, and no red-line performance/runtime check fires.
+- Make a focused structural improvement when the narrow patch would deepen one identified structural problem, such as scattering one concern across layers, duplicating security logic with the same change driver, or adding another caller-specific branch to a strained abstraction.
+- Stop and surface the conflict when ownership is unclear, caller contracts would silently change, migration/rollback order is unknown, or multiple dimensions point in different directions. Do not produce code and mention the concern in the same response [because once code exists, pressure shifts toward salvaging it instead of resolving the design choice].
 
-## Decision Signals
+## Evidence Output
 
-**Abstraction threshold**: The primary question is not how many times the code appears, but what would cause it to change — and whether that cause is shared across all copies. Ask: "What event would require me to modify this code?" If every copy has the same answer, extraction reduces drift risk. If any copy has a different answer, extraction creates a coupling point that makes both cases harder to change independently.
+When this skill affects the implementation, keep the final explanation short but name the evidence that made the chosen shape sound:
 
-Occurrence count is a proxy for this question: at 3+ copies the change drivers are usually shared; at 2 copies they often diverge. Apply the count as a starting signal — if the change-driver answer is clear and unambiguous, it takes precedence over the count. A pure utility with no domain semantics shared across 2 call sites may justify extraction; domain logic appearing in 3 places but changing for different product reasons does not.
+- responsible owner or layer used
+- caller/contract impact preserved or surfaced
+- state or dependency boundary checked when relevant
+- performance/runtime red lines checked when relevant
+- verification run, or why verification could not be run
 
-**Complexity placement**: If callers must know implementation details to use a function correctly, the abstraction boundary is in the wrong place — pull complexity downward into the module.
+## Stop And Revise
 
-**Failure path ownership**: Name the recovery owner before adding error handling. The right owner is usually the outermost caller with full context — not the inner function that detected the problem. Scattered partial recovery across layers is worse than explicit propagation with a single owner.
+Stop before coding or revise the diff if any condition is true:
 
-**Contract change detection**: Callers depend on observed behavior, not documented behavior. Any change to default return values, side effects, or error types is a contract change — regardless of what the docs say.
-
-**Dependency direction**: New imports crossing package or module boundaries are structural commitments. Before adding one, confirm the dependency flows from unstable toward stable code — not the reverse.
-
-**State tracing**: Before any refactor that moves code across module boundaries, explicitly enumerate every piece of state the code reads or writes. Missing one creates a consistency window that did not exist before.
-
-**Performance anti-patterns** — Check these regardless of whether the code is on a hot path; they are structural mistakes, not optimization choices:
-- Query, HTTP call, or file read inside a loop → confirm a batch alternative exists or is not applicable before accepting [N+1 is the single most common performance regression and is always fixable without profiling]
-- Collection loaded entirely into memory without a size bound → confirm it is bounded at production scale [unbounded loads cause OOM incidents, not slow responses]
-- New external call (HTTP, database, subprocess) with no timeout → a timeout is required [no timeout converts one slow dependency into an indefinite caller freeze]
-- Persistent mutable state in a long-running process that accumulates with each unit of work and has no eviction, rotation, or size bound → confirm the accumulated key space is bounded by design, or surface as unbounded memory growth [a continuously running process will exhaust memory in proportion to total work processed — this passes all tests and fails only under sustained production load]
-
-If the code is on a hot path (request handlers, event processors, or any path that scales with data volume):
-- Nested loops over a collection whose production size is unknown → flag as O(n²) risk and confirm n is bounded
-- Sequential independent I/O calls → confirm they cannot be parallelized [sequential A→B→C when they are independent: latency = A+B+C; parallel: max(A,B,C)]
-
-For detailed guidance per dimension, see `references/performance-dimensions.md`.
-
-**Scope trigger**: If one judgment dimension raises a concern — scope a focused improvement. If multiple dimensions conflict — pause and make the conflict explicit. If none fire — narrow patch. For detailed scope decision support, see `references/risk-triage.md`.
-
-## Completion Criteria
-
-- [ ] The diff is scoped to what the task requires — no files, functions, or abstractions added beyond direct necessity.
-- [ ] If the change touches shared state, reads and writes were traced across all affected boundaries.
-- [ ] If the change requires migration (schema, API, config), deployment ordering, backward-compatible read/write behavior during rollout, and rollback or fallback impact were identified; any unknown was surfaced before implementation.
-- [ ] If invoked after receiving code review, the implemented change addresses the review concern while preserving the existing responsibility owner, public contract, and dependency direction; any change to those was surfaced before implementation.
-- [ ] If the change makes an existing capability path unreachable, that impact was surfaced explicitly before implementation.
-- [ ] If implementing toward a goal identified by a reviewer, that goal was confirmed by the user rather than only inferred.
-- [ ] Performance anti-patterns checked: no query/call-per-loop-item without confirming batching is not applicable, no collection loaded into memory without a confirmed production-scale bound, no new external call missing a timeout.
-- [ ] If the code runs in a persistent process (server, event consumer, daemon), any persistent mutable state that grows with work volume has a confirmed bound or eviction mechanism, or the risk is surfaced explicitly.
-
-**If any criterion is not met, return to the relevant section before exiting.**
-
-## Verification Approach
-
-This skill is artifact-type: completion is verified by self-checking the produced diff against the Completion Criteria checklist above. No separate user confirmation is required as a completion step — but the diff must be the evidence, not the agent's assessment of the diff.
-
-## Anti-Rationalization Check
-
-This section exists because a tidy-looking diff and a structurally sound implementation are not the same thing — and the agent cannot reliably distinguish them from the inside.
-
-Pause before exiting.
-
-Did I add anything justified only by "this supports testability," "this could be useful," or "this is clean design" — without a concrete caller or usage evidence in the existing code?
-
-Before exiting, name the evidence used for soundness: affected callers checked, contracts preserved or surfaced, state touched traced, and verification run or intentionally skipped with reason. If no concrete evidence exists, do not treat the tidy diff as sufficient.
-
-Completion-faking signals specific to implementation — stop if any apply:
-- Tests were modified to make the change pass rather than because the behavioral contract changed — passing tests are not evidence of correctness if the tests were adjusted to fit the implementation
-- An abstraction was introduced where no second concrete caller exists in the codebase at the time of writing
-- Behavior changed under an existing function name without surfacing that the implicit contract changed
-- A parameter or conditional was added to an existing abstraction instead of questioning whether the abstraction is still the right boundary
-- The diff is scoped to what was asked without checking whether the ask itself points to the wrong layer
-
-For detailed scope decision heuristics, see `references/risk-triage.md`.
-
-## Self-Correction Signals
-
-Stop and revise when:
-
-- you are implementing directly from the request before reading the affected function, its callers, and the module boundary it belongs to
-- you are treating the first editable location as the right implementation location
-- you are adding parameters or conditionals to an existing abstraction before checking whether each branch maps to a distinct caller-specific behavior
-- you are introducing an abstraction without a second concrete caller that demonstrates the need
-- you are implementing accepted review feedback by copying the reviewer's suggested code or location without checking responsibility ownership, dependency direction, and public-contract impact
-- you are treating unconfirmed scope or acceptance criteria as settled — if the user did not state it, it requires confirmation before implementing, not inference from the request wording
-- you are skipping this skill because codebase investigation or root-cause analysis is complete — prior investigation confirms where to change, not whether the implementation is structurally sound
-- you are making changes to adjacent code not required by the task rather than noting them for later
-- you are using an external API, function signature, or library behavior from memory without verifying against actual source or documentation
-- you have checked at least two applicable dimensions on a small change and found no observable contract, ownership, state, dependency, or performance blocker — stop analysis, pick the simpler local edit, and write the code
-- you see a new query or external call inside a loop without confirming that batching is not possible
-- you see a collection loaded entirely into memory without confirming its production-scale size bound
-- you add a new external call without a timeout
-- you identified a structural conflict (broken contract, state ownership ambiguity, wrong responsibility layer) and are producing code alongside the concern rather than stopping until the conflict is resolved
-- the request uses simplicity framing ("one-liner," "quick fix," "straightforward") and you have not checked the affected call sites and contracts for evidence that contradicts that framing — the framing is the requester's prior, not your conclusion
-- you are reviewing code in a long-running process and have not checked whether any persistent mutable state accumulates with work volume without a bound or eviction mechanism
+- The first editable location was treated as the right location without checking callers and ownership.
+- The implementation changes behavior under an existing name without surfacing the contract change.
+- A shared abstraction was introduced without current callers that share a change driver.
+- A parameter or conditional was added to an abstraction before mapping branches to callers.
+- A test, snapshot, type suppression, or linter rule was changed because it was easier than fixing or explaining the underlying behavior.
+- The diff removes a currently reachable capability path, fallback, migration behavior, native path, or version-specific branch without surfacing the capability loss first.
+- The implementation adds persistent mutable state in a long-running process without a bound or eviction mechanism.
+- The task is review-feedback implementation and the literal suggested patch moves responsibility, changes contract, or reverses dependency direction.
 
 ---
 
-For detailed reasoning heuristics on each structural concern, see `references/judgment-dimensions.md`.
-For scope decision support, see `references/risk-triage.md`.
-For code review response guidance, see `references/review-response-judgment.md`.
-For AI-specific failure patterns and explanations, see `references/ai-agent-pitfalls.md`.
+See `references/judgment-dimensions.md` when a change touches abstraction, complexity placement, failure handling, contracts, dependencies, observability, security, state, or migration.
+See `references/risk-triage.md` when deciding between a narrow patch, focused structural improvement, or pause.
+See `references/performance-dimensions.md` when performance, resource, frontend, database, async, or concurrency impact is part of the change.
+
+Example index:
+
+| Example | Read when |
+|---------|-----------|
+| `examples/wrong-abstraction.md` | Repeated or similar code may need separation or consolidation based on change drivers. |
+| `examples/complexity-misplacement.md` | Validation, transformation, or recovery logic is being split across layers. |
+| `examples/implicit-contract-break.md` | A refactor appears signature-safe but may change observed caller behavior. |
+| `examples/test-manipulation.md` | Tests, snapshots, or type checks are tempting to change just to make verification pass. |

@@ -1,225 +1,148 @@
-# Wrong Abstraction — Surface Similarity vs. True Duplication
+# Abstraction Change Drivers - Separate vs. Consolidate
 
-This contrast pair illustrates the judgment call around abstraction: when does
-extracting "duplicated" code create a wrong abstraction that costs more than
-the duplication it removed?
+This contrast pair calibrates both sides of abstraction judgment:
+
+- surface-similar code should stay separate when callers change for different reasons
+- repeated logic should be consolidated when callers share the same safety rule, business rule, or lifecycle driver
+
+The question is not "how many copies exist?" or "do these snippets look similar?"
+The question is: "What event would require each copy to change?"
 
 ---
 
-## Scenario
+## Case A - Keep Separate When Change Drivers Diverge
 
-**Request:** "Add rate limiting to the API endpoints. The `/users` endpoint
-should limit to 100 req/min per user, and the `/search` endpoint should limit
-to 20 req/min per IP."
+**Task:** "Add rate limiting to `/users` and `/search`."
 
-**Current code shape:**
+**Current need:**
+
+- `/users`: limit authenticated users to 100 requests/minute per user
+- `/search`: limit anonymous traffic to 20 requests/minute per IP
+
+**Bad move:** create one generic `createRateLimiter(options)` because both endpoints
+"need rate limiting."
+
 ```typescript
-// routes/users.ts
-router.get('/users', async (req, res) => {
-  const userId = req.auth.userId
-  const users = await UserService.list(userId)
-  res.json(users)
+createRateLimiter({
+  keyExtractor: (req) => req.auth.userId,
+  limit: 100,
 })
 
-// routes/search.ts
-router.get('/search', async (req, res) => {
-  const query = req.query.q
-  const results = await SearchService.search(query)
-  res.json(results)
+createRateLimiter({
+  keyExtractor: (req) => req.ip,
+  limit: 20,
+  onLimitExceeded: (req) => logSuspiciousActivity(req.ip),
 })
 ```
 
-No rate limiting exists yet. Both endpoints need it.
+This looks clean, but the two callers change for different reasons:
+
+- The user limiter is quota management. It may need per-plan limits, rate-limit
+  headers, upgrade messaging, or cached fallback behavior.
+- The search limiter is abuse defense. It may need IP reputation, sliding windows,
+  escalation, or automatic blocking.
+
+The shared abstraction will accumulate caller-specific options:
+
+```typescript
+createRateLimiter({
+  keyExtractor,
+  limit,
+  windowType,
+  onLimitExceeded,
+  returnCachedOnLimit,
+  addRateLimitHeaders,
+  autoBlockAfter,
+})
+```
+
+**Corrected move:** keep the concerns separate.
+
+```typescript
+// Owns per-user quota enforcement.
+export function userQuotaLimiter() {}
+
+// Owns IP-based abuse defense.
+export function ipDefenseLimiter() {}
+```
+
+If both later need the same sliding-window primitive, extract that primitive only.
+Do not bind quota management and abuse defense behind one option-heavy middleware.
 
 ---
 
-## Bad Case — Premature Abstraction from Surface Similarity
+## Case B - Consolidate When Change Drivers Match
 
-**Reasoning:** "Both endpoints need rate limiting. I'll extract a shared
-rate limiter middleware to avoid duplication."
+**Task:** "Address path traversal review comments in CLI env-loading flows."
 
-**Implementation:**
-```typescript
-// middleware/rateLimiter.ts
-function createRateLimiter(options: {
-  keyExtractor: (req: Request) => string,
-  limit: number,
-  window: number,
-  onLimitExceeded?: (req: Request) => void,
-}) {
-  const store = new Map<string, { count: number, resetAt: number }>()
-  
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const key = options.keyExtractor(req)
-    const now = Date.now()
-    const entry = store.get(key)
-    
-    if (entry && entry.resetAt > now) {
-      if (entry.count >= options.limit) {
-        options.onLimitExceeded?.(req)
-        return res.status(429).json({ error: 'Rate limited' })
-      }
-      entry.count++
-    } else {
-      store.set(key, { count: 1, resetAt: now + options.window })
-    }
-    next()
-  }
-}
+**Current need:**
 
-// routes/users.ts
-router.get('/users',
-  createRateLimiter({
-    keyExtractor: (req) => req.auth.userId,
-    limit: 100,
-    window: 60000,
-  }),
-  async (req, res) => { /* ... */ }
-)
+Three files need to enforce the same rule:
 
-// routes/search.ts
-router.get('/search',
-  createRateLimiter({
-    keyExtractor: (req) => req.ip,
-    limit: 20,
-    window: 60000,
-    onLimitExceeded: (req) => logSuspiciousActivity(req.ip),
-  }),
-  async (req, res) => { /* ... */ }
-)
+```text
+commands/create.ts
+commands/build.ts
+utils/loadEnv.ts
 ```
 
-**Why this looks right but isn't:**
+The shared rule is: user-controlled or config-controlled paths must not escape the
+approved root.
 
-This looks clean. But these two rate limiters are solving different problems
-that happen to share the same name:
-
-- The user endpoint limits authenticated users to prevent abuse of their own
-  quota. When limits are hit, it's informational.
-- The search endpoint limits by IP to defend against scraping and DDoS. When
-  limits are hit, it's a security event that needs logging, possible IP
-  banning, and escalation.
-
-Within weeks, the search rate limiter needs:
-- Sliding window instead of fixed window (to prevent burst-at-boundary attacks)
-- IP reputation scoring integration
-- Different limits for authenticated vs. anonymous users
-- Automatic IP blocking after repeated violations
-
-The user rate limiter needs:
-- Per-plan limits (free vs. paid users)
-- Graceful degradation (return cached data instead of 429)
-- Rate limit headers (X-RateLimit-Remaining, etc.)
-
-Now `createRateLimiter` accumulates parameters and conditionals:
+**Bad move:** add a local helper to each file.
 
 ```typescript
-function createRateLimiter(options: {
-  keyExtractor: (req: Request) => string,
-  limit: number | ((req: Request) => number),  // now dynamic
-  window: number,
-  windowType: 'fixed' | 'sliding',  // new parameter
-  onLimitExceeded?: (req: Request) => void,
-  returnCachedOnLimit?: boolean,  // new parameter
-  addRateLimitHeaders?: boolean,  // new parameter
-  autoBlockAfter?: number,  // new parameter
-  // ... growing
-}) {
-```
-
-The abstraction is now harder to understand than two separate implementations
-would have been. Every caller must navigate options that only exist for the
-other caller's use case. The shared interface became a liability.
-
----
-
-## Corrected Case — Tolerating Duplication Until Patterns Stabilize
-
-**Step 1 — Recognize surface similarity vs. true duplication:**
-
-Both endpoints "need rate limiting," but the underlying concerns are different:
-quota management vs. security defense. They will change for different reasons
-at different times.
-
-**Step 2 — Apply the judgment dimension (Abstraction Correctness):**
-
-- Are these cases truly the same, or do they just look the same right now?
-  → They look the same right now but are already showing signs of divergence
-  (different key strategies, different on-exceed behaviors).
-- Would extracting a shared abstraction make both cases harder to change
-  independently? → Yes. Each case has its own trajectory.
-- Is there a risk of the abstraction accumulating conditionals? → High.
-  The diverging requirements are already visible.
-
-**Step 3 — Decide: duplicate or abstract?**
-
-Keep them separate. Write two independent rate limiting implementations,
-each tailored to its specific concern.
-
-**Result:**
-```typescript
-// middleware/userQuotaLimiter.ts
-// Owns: per-user quota enforcement for authenticated endpoints
-export function userQuotaLimiter() {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.auth.userId
-    const plan = await getUserPlan(userId)
-    const usage = await getUsage(userId)
-    
-    if (usage >= plan.requestLimit) {
-      res.set('X-RateLimit-Remaining', '0')
-      res.set('X-RateLimit-Reset', plan.resetTime.toString())
-      return res.status(429).json({
-        error: 'Quota exceeded',
-        upgradeUrl: '/pricing'
-      })
-    }
-    
-    await incrementUsage(userId)
-    res.set('X-RateLimit-Remaining', String(plan.requestLimit - usage - 1))
-    next()
-  }
-}
-
-// middleware/ipDefenseLimiter.ts
-// Owns: IP-based defense against scraping and abuse
-export function ipDefenseLimiter(limit: number) {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const ip = req.ip
-    const window = slidingWindow(ip, 60000)
-    
-    if (window.count >= limit) {
-      await logSuspiciousActivity(ip)
-      if (window.violations > 3) {
-        await blockIp(ip, '1h')
-      }
-      return res.status(429).json({ error: 'Too many requests' })
-    }
-    
-    window.increment()
-    next()
-  }
+// commands/create.ts
+function isSubPath(parent: string, child: string): boolean {
+  const relative = path.relative(parent, child)
+  return relative !== '' && !relative.startsWith('..') && !path.isAbsolute(relative)
 }
 ```
 
-Each implementation is simple, focused, and easy to change independently.
-If a shared pattern genuinely emerges later (e.g., both need the same
-sliding window algorithm), that specific utility can be extracted then —
-based on actual usage evidence, not predicted similarity.
+```typescript
+// commands/build.ts
+function isSubPath(parent: string, child: string): boolean {
+  const relative = path.relative(parent, child)
+  return !relative.startsWith('..') && !path.isAbsolute(relative)
+}
+```
+
+```typescript
+// utils/loadEnv.ts
+function isSubPath(parent: string, child: string): boolean {
+  const relative = path.relative(parent, child)
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative))
+}
+```
+
+Each patch can satisfy its local review comment, but ownership of one security
+decision has been multiplied. Future changes to symlink handling, empty-path
+semantics, or normalization may update one copy and miss the others.
+
+**Corrected move:** consolidate the shared boundary rule in one owner.
+
+```typescript
+// utils/pathSafety.ts
+export function isPathInside(parent: string, child: string): boolean {
+  const relative = path.relative(parent, child)
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative))
+}
+```
+
+Then all three call sites use the same helper. If one call site needs a different
+rule, make that difference explicit at the shared boundary rather than hiding it
+inside a copied local helper.
 
 ---
 
 ## The Distinction
 
-| | Bad case | Corrected case |
+| Question | Keep separate | Consolidate |
 |---|---|---|
-| Rate limiting works initially | Yes | Yes |
-| Agent checked if cases are truly the same | No — assumed surface similarity = duplication | Yes — recognized different concerns |
-| Abstraction accumulates conditionals over time | Yes — each case pulls it in a different direction | No — each case evolves independently |
-| Adding new requirements is easy | No — must navigate shared options | Yes — change one without affecting the other |
-| Code is easy to delete/replace | No — shared abstraction entangles both | Yes — each can be replaced independently |
+| Do callers change for the same reason? | No | Yes |
+| What would a future requirement affect? | One concern independently | Every copy of the same rule |
+| Main risk if abstracted/consolidated wrong | Option-heavy abstraction with caller-specific branches | Security or business rule drift across copies |
+| Correct move | Separate implementations; extract only stable primitives | One owner for the shared rule |
 
-The test is not "do these code blocks look similar?" but "do these code
-blocks change for the same reasons at the same time?" If they don't, keeping
-them separate is cheaper than the wrong abstraction — even if it means some
-lines of code appear in both places.
+Use duplication count as a signal, not a verdict. Two copies with different
+change drivers may need separation; three copies of one security rule may need
+one owner immediately.

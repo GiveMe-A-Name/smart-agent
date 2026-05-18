@@ -12,7 +12,7 @@ When reasoning about how a change should land, work through these dimensions. No
 - Before "cleaning up" repetition, identify the change driver for each repeated block. If any block changes for a different reason, keep them separate even when the code looks similar today.
 - If an existing shared abstraction has accumulated conditionals to handle special cases, compare the abstraction against inlining at each caller: count caller-specific branches, options used by only one caller, and behavior differences hidden behind the shared name.
 
-See `examples/wrong-abstraction.md` for a case where eagerly extracting surface-similar code creates a worse outcome than tolerating duplication. See `examples/security-review-duplicate-helper.md` for the opposite case — where 3+ identical copies of security logic should be consolidated into a shared helper.
+See `examples/wrong-abstraction.md` for contrast cases where change-driver analysis decides whether similar code should stay separate or repeated logic should be consolidated.
 
 ## 2. Complexity Placement
 
@@ -105,7 +105,7 @@ See `performance-dimensions.md` for deep guidance on each dimension: algorithmic
 **Question**: Does this change maintain or improve the system's security posture? What attack surface does it introduce?
 
 **Key signals**:
-- Input validation: Does the change handle untrusted input? All data from external sources (user input, API responses, file contents, environment variables) must be validated before use. Validation should happen at the boundary, not scattered across layers.
+- Input validation: Does the change handle untrusted input? Trust-boundary validation belongs at the boundary that receives external data: parse, normalize, size-limit, type-check, and reject unsafe shapes before the data enters the system. Domain validation belongs in the layer with business context. Do not scatter the same validation concern across both layers.
 - Authentication and authorization: If the change exposes a new endpoint, route, or data path, are auth checks in place? Check that authorization is enforced at the right layer — not just at the UI, but at the API/service layer.
 - Data exposure: Does the change risk exposing sensitive data in logs, error messages, API responses, or URLs? PII, credentials, tokens, and internal system details should never appear where they shouldn't.
 - Dependency trust: If the change adds a new dependency, what is the trust level? Evaluate the dependency's maintenance status, security history, and the blast radius of a supply-chain compromise.

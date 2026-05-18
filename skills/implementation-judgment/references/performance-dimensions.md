@@ -23,7 +23,7 @@ Deep guidance for each dimension. Use when a performance signal in SKILL.md requ
 
 **Question**: Is this code on a hot path?
 
-The single most important performance judgment. Code on a cold path (admin tools, one-time migrations, infrequent background jobs with small data) does not need performance analysis beyond the three structural anti-patterns (N+1, unbounded memory, missing timeouts). Code on a hot path deserves attention on all dimensions.
+The single most important performance judgment. Code on a cold path (admin tools, one-time migrations, infrequent background jobs with small data) does not need performance analysis beyond the runtime red lines in `SKILL.md`. Code on a hot path deserves attention on all dimensions.
 
 **Hot path signals**:
 - Request-handling code: anything in the chain from receiving a user request to sending a response — middleware, controllers, serializers, database queries within a request
@@ -71,7 +71,7 @@ Code that passes tests with 10 items may be unusable with production data volume
 In most systems, I/O dominates latency. The biggest performance wins usually come from eliminating unnecessary I/O, not from optimizing computation.
 
 **Key signals**:
-- **N+1 pattern**: one query/call per item instead of a batch — the fix is always the same: batch the operation
+- **N+1 pattern**: one query/call per item instead of a batch — first check whether batching is available and preserves the required semantics
   ```
   # N+1: one query per user
   for user in users:
