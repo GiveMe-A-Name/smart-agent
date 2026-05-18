@@ -75,10 +75,10 @@ Use history to understand design decisions — not to audit code line by line.
 
 ## Read Directory Structure for Architecture
 
-Before diving into files, spend a moment understanding how the project is organized:
+When architecture, ownership, or entry-point discovery is part of the current question, spend a short pass understanding how the project is organized:
 - Top-level directories often map to architectural layers or domains
 - `package.json`, `Cargo.toml`, `go.mod`, or equivalent reveal dependencies and project shape
 - Monorepo structures reveal module boundaries
 - Shared/common directories reveal cross-cutting utilities
 
-This gives you a mental map that makes subsequent file-level investigation faster.
+This pass should produce a concrete next lookup, such as an entry point, module boundary, or dependency to trace. Stop when the structure is no longer narrowing the current question.

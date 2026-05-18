@@ -17,7 +17,7 @@ Different tasks have different optimal starting points. Choose the strategy that
 3. Trace the data flow for a similar feature end to end
 4. Identify the extension points where your feature plugs in
 5. Check: what shared utilities or base classes should you use?
-6. Check build configuration and test infrastructure: read the project's build config (e.g. `pyproject.toml`, `Cargo.toml`, `package.json`) for package discovery rules and linting constraints; read the test infrastructure (e.g. `conftest.py`, fixture files) for the test pattern new code must follow.
+6. Check build configuration and test infrastructure when they affect how new code is discovered, generated, linted, or tested: read the project's build config (e.g. `pyproject.toml`, `Cargo.toml`, `package.json`) for package discovery rules and linting constraints; read the test infrastructure (e.g. `conftest.py`, fixture files) for the test pattern new code must follow.
 
 ## Understanding for Refactoring
 
@@ -29,7 +29,7 @@ Different tasks have different optimal starting points. Choose the strategy that
 
 ## Understanding Architecture or "How Does X Work"
 
-1. Start from directory structure and entry points
+1. Use directory structure only to identify likely entry points, module boundaries, or ownership for the current question
 2. Read types/interfaces to understand module contracts
 3. Trace one concrete request or operation end to end
 4. Note the architectural layers and how they communicate
