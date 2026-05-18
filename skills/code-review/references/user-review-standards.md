@@ -40,7 +40,7 @@ result = cache.get_or_compute(key, compute, ttl=300)
 **Example**:
 ```python
 # Bad: caller must read implementation to know save() sends email
-user.save()  # also sends a welcome email if user is new — not obvious from the name
+user.save()  # also sends a welcome email if user is new — side effect hidden by the method name
 
 # Good: behavior is explicit at the call site
 user.save()
@@ -52,10 +52,10 @@ if user.is_new:
 
 ## 3. Rule of Three
 
-**Principle**: An abstraction is justified after the same pattern appears in 3 or more places. Extracting earlier is premature — the pattern hasn't proven itself yet.
+**Principle**: An abstraction is usually justified after the same pattern appears in 3 or more places. Extract earlier only when current callers share the same change driver and the abstraction boundary is already stable.
 
 **Violation signals**:
-- A new helper or utility is introduced but used in only 1–2 places
+- A new helper or utility is introduced for only 1–2 call sites whose change drivers are not proven to match
 - An abstraction was created "for future use" with no second concrete caller today
 - A class or function could be replaced by a few inline lines at each use site without meaningful loss
 
@@ -73,10 +73,10 @@ def format_user_display_name(user):
 
 ## 4. DRY Violation
 
-**Principle**: The same logic appearing in multiple places means a bug fix must be applied in multiple places. This is a design problem, not just a style concern.
+**Principle**: The same logic appearing in multiple places with the same change driver means a bug fix must be applied in multiple places. This is a design problem, not just a style concern.
 
 **Violation signals**:
-- The same computation or conditional appears in 2+ places and would need to be updated together
+- The same computation or conditional appears in 2+ places and would need to be updated together for the same product, safety, or lifecycle reason
 - A bug in one copy likely means the same bug exists elsewhere
 - Copy-pasted code with minor surface variations but identical core logic
 

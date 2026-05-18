@@ -1,6 +1,6 @@
 # Code Review Output Template
 
-Use this as the default structure when it helps. You may adapt section names or ordering if the review still states the Layer 0-1 assessment, concrete issues, and a verdict. Omit a section only if there are genuinely no findings at that level — do not omit to appear positive.
+Use this as the default structure for a complete review. Adapt section names or ordering only when the review still states the Layer 0-1 assessment, concrete issues, automated check status when relevant, and a verdict. Omit a severity section only when the review found zero findings at that level.
 
 ---
 
@@ -45,7 +45,7 @@ If none: omit this section.]
 - **Lens/Standard:** [Optional. Name the specialized lens or user-defined standard when it is what makes this finding defensible.]
 - **What:** [Specific description]
 - **Why:** [Impact on correctness, maintainability, or reliability]
-- **Fix:** [Suggestion, if not obvious]
+- **Fix:** [Targeted corrective action when the issue does not already determine the required change]
 
 ### Minor (Nice to Have)
 
