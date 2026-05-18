@@ -1,6 +1,6 @@
 # Plan Review Output Template
 
-Use this structure for every review. Omit a section only if there are genuinely no findings at that level — do not omit to appear positive.
+Use this structure for every review. Omit a section only when the review found zero findings at that level — do not omit to appear positive.
 
 ---
 
@@ -41,7 +41,7 @@ If none: omit this section.]
 - **Location:** `plan-file.md:line`
 - **What:** [Specific description]
 - **Why:** [What fails, becomes unreliable, or cannot be verified if this goes unfixed — a concrete consequence, not "may cause issues"]
-- **Fix:** [Suggestion, if not obvious]
+- **Fix:** [Targeted corrective action when the issue does not already determine the required change]
 
 ### Minor (Nice to Have)
 
