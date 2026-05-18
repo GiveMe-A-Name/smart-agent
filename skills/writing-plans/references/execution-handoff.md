@@ -2,7 +2,7 @@
 
 ## Read-Only Constraints During Execution
 
-Two sections of the plan document are frozen once execution begins and must never be modified:
+These parts of the plan document have read-only constraints once execution begins:
 
 1. **Human Review Section** — frozen at approval. It is a contract between the human and the agent. Read it for context; never write to it. If execution reveals the contract is fundamentally wrong (goal or approach changed), stop and ask the human to re-approve a revised plan — do not silently update the Human Review Section.
 
@@ -10,7 +10,7 @@ Two sections of the plan document are frozen once execution begins and must neve
 
 ## Execution Log
 
-Maintain an `## Execution Log` at the bottom of the plan document during execution. **Never edit the plan tasks section during execution** — it stays static as source of truth.
+Maintain an `## Execution Log` at the bottom of the plan document during execution. During normal execution, the plan tasks section stays static as the source of truth. Edit only not-yet-started tasks, and only when a named plan revision trigger fires.
 
 Each log entry answers: **what was done and why** — not just status. A future agent reading the log should understand the intent behind each change, not just that it happened.
 

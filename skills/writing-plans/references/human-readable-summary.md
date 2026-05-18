@@ -53,10 +53,18 @@ Each design choice that requires human ratification. Format:
 
 > **[Decision]:** [alternatives considered] → [chosen approach and why]
 
-Only include decisions where a reasonable person might have chosen differently. Obvious choices with no real alternative can be omitted.
+Only include decisions where a reasonable person might have chosen differently. Obvious choices with no real alternative can be omitted. If a medium/large plan has no decisions requiring human ratification, write `None requiring human ratification` so the absence is explicit.
 
 Example:
 > **Retry strategy:** client-side retry with exponential backoff vs. queue-based retry → chose client-side because job completion is already synchronous and introducing a queue would require new infrastructure for a non-critical feature.
+
+## Conflict Priority (medium/large when goals can compete)
+
+When two plan goals can conflict, state the tiebreaker in the Human Review Section:
+
+> **Conflict priority:** When [X] conflicts with [Y], prefer [X] because [reason].
+
+Omit this field only when no competing goals are named or implied by the plan.
 
 ---
 
@@ -64,7 +72,7 @@ Example:
 
 - **All sizes** — Intent Statement always required. It is the first line of the Human Review Section regardless of plan size.
 - **Tiny/Small** — Intent Statement + Layer 1 only. The plan itself is short enough that a human can read it directly.
-- **Medium/Large** — Intent Statement + Layer 1 + Layer 2 + Task Overview + Key Decisions. The technical detail is dense enough that humans need a complete separate entry point.
+- **Medium/Large** — Intent Statement + Layer 1 + Layer 2 + Task Overview + Key Decisions (or `None requiring human ratification`) + Conflict Priority when goals can compete. The technical detail is dense enough that humans need a complete separate entry point.
 
 ## Freeze Rules
 

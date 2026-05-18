@@ -30,7 +30,7 @@ Block if:
 - it omits the Intent statement
 - it contains file paths, line numbers, function names, method names, implementation-only class/module names, or non-user-visible CLI flags
 - it describes implementation mechanics without naming the user problem, system behavior, or product/domain concept
-- medium/large plans omit Task Overview or Key Decisions
+- medium/large plans omit Task Overview, Key Decisions or `None requiring human ratification`, or Conflict Priority when goals can compete
 
 Reason: if the human-facing surface requires codebase knowledge, the user can approve a direction they do not actually understand.
 
@@ -91,7 +91,7 @@ Block if:
 - no plan revision trigger is named
 - no explicit exclusion exists where a reasonable agent could expand scope
 - cross-boundary work lacks interface or handoff points
-- competing goals exist but no conflict priority states which wins
+- competing goals exist but no conflict priority states which wins in the Human Review Section
 
 Reason: without explicit controls, the executing agent will make scope and trade-off decisions at the moment of highest uncertainty.
 

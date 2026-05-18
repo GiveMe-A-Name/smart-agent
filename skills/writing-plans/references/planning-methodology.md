@@ -1,6 +1,6 @@
 # Planning Methodology
 
-Reference material for the writing-plans skill. Contains detailed guidance on how to think about planning — what to assess, how to decompose, how to estimate, and how to handle risk. The main SKILL.md contains the law (invariants, completion criteria, failure signals); this file contains the reasoning behind it.
+Reference material for the writing-plans skill. Contains detailed guidance on how to think about planning — what to assess, how to decompose, how to estimate, and how to handle risk. The main SKILL.md contains the decision-critical principles and constraints; this file contains the reasoning behind them.
 
 ---
 

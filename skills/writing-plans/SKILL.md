@@ -1,159 +1,89 @@
 ---
 name: writing-plans
-description: "Plan before implementing when the path is unclear. TRIGGER when: you cannot immediately state the files involved, what changes, and how to verify it. DO NOT TRIGGER when: executing an existing plan, or the change is trivially scoped to a single known file."
+description: "Create implementation plans that turn a settled target into scoped, verifiable tasks. TRIGGER when: a user asks for a plan, or implementation work has a confirmed goal but affected files, sequencing, risks, or verification are not mapped."
 ---
 
 # Writing Plans
 
-Plan before writing code when the path is unclear. A plan that doesn't match task size is waste — tiny work gets a prose note, large work gets full decomposition.
+Turn a confirmed implementation target into a right-sized execution plan.
 
-## Trigger Logic
+## Principles
 
-**Invocation default**: Skipping a plan converts unknown unknowns into mid-implementation surprises. Even a Tiny plan forces the situation assessment that prevents wasted work. Invoke before writing code unless executing a plan that already exists and has no remaining decisions.
+- **Assessment before decomposition.** Do not write tasks until you can state: *"This is a [size] [nature] task. The relevant code/evidence is [X]. The main constraint is [Y]. Done means [exact verification command -> expected output]."* [because a plan written before this point can look complete while targeting the wrong files or scope]
+- **Right-size the artifact to the uncertainty.** Tiny work gets a prose note; small work gets a short ordered list; medium/large work gets a persistent plan with risks, exclusions, stop signals, and handoff detail [because plan structure has cost, and its value comes from reducing ambiguity the executor would otherwise face]
+- **Tasks must deliver behavior or resolve a named uncertainty.** A task that only creates a layer, file category, or scaffolding with no independent verification is a horizontal slice [because integration risk is delayed until the end, where it is most expensive to recover]
+- **Plan the contract, not the implementation recipe.** Specify system promises, inputs, outputs, errors, ownership, and verification; leave library choice, local code shape, and small refactors to execution unless they are already decided constraints [because over-specified plans block execution-time judgment when code evidence changes]
+- **Human approval and agent execution need different surfaces.** The Human Review Section uses user/domain language with no file paths; the execution section names exact existing files, directories for new files, first actions, and commands [because humans approve outcomes and tradeoffs, while agents need cold-start instructions]
+- **Detail decays with distance.** Fully detail only tasks whose inputs are known now. Later tasks that depend on findings from earlier tasks stay goal-level with revision triggers [because detailed future steps built on unknown outcomes turn assumptions into instructions]
 
-Use this skill when:
-- you cannot immediately state the files involved, what specifically changes, and how to verify it
-- the work involves multiple steps, files, or domains where sequencing or task boundaries affect the outcome
-- the work is a refactor, migration, or architecture change where mapping what touches what matters before moving anything
+## Situation Assessment Gate
 
-Do not use this skill when:
-- executing an already-agreed plan where scope, targets, and sequencing are settled [because writing a second plan when one already governs execution creates ambiguity about which document is authoritative]
-- still in open-ended exploration, root-cause investigation, or brainstorming with no settled implementation target [because planning without a confirmed target produces a structurally complete document for the wrong problem]
+Before writing the plan, record or be able to state these from observable evidence:
 
-If prerequisite understanding is still missing — codebase evidence thin, or intent unclear — build that first.
+- **Intent:** the user-visible or domain-level outcome, in the user's terms.
+- **Size:** Tiny / Small / Medium / Large, justified by affected functions, files, modules, interfaces, services, or domains.
+- **Nature:** bug fix, feature, refactor, migration, or architecture change. Bug fixes require a named root cause. Refactors require a caller/dependency map. Features require at least one existing pattern read or an explicit note that none exists.
+- **Current state:** files or artifacts read, relevant behavior observed, existing patterns to reuse, and constraints that cannot move.
+- **Done state:** exact final verification command(s) and expected output.
 
-## Capability Boundary
+Stop before planning if intent, affected area, or final verification is unknown. For bug fixes, also stop if the root cause is unknown. Other uncertainties may become early plan tasks only when they are named, bounded, and have their own verification signal.
 
-This skill owns the full planning cycle: from reading a spec to a plan ready for implementation.
-
-Does NOT own:
-- Execution of the plan
-- Spec creation or open-ended brainstorming
-- Root cause investigation
-- Engineering judgment about HOW each change should land — that belongs to execution
-
-Does define the plan document structure; execution log maintenance rules live in `references/execution-handoff.md`.
-
-## Invariants
-
-```
-NO PLAN WITHOUT SITUATION ASSESSMENT FIRST
-```
-
-You cannot start writing until you can state: *"This is a [size] [nature] task. The relevant code is [X]. The constraint is [Y]. Done means: [exact verification command → expected output]."* [A plan written before reaching this state looks structurally complete while targeting the wrong files or solving the wrong scope — the structure becomes false confidence, not real guidance.]
-
-If you can't name the files involved or state how to verify completion, you haven't assessed enough.
-
-**"Restore old behavior / keep original logic" → ambiguous by construction.** Check whether reachable capability paths exist in the current codebase that weren't present at the referenced baseline. If they do, name the interpretations explicitly and get the user's choice before writing any plan — a mechanical revert that silently closes a reachable path is a regression, not a restoration.
-
-**"Historical behavior + new capability" conflict → behavior matrix required.** Output input conditions × old behavior × current behavior × candidate target behavior. If any cell is a "?" — a behavior the user hasn't confirmed — resolve those cells with the user before planning.
-
-## Completion Criteria
-
-- [ ] The Human Review Section opens with a standalone **Intent** statement — one sentence stating what the user wants to achieve in their terms. This appears before Layer 1 and before all other fields.
-- [ ] The plan starts with a Human Review Section (Layer 1 for all sizes; Layer 2 + Task Overview + Key Decisions also for medium/large).
-- [ ] **Human Review Section language check:** It contains zero file paths, line numbers, function names, method names, implementation-only class/module names, or non-user-visible CLI flags. Each bullet names a user-visible or domain-level outcome. If a sentence needs codebase knowledge to understand, rewrite it by replacing implementation detail with the user problem, system behavior, or product/domain concept it represents.
-- [ ] **Task Overview present (medium/large):** Each task has one plain-English sentence in the Human Review Section explaining what it achieves and why it comes at this point in the sequence.
-- [ ] **Key Decisions present (medium/large):** Every design choice requiring human ratification is listed with alternatives considered and reasoning.
-- [ ] The plan states task size, nature, current state, and decomposition strategy.
-- [ ] Each task in the execution section opens with one sentence in human terms explaining *why this task exists* — what problem it solves or what risk it resolves.
-- [ ] Each task is a vertical slice: delivers verifiable value, leaves the codebase working, ordered risk-first.
-- [ ] For existing files being modified: paths are exact. For new files in medium/large work: module and direction are clear, exact names are execution-time judgment. Planned changes are concrete, not vague.
-- [ ] For medium/large: contingencies for the riskiest assumptions and plan revision triggers identified.
-- [ ] For cross-boundary work: interfaces and handoffs are explicit.
-- [ ] **Execution cold-start test:** Read the first task in isolation, without any conversation context. The task must name the specific existing files to open or the module/directory where new files belong, and the first behavior-changing action. If the first task requires inferring context from a prior message, revise it.
-- [ ] For medium/large: at least one explicit exclusion stated — what is deliberately out of scope.
-- [ ] For medium/large: stop signals listed in the plan document — conditions under which the agent must pause and ask before continuing.
-- [ ] For medium/large with multiple competing goals: conflict priority stated.
-- [ ] **Progressive refinement (large only):** Tasks whose specific steps depend on outcomes from earlier tasks not yet done are written at goal level — one short paragraph stating what the task achieves and what it depends on. They do NOT have step-by-step checklists. Typically only the first 2–3 tasks are fully detailed; if more than 3 tasks have detailed checklists, verify whether the far tasks' steps could change once early tasks complete — if yes, revise them to goal-level [because planning steps in detail before you know the inputs is planning for a future that does not exist yet].
-
-**If any criterion is not met, return to the relevant section before exiting.**
-
-## Verification Approach
-
-This skill is artifact-type: completion is verified by self-checking the plan document against the Completion Criteria checklist above. No separate user confirmation is required as a completion step — the Human Review Section embedded in the plan document is the mechanism for user approval of scope and direction.
-
-## Anti-Rationalization Check
-
-This section exists because model introspection is unreliable when the work looks finished — a plan that satisfies all checklist items can still be a document that fails at execution time.
-
-Pause before exiting. Do not treat this section as another checklist to clear.
-
-Did I ignore failure signals (over-planning, under-planning, horizontal slicing) because the plan already looks orderly?
-
-Am I exiting because the plan is genuinely complete, or because the outline now looks structured enough?
-
-Completion-faking signals specific to plan writing — stop if any apply:
-- Task why-sentences restate the task name rather than explain why the task exists at this point in the sequence
-- Verification steps are written as prose ("run the tests") rather than executable commands with expected output — prose is not a verification step
-- Reading the first task requires the planning conversation for context — the plan is not self-contained
-- The Human Review Section contains file paths, line numbers, function names, method names, implementation-only class/module names, or non-user-visible CLI flags
-- A Human Review Section sentence explains implementation mechanics without naming the user problem, system behavior, or product/domain concept it represents
-- For large plans: read the last task in isolation — if its detailed steps depend on specific outcomes from earlier tasks not yet done, progressive refinement was not applied; convert tasks whose content depends on uncertain earlier outcomes to goal-level descriptions
-- For large plans: count tasks with step-by-step checklists — if more than 3 have them, verify whether the far tasks' steps could change once early tasks complete; if yes, revise to goal-level
-
----
+Special ambiguity checks:
+- **"Restore old behavior" / "keep original logic":** check whether current code has reachable capability paths absent from the referenced baseline. If yes, list the interpretations and ask which target behavior should win before planning [because a mechanical revert can silently remove a real current capability].
+- **Historical behavior plus new capability:** create an input conditions x old behavior x current behavior x target behavior matrix. If any target cell is unknown, resolve it before planning.
+- **Hedged user suggestions:** if the user says "maybe", "probably", "not sure", "or something", or similar, do not convert the suggestion into committed scope. Ask, exclude with a note, or mark it as a pending decision [because unconfirmed scope becomes invisible work during execution].
 
 ## Task Sizing
 
-Calibrate plan depth to task size:
+| Size | Observable scope | Plan depth |
+|------|------------------|------------|
+| **Tiny** | One function/method, no new interface, no new test design | Prose note: file, change, verification command |
+| **Small** | Crosses function boundaries, one domain, existing patterns apply | Short ordered list: files, sequence, checks |
+| **Medium** | New interface/concept, multiple domains, or new test design | Persistent plan with ordered tasks, risks, exclusions, contingencies |
+| **Large** | Architecture decisions, multi-component impact, or cross-boundary coordination | Full decomposition; near tasks detailed, far tasks goal-level |
 
-| Size | Scope | Plan depth |
-|------|-------|------------|
-| **Tiny** | One function/method, no new interfaces, no new test design | Prose note: file, change, verification command |
-| **Small** | Crosses function boundaries, one domain, existing patterns apply | Short list: files, order, checks |
-| **Medium** | New interface or concept, multiple domains, new test design | Ordered tasks with risks, commit points, contingencies |
-| **Large** | Architecture decisions, multi-component impact | Full decomposition; near tasks detailed, far tasks goal-level |
+## Plan Shape
 
-## Quality Principles
+All plan sizes need a Human Review Section first. See `references/human-readable-summary.md` when writing or revising that section's fields, freeze rules, or examples.
 
-Regardless of size, a usable plan is concrete:
-- **File paths match certainty** — exact for existing files being modified; directional for new files in medium/large work ("discovery + validation modules in `plugins/`", not just "somewhere in src/")
-- **Concrete changes** — not "add error handling", but what the code should actually do
-- **Specific verification** — executable command with expected output; "run the tests" is not a verification step, `pytest tests/foo.py::test_bar -v → PASS` is
-- **One thing per step** — if a step has "and", it's two steps
-- **Vertical slice per task** — delivers verifiable value, not just a layer
-- **Working state after each task** — commit point rule applies at every level
-- **Contract, not implementation** — specify what the system promises (endpoint, inputs, outputs, error conditions), not how it delivers (which library, which algorithm, which code structure); if a step reads like pseudocode or a code walkthrough, it belongs in execution
-- **Task purpose line required** — every task must open with one sentence explaining why it exists in human terms (e.g. *"Proves the approach works before investing in config and retry logic"*), not a restatement of what the checklist does
-- **Explicit exclusions** — for medium/large: state what the plan does NOT cover; without this, an agent will extrapolate scope at execution time
-- **Conflict priority** — for medium/large with competing goals: name which wins when they conflict (e.g., "correctness over performance; security before schedule")
-- **Stop signals** — for medium/large: name conditions that require pausing and asking before continuing; see `references/planning-methodology.md`
-- **Uncertainty surfaced, not buried** — if the user expressed doubt about a premise ("I think X works this way", "not sure if", "maybe"), treat it as unverified; name it as an explicit assumption and add a verification step before any task that depends on it [because an unverified assumption embedded in a plan propagates into every dependent task — if the premise is wrong, all downstream work is built on a false foundation]
+Tiny/Small plan body:
+- assessment sentence: size, nature, relevant code/evidence, main constraint, done state
+- files or areas involved
+- ordered steps or prose note at the depth required by size
+- exact verification command(s) with expected output
 
-## Failure Signals
+Medium/Large plan body:
+- Human Review Section with Intent, Layer 1, Layer 2, Task Overview, Key Decisions or `None requiring human ratification`, and conflict priority when goals can compete
+- technical assessment: size, nature, current state, decomposition strategy
+- explicit exclusions
+- risks, contingencies, and revision triggers for the riskiest assumptions
+- stop signals: concrete conditions that require pausing for human decision
+- file map: exact existing files for planned modifications; directories/modules for new files when names are not yet certain
+- ordered tasks with purpose line, dependencies, concrete changes, verification, and commit point
+- `## Execution Log` placeholder described in Execution Handoff
 
-**Over-planning** — stop if:
-- Writing TDD ceremony for a one-function change
-- Plan document heavier than the work itself
-- Running a review loop on a tiny/small task
-- Planning tasks 6+ in full detail when tasks 1-3 haven't been done yet [because early tasks will change the shape of later tasks — detailed planning beyond the next 2-3 tasks is planning for a future that does not exist yet]
-- Specifying implementation details (library choice, algorithm, code structure) rather than the behavioral contract
-- A suggestion the user hedged ("probably", "maybe", "idk", "or something", "should we also?") became a committed task — hedged suggestions require an explicit decision (ask, exclude with a note, or flag as pending); do not silently absorb them as confirmed scope
+For detailed decomposition, estimation, contingency, and stop-signal guidance, see `references/planning-methodology.md` when the plan is medium/large or when a small plan has unresolved sequencing risk.
 
-**Under-planning** — stop if:
-- Starting medium/large work without a file map
-- Verification written as prose ("run the tests") rather than executable command with expected output [because prose verification cannot be mechanically confirmed — "done" becomes unverifiable and the plan cannot serve as a cold-start execution document]
-- Planning a bug fix without knowing the root cause
-- No dependency analysis for work crossing multiple modules
-- No contingency for the riskiest assumption in a medium/large plan [because the riskiest assumption is where the plan is most likely to break — skipping it produces a plan that is only correct if everything goes right]
-- No plan revision triggers — plan assumes everything goes as expected
-- Tasks reference context from the planning conversation rather than stating it directly in the document
-- No explicit exclusions for medium/large work where an agent could plausibly extend scope
-- No stop signals — agent has no defined conditions to pause and ask
-- Cross-boundary work with no agreed interfaces or handoff points
+## Task Design Constraints
 
-**Horizontal slicing** — stop if:
-- All tasks in one layer ("create all models", "create all endpoints")
-- No task delivers end-to-end verifiable behavior
-- The first task you can actually test is the last one
-- Tasks leave the codebase in a non-working state
+- Each task opens with one human-language purpose sentence that explains why the task exists at this point in the sequence.
+- Each task is a vertical slice or a named uncertainty-reduction task. It must leave the codebase in a working state.
+- Existing file paths are exact. New files in medium/large plans name the module/directory and responsibility; exact filenames may remain execution-time judgment unless another task depends on them.
+- Planned changes are concrete enough that a cold-start executor can act, but they do not prescribe local implementation details unless those details are part of the approved contract.
+- Verification is executable: command plus expected output. Prose such as "run tests" is not a verification step.
+- Cross-boundary work names interfaces, inputs, outputs, error behavior, owner, and handoff point before parallel or dependent tasks begin.
+- The first task passes the cold-start test: read by itself, it names the files or modules to open and the first behavior-changing or uncertainty-resolving action.
+- For large plans, no more than the first 2-3 tasks get step-by-step checklists unless later task inputs are already known from evidence. Far tasks whose steps depend on earlier outcomes stay goal-level.
 
-**Skipping assessment** — stop if:
-- You started writing before reading the relevant code
-- You don't know which files are involved
-- You haven't stated the decomposition strategy
-- The plan states as confirmed something the user expressed uncertainty about ("I think", "not sure", "maybe"), with no verification step [because an unverified assumption embedded in a plan propagates into every dependent task — if wrong, all downstream work is built on a false premise]
+## Human Review Section Constraints
+
+- The plan begins with a standalone **Intent** sentence before Layer 1 and before every other field.
+- Layer 1 appears for all sizes; Layer 2, Task Overview, and Key Decisions appear for medium/large.
+- Human Review Section text contains zero file paths, line numbers, function names, method names, implementation-only class/module names, or non-user-visible CLI flags.
+- Every Human Review Section bullet names a user-visible, developer-visible, or domain-level outcome. If a sentence requires codebase knowledge to understand, rewrite it using the user problem, system behavior, or product/domain concept.
+- For medium/large, each Task Overview item states what the task achieves and why it comes at that point in the order.
+- Key Decisions list only decisions a reasonable human might choose differently, with alternatives and reasoning. If no such decision exists in a medium/large plan, write `None requiring human ratification` rather than inventing one.
+- If medium/large goals can compete, Conflict Priority appears in the Human Review Section.
 
 ---
 
@@ -188,20 +118,20 @@ For fields, scaling rules, freeze semantics, and Before/After examples — see `
 
 ## Execution Handoff
 
-Save to `docs/plans/YYYY-MM-DD-<name>.md`, then offer to execute. The plan settles scope and targets; execution still requires judgment about how each change lands.
+Save Medium/Large plans to `docs/plans/YYYY-MM-DD-<name>.md`, then offer to execute. Save Tiny/Small plans only when the user asked for a persistent plan or the repo convention requires it. The plan settles scope and targets; execution still requires judgment about how each change lands.
 
-Include an `## Execution Log` section at the bottom of the plan document — section created at plan time with exactly this placeholder line (do not leave it blank):
+Include an `## Execution Log` section at the bottom of saved plans with exactly this placeholder line:
 
 ```
-*(append entries here as each task completes — format: `[YYYY-MM-DD] Task N: what was done and why; key decisions; any failures and how they were fixed`)*
+*(append entries here as each task completes - format: `[YYYY-MM-DD] Task N: what was done and why; key decisions; any failures and how they were fixed`)*
 ```
 
-For log entry format, read-only constraints, failed-task recording, and revision mechanics — see `references/execution-handoff.md`.
+For log entry format, read-only constraints, failed-task recording, and revision mechanics, see `references/execution-handoff.md` before executing or revising a saved plan.
 
 ---
 
 ## Planning Methodology
 
-For detailed planning guidance — how to assess task size, decomposition strategies, estimation, and contingency planning — see `references/planning-methodology.md`.
+For detailed planning guidance, see `references/planning-methodology.md` when task sizing, decomposition, estimation, contingency planning, or stop signals need more detail than the main file provides.
 
-For Tiny/Small/Medium/Large plan examples — see `examples.md`.
+For Tiny/Small/Medium/Large plan examples, see `examples.md`.
