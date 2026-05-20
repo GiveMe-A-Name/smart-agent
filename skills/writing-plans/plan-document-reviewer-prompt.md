@@ -14,11 +14,14 @@ The review is not a rewrite request. It identifies blocking gaps, explains why e
 
 Before reviewing, collect observable evidence:
 - read the plan document from top to bottom
+- if invoked as a sub-agent, read the review packet and use only its stated user intent, constraints, plan path, docs, and files as review scope
 - read any architecture docs, specs, or repository instructions explicitly named by the plan
 - read code files that the plan names as current-state evidence or modification targets
 - if a referenced file does not exist, record that as an issue rather than inferring the intended file
 
 A review without this context cannot catch repo-alignment failures [because the plan may be internally coherent while naming files, patterns, or constraints that do not exist].
+
+Sub-agent context is intentionally incomplete. Do not infer unstated user goals, hidden conversation history, or preferred implementation details. Treat missing context as a finding only when the plan itself requires that context to execute, approve, or verify safely. Do not report a preference as an issue unless it identifies a specific execution failure mechanism tied to plan text, packet constraints, repository evidence, or a missing referenced artifact.
 
 ## What to Check
 
@@ -135,6 +138,7 @@ Return:
 - Size reviewed: Tiny / Small / Medium / Large
 - Verdict: Approved / Approved with fixes / Blocked
 - Blocking threshold applied: Critical only / Critical + Important
+- Context used: plan, review packet items, docs, and code files actually read
 
 ## Issues
 ### Critical

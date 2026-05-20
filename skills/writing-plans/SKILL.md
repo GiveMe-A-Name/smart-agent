@@ -106,7 +106,14 @@ Use independent review only when the plan has evidence of coordination risk. The
 
 **Tiny/Small — review skipped.** The review overhead exceeds value when the plan changes one known behavior path, uses exact files, and has a single verification command.
 
-When review is required, use the independent-review guidance in `plan-document-reviewer-prompt.md`. The blocking threshold depends on plan size: Large fixes Critical and Important issues before handoff; Medium fixes Critical issues before handoff and surfaces Important issues to the human reviewer.
+When review is required, launch a fresh sub-agent reviewer when the environment supports sub-agents. Give it a bounded review packet, not the whole planning conversation: the plan document, the original user-visible intent, non-negotiable user constraints, the frozen Human Review Section if it already exists, repository instructions or architecture docs named by the plan, and the exact files the plan cites as evidence or modification targets. Ask the reviewer to follow `plan-document-reviewer-prompt.md` and to flag missing context instead of inferring it [because independence catches planner rationalization, while a bounded packet prevents a context-poor reviewer from inventing priorities outside the user's intent].
+
+The planner remains responsible for adjudication. For every Critical or Important reviewer issue, classify it before editing the plan:
+- **Accept:** the issue cites plan text, user intent, repository evidence, or a missing context/file condition that can break execution; update the plan.
+- **Surface:** the issue depends on a human trade-off or missing user decision; add it to Key Decisions, stop signals, or the handoff note.
+- **Reject:** the issue is a preference, asks for scope outside the approved intent, or cannot identify an execution failure mechanism from the review packet; do not change the plan for it.
+
+Do not treat the sub-agent verdict as authoritative. The blocking threshold depends on the adjudicated issues, not raw reviewer output: Large fixes accepted Critical and Important issues before handoff; Medium fixes accepted Critical issues before handoff and surfaces accepted Important issues to the human reviewer. If sub-agents are unavailable, run the same review prompt in a separate pass and note that the review was not independently delegated.
 
 ## Human Review Section
 
