@@ -26,38 +26,6 @@ Build a task-specific repository slice before answering codebase questions or su
 - For add-a-feature investigations, read build/package configuration and test infrastructure when they define package discovery, linting, generated code, fixture patterns, or test execution. Source-only evidence is insufficient when new code must pass those gates.
 - Stop expanding after the current evidence answers the task and the remaining unknowns are not on the answer's critical path. Continuing to read unrelated files after this point is undirected browsing.
 
-## Evidence Output
-
-When responding from this skill, include only the sections that match the task:
-
-- **Findings:** behavior or structure proven from evidence, with file/line or command anchors.
-- **Call flow:** entry point -> delegation path -> behavior-changing code, when behavior tracing matters.
-- **Relevant files:** each file's role, not just its path.
-- **Patterns to follow:** analogous implementations, tests, helpers, or conventions, when the task is action-oriented.
-- **Candidate change points:** only for action-oriented tasks; include evidence for why each point owns the behavior.
-- **Unknowns:** what could not be confirmed from the files and commands read. For focused single-path questions, one sentence is enough. For broad architecture or cross-module questions, split Proven / Hypothesized / Unknown.
-
-## Stop Conditions
-
-Stop investigating and answer when all applicable conditions are true:
-
-- The relevant entry point and behavior-changing code have been traced, or the missing file/path that prevents tracing has been named.
-- Each conclusion has an evidence anchor from this session.
-- Action-oriented tasks have a pattern or convention check, unless the investigation found no precedent and says so explicitly.
-- Runtime overrides and relevant config/test infrastructure have been checked when they can change the answer.
-- The next lookup would test the same hypothesis in another location rather than a materially new question.
-
-Stop and revise the investigation if any condition is true:
-
-- A conclusion names a file, function, or owner that has not been read or traced in this session.
-- The answer says "likely" or "probably" for a behavior that could be verified by tracing one more reachable call edge.
-- A candidate change point was chosen from directory structure, naming, or the user's suggestion rather than behavior-changing code and callers.
-- The investigation stops at an export, registry, facade, adapter, middleware, or config layer while the question depends on deeper behavior.
-- The response lists files without explaining how they interact.
-- The task is action-oriented and evidence items lack practical implications for the requested change.
-
----
-
 See `references/investigation-techniques.md` when choosing how to trace entry points, delegates, consumers, patterns, types, tests, history, or directory structure.
 See `references/task-driven-investigation.md` when the task type is clear but the starting strategy is not.
 See `references/challenging-situations.md` when the codebase is large, infrastructure-heavy, poorly named, or poorly documented.
@@ -66,7 +34,5 @@ Example index:
 
 | Example | Read when |
 |---------|-----------|
-| `examples/undirected-vs-task-driven.md` | The investigation is drifting into general repo browsing instead of testing task-specific hypotheses. |
 | `examples/tracing-behavior.md` | The current evidence stops at an entry point, wrapper, facade, or function name and behavior-changing code has not been reached. |
 | `examples/pattern-discovery.md` | The task is action-oriented and you need to identify existing conventions or extension points before proposing a change. |
-| `examples/fake-new-hypothesis.md` | A follow-up lookup would check a sibling file or nearby location without changing the underlying question being tested. |

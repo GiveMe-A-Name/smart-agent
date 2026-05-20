@@ -12,16 +12,6 @@ In a large codebase (hundreds of thousands or millions of lines), you cannot und
 - **Recognize the diminishing returns curve.** The first 20% of investigation gives you 80% of the understanding. When each new file you read adds only marginal information, you likely have enough to proceed. The remaining unknowns will surface during implementation — that's normal, not a sign of insufficient research.
 - **Track what you've explored and what you haven't.** In a large codebase, it's easy to lose track of what you've already investigated. Maintain a mental (or written) map of: explored and understood, explored but uncertain, known to exist but not explored, unknown.
 
-## Infrastructure and Configuration Code
-
-Dockerfiles, CI/CD pipelines, Infrastructure-as-Code (Terraform, CloudFormation), and build configurations are code too — but they follow different conventions than application code.
-
-**Key signals**:
-- **Read infrastructure code for intent, not syntax.** A Dockerfile tells you how the application is built and deployed. A CI config tells you what quality gates exist. A Terraform file tells you what cloud resources the system depends on. These are architecture documents disguised as code.
-- **Trace the deployment pipeline.** Understanding how code gets from a commit to production often reveals constraints that application code alone doesn't show: which tests run, what environments exist, what approvals are needed, what resources are provisioned.
-- **Configuration files reveal implicit dependencies.** Environment variables, secrets management, service discovery configs, and feature flags all indicate external dependencies and runtime behavior that doesn't appear in the application source.
-- **Build system configuration reveals project structure.** Monorepo configs (workspace definitions, build targets), bundler configs, and compiler settings reveal module boundaries, dependency relationships, and build order — often more reliably than documentation.
-
 ## Poorly Documented or Poorly Named Codebases
 
 When variable names are cryptic, comments are absent or misleading, and no documentation exists, standard investigation techniques still work — but require more inferential reasoning.
