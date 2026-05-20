@@ -141,4 +141,14 @@ For log entry format, read-only constraints, failed-task recording, and revision
 
 For detailed planning guidance, see `references/planning-methodology.md` when task sizing, decomposition, estimation, contingency planning, or stop signals need more detail than the main file provides.
 
-For Tiny/Small/Medium/Large plan examples, see `examples.md`.
+## Example Case References
+
+Read only the example case that matches the planning problem; do not read every example by default [because examples calibrate judgment, and loading unrelated cases can make the plan imitate the wrong size or failure mode].
+
+| Case | Read when | Reference point |
+|------|-----------|-----------------|
+| `examples/tiny-bug-fix.md` | Planning a one-path bug fix with a known root cause. | Minimum viable plan: human-readable intent plus one executable note. |
+| `examples/medium-webhook-notifications.md` | Planning a medium feature that crosses a few modules but can be proven by a walking skeleton. | Human/agent split, vertical slicing, risk-first ordering, exclusions, stop signals, and executable tasks. |
+| `examples/large-plugin-system.md` | Planning a large architecture change with contracts, dependencies, and later tasks that depend on early findings. | Contract-first planning, dependency ordering, progressive refinement, and plan revision after early findings. |
+| `examples/completion-faking-anti-pattern.md` | Checking whether a plan has section-shaped tasks but cannot be executed cold. | Why structure without exact first actions, commands, and referents fakes completeness. |
+| `examples/horizontal-slicing-anti-pattern.md` | Checking whether tasks are grouped by layers instead of working behavior. | Why layer-by-layer tasking delays learning and verification. |
