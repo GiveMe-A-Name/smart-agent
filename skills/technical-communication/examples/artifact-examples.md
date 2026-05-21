@@ -1,124 +1,134 @@
 # Artifact Examples
 
-Positive and negative examples for key judgment calls in technical communication.
+Read the matching case when the artifact shows that pattern. Apply the judgment before polishing prose.
 
 ---
 
-## Opening Paragraph: Decision / Proposal Artifact
+## Proposal Opening - Put the Decision Before Context
 
-**Positive — recommendation in paragraph 1:**
+Read this when drafting or revising an RFC, design doc, proposal, review response, or change summary whose opening starts with history, background, or implementation detail.
 
-> We recommend migrating the auth service from session tokens to JWTs by Q3. The current session store (Redis) is a single point of failure that caused 47 minutes of downtime in the March incident; JWTs eliminate the dependency. The main tradeoff is that token revocation becomes slower (up to 15 minutes for blacklist propagation vs. instant with session deletion). This document proposes the migration plan and asks for approval to begin in the next sprint.
+Bad move:
 
-The reader knows the recommendation, the problem it solves, the tradeoff, and the ask — before the second paragraph.
+> The auth service was originally built in 2019 using Redis-backed session tokens. Over the past year, several incidents have highlighted limitations with this approach. In March, a Redis failover caused 47 minutes of downtime. The team evaluated several alternatives and believes JWT-based auth addresses these concerns. We recommend migrating by Q3.
 
-**Negative — recommendation buried:**
+Better move:
 
-> The auth service was originally built in 2019 using Redis-backed session tokens. At the time, this was the standard approach for the team. Over the past year, several incidents have highlighted limitations with this approach. In March, a Redis failover caused 47 minutes of downtime. The team has evaluated several alternatives and believes JWT-based auth addresses these concerns. We recommend migrating by Q3.
+> We recommend migrating the auth service from Redis-backed session tokens to JWTs by Q3. Redis session storage caused 47 minutes of downtime during the March failover incident; JWTs remove that runtime dependency. The main tradeoff is slower token revocation, up to 15 minutes through blacklist propagation instead of instant session deletion. This document asks for approval to start the migration next sprint.
 
-The recommendation does not appear until the fifth sentence. A reader who stops after paragraph 1 has only context — no decision, no ask, no tradeoff.
+Judgment to apply:
+
+- If the artifact asks for approval, review, or alignment, put the recommendation, problem, tradeoff, and ask in paragraph 1.
+- Move historical context after the opening unless the context is needed to understand the recommendation itself.
+- Do not make the reader infer the ask from background.
 
 ---
 
-## Failure Signal: Claim Without Evidence
+## Evidence Anchor - Replace Vague Action Claims
 
-**Negative — claim drives urgency with no anchor:**
+Read this when a claim drives urgency, priority, risk, or correctness and uses vague words such as "soon", "too small", "often", "may", "various", or "problematic."
+
+Bad move:
 
 > The current database connection pool is too small and will cause problems as traffic grows. We need to increase it soon.
 
-No numbers, no timeline, no evidence. "Too small," "problems," and "soon" cannot be acted on.
+Better move:
 
-**Positive — same claim with evidence:**
+> The connection pool is capped at 20 connections. During peak traffic from 2-4pm UTC, active connections reach 18-19 at P95 over the past 30 days. With current traffic growth of about 8% month over month, the pool will saturate within 6 weeks. Increase the pool to 50 connections to avoid queueing that would add about 200ms to database-backed requests.
 
-> The connection pool is currently sized at 20 connections. At peak load (2-4pm UTC), active connections reach 18-19 (P95 over the past 30 days). At current traffic growth (~8% month-over-month), we will saturate the pool within 6 weeks. We recommend increasing it to 50 connections now to avoid a queue buildup that would add ~200ms to every database request.
+Judgment to apply:
 
-Each claim that drives urgency has a number, a condition, or observed evidence.
-
----
-
-## Boundary: When NOT to invoke this skill
-
-**Scenario: a Slack message to a teammate**
-
-> "hey, the deploy pipeline is failing on staging — looks like the config change from this morning. I'm rolling it back now"
-
-This is informal and ephemeral. It does not need audience analysis, vehicle selection, or longevity handling. Do not apply this skill.
-
-**Scenario: an inline code comment**
-
-```python
-# retry up to 3 times with exponential backoff
-```
-
-This is implementation-level documentation handled by code documentation judgment, not a durable artifact requiring the full skill. Do not apply this skill.
+- Replace vague urgency with an observed number, condition, timeframe, example, link, or explicit assumption.
+- If no anchor is available, qualify the claim as an assumption or remove it from the recommendation.
+- Do not let a recommendation depend on adjectives the reader cannot verify.
 
 ---
 
-## Everyday Technical Writing: PR Description
+## PR Description - Supply What the Diff Cannot
 
-**Negative — describes the diff instead of supplying context:**
+Read this when writing or revising a PR description that describes changed files or implementation steps but does not explain why the change exists, what risk matters, or where review should focus.
+
+Bad move:
 
 > Added Redis caching layer. Updated UserController to call CacheService before hitting the database. Added cache invalidation on profile update.
 
-This is a summary of the diff. The reviewer can read the diff. It provides no motivation, no risk signal, and no review focus — the reviewer must reconstruct intent from the code.
+Better move:
 
-**Positive — supplies what the diff cannot:**
+> Adds Redis caching with a 5-minute TTL to `GET /users/:id` to reduce peak database load. User profile reads account for 38% of database CPU during peak traffic over the past 30 days. Main risk: profiles can remain stale for up to 5 minutes after update; product accepted this for non-critical profile fields. Review focus: cache key construction in `user_cache.go` must include `tenant_id` to prevent cross-tenant data exposure.
 
-> Adds Redis caching (5-min TTL) to GET /users/:id to reduce database load at peak. User profile queries account for 38% of database CPU at peak (Datadog, past 30 days). Without this we cannot meet the Q3 latency SLA. Main risk: profiles remain stale for up to 5 minutes after update — product confirmed this is acceptable (Slack #eng-product, 2024-06-12). Review focus: cache key construction at `user_cache.go:42` — must scope by `tenant_id` to avoid cross-tenant leakage.
+Judgment to apply:
 
-The reviewer knows why this change was made, what the risk is and who accepted it, and where to focus — before reading a single line of code.
+- Do not repeat file-level changes that are already visible in the diff.
+- Provide motivation, evidence, user or system impact, accepted risk, test or rollout evidence, and review focus.
+- Name the riskiest file, behavior, or contract so review effort goes to the right place.
 
 ---
 
-## Code Documentation: API Docs
+## API Docs - Document the Caller Contract
 
-**Negative — documents the implementation, not the contract:**
+Read this when documenting a function, endpoint, SDK method, CLI command, or public interface.
+
+Bad move:
 
 ```python
 def create_payment(amount: float, currency: str) -> dict:
     """
-    Calls the Stripe API with the given amount and currency,
-    converts currency to the Stripe format (e.g., USD → usd),
-    and stores the transaction in the payments table.
-    Returns the Stripe response as a dict.
+    Calls Stripe with the given amount and currency, converts currency to the Stripe format, stores the transaction in the payments table, and returns the Stripe response.
     """
 ```
 
-This describes how the function works internally. When the implementation changes (different payment processor, different storage), this comment lies. A caller has no information about what inputs are valid or what errors to handle.
+Risk signal: the text names internal providers, storage, or implementation sequence while omitting valid inputs, outputs, and errors. Move those internals out unless callers must act on them.
 
-**Positive — documents the contract a caller depends on:**
+Better move:
 
 ```python
 def create_payment(amount: float, currency: str) -> dict:
     """
-    Creates a payment intent for the given amount.
+    Creates a payment intent.
 
-    amount: positive number in major units (e.g., 10.00 for $10.00)
-    currency: ISO 4217 code (e.g., "USD", "EUR")
+    amount: positive number in major units, such as 10.00 for $10.00.
+    currency: ISO 4217 code, such as "USD" or "EUR".
 
     Returns: {"id": str, "status": "pending"|"succeeded"|"failed", "amount": float}
     Raises: PaymentValidationError if amount <= 0 or currency is unrecognized.
-    Raises: PaymentGatewayError if the payment processor is unreachable.
+    Raises: PaymentGatewayError if the payment provider is unreachable.
     """
 ```
 
-The implementation can be rewritten entirely without this comment becoming false. A caller knows exactly what to pass, what to expect, and what errors to handle.
+Judgment to apply:
+
+- Document what callers can rely on: valid inputs, outputs, errors, side effects, compatibility, and examples.
+- Do not document internal providers, storage, conversion steps, or implementation sequence unless callers must act on that detail.
+- If the implementation can change without changing caller behavior, keep it out of the contract docs.
 
 ---
 
-## Living vs. Point-in-Time Artifact
+## Artifact Lifetime - Supersede Snapshots, Maintain Living Docs
 
-**Point-in-time (ADR) — correct handling:**
+Read this when editing an ADR, postmortem, runbook, API reference, README, or architecture overview.
 
-The ADR records the decision as it was made. When the decision changes, a new ADR is written that supersedes this one. Do not append corrections or update history inline — that corrupts the historical record.
+Bad move for an ADR:
 
-**Living artifact (Runbook) — unresolved maintenance path:**
+> Update ADR-004 to say we now use JWTs instead of Redis sessions.
 
-> Runbook: Restarting the Payment Service
-> Last updated: 2024-01-15
+Risk signal: the edit rewrites a point-in-time decision as if it were a living artifact. Supersede it instead so future readers keep the original decision context.
 
-The source material, repository conventions, and conversation provide no maintenance path. When the restart procedure changes (it will), the agent has no way to tell who should keep it current. Future operators may follow stale commands.
+Better move for an ADR:
 
-**Living artifact — maintenance path resolved before publishing:**
+> Create a new ADR: "ADR-007: Migrate auth sessions from Redis to JWTs." Include the new decision, current constraints, alternatives considered, consequences, and `Supersedes: ADR-004`. If repository convention allows, add only a short pointer in ADR-004: `Superseded by ADR-007`.
 
-The repository has a `CODEOWNERS` rule for runbooks and an existing docs convention that procedure changes are reviewed by the platform on-call rotation. The agent can treat the maintenance path as resolved while preserving the artifact's existing format.
+Bad move for a runbook:
+
+> Restart the payment service with `kubectl rollout restart deploy/payment`.
+
+Risk signal: the runbook gives a command but no owner, source of truth, review trigger, expected result, or escalation path. Add the maintenance path before treating it as publishable.
+
+Better move for a runbook:
+
+> Owner: platform on-call rotation. Source of truth: `deploy/k8s/payment-service`. Review trigger: any change to deployment name, namespace, readiness check, or rollback procedure. First check: `kubectl -n payments get deploy/payment -o wide`. Restart command: `kubectl -n payments rollout restart deploy/payment`. Expected result: rollout completes within 5 minutes; escalate to platform incident channel if it does not.
+
+Judgment to apply:
+
+- Treat ADRs and postmortems as snapshots. Supersede them instead of rewriting their historical decision or incident record.
+- Treat runbooks, READMEs, API docs, and architecture overviews as living artifacts. Include an owner, source of truth, review trigger, repository convention, or explicit assumption before materially revising them.
+- If the user asks for an edit that conflicts with artifact lifetime, surface the conflict and choose the shape that preserves future reader trust.
