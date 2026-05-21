@@ -5,74 +5,58 @@ description: "Explore an open idea or problem to surface options, assumptions, a
 
 # Brainstorming
 
-Explores an open idea through dialogue. The output is clearer thinking — surfaced options, assumptions, and decision factors. The user decides when to stop and what to do next.
+Use this skill to improve the user's decision state while the topic is still open. The output is clearer thinking: grounded problem framing, distinct options, surfaced assumptions, decision factors, and uncertainty that can be acted on.
 
-## Trigger Signals
+## Principles
 
-**Invocation default**: Skipping exploration when it is needed converts unresolved questions into implementation mistakes — wrong interfaces, missing constraints, or structure that has to be undone. The cost of an unnecessary exploration is a short conversation. The cost of missing it is building the wrong thing. Invoke this skill whenever the topic is open and at least one decision about shape, scope, tradeoff, or approach remains unexamined.
+- **Hold the problem open before narrowing.** When shape, scope, tradeoff, or approach is still unresolved, surface alternatives, assumptions, and decision factors before reducing the conversation to one path [because premature narrowing turns unexplored assumptions into wrong interfaces, missing constraints, or implementation work that has to be undone].
+- **Ground the need before evaluating solutions.** If the user's framing prescribes an action such as "refactor X", "switch to Y", or "add Z", restate the underlying need and named assumptions before comparing approaches [because solution-shaped framings can hide the actual problem the options must solve].
+- **Put materially different options on the table.** Offer approaches that differ in design, scope, ownership, cost, reversibility, or risk; do not count cosmetic variations of one approach as options [because the user cannot reason about tradeoffs without real alternatives].
+- **Make hidden assumptions explicit.** Treat absolute language, fixed tools, prior decisions, and unexplained constraints as assumptions to surface or test [because implicit assumptions silently remove valid option spaces].
+- **Name the decision factors.** When two or more options exist, compare them on observable axes such as reversibility, blast radius, maintenance cost, time-to-first-value, coupling, stakeholder impact, and uncertainty [because explicit factors let the user match options to actual constraints instead of choosing by vibe].
+- **Introduce perspectives outside the user's frame.** Add blind spots, affected stakeholders, failure modes, non-action options, long-term costs, or cross-domain analogies when the conversation is staying inside one frame [because the agent's value in brainstorming is expanding the option space, not just reorganizing what the user already said].
+- **Scale the session to the topic.** A small open question still gets useful exploration, but the response should be proportionate: a short topic may need one reframing, two options, or one decisive question rather than a full workshop [because skipping exploration loses signal, while over-expanding a small topic creates noise].
 
-Invoke when: the topic is open and at least one decision about shape, scope, tradeoff, or approach remains unexamined.
+## Constraints
 
-Do not use this skill when:
-- the approach and interfaces are already decided and the remaining step is writing code against that decision
-- the question is a factual lookup or a clarification with no open decisions
+- Ask at most one question per message.
+- If the latest user request is a factual lookup, a direct clarification, or a code/action request with no open decision, do not brainstorm; answer or act on that request.
+- If the approach and interfaces are already decided and the remaining work is execution, do not reopen exploration unless the user asks to revisit the decision.
+- Do not choose a direction on the user's behalf unless the user asks for a recommendation.
+- Do not turn brainstorming into spec writing, implementation planning, sub-project decomposition, library selection, file organization, or syntax discussion before the root problem and options are grounded.
+- Do not continue brainstorming after the user signals convergence with language like "let's go with X", "let's plan this out", or "start implementing".
+- Do not leave the current goal to propose unrelated refactors, adjacent projects, or interesting but non-serving directions.
 
-## Capability Boundary
+## Output Shapes
 
-This skill covers divergent exploration: grounding the problem, surfacing options, making assumptions visible, naming decision factors, and introducing perspectives outside the user's frame.
-
-This skill does NOT own:
-- Choosing a direction on the user's behalf
-- Spec writing or implementation planning
-- Sub-project decomposition
-
-The user owns convergence. When the user signals they are ready to stop exploring and move on (e.g. "let's go with X", "let's plan this out", "start implementing"), exit this skill — do not continue to diverge.
-
-## Invariants
-
-- One question per message — no exceptions
-- Actively introduce perspectives, options, and questions from outside the user's original frame — divergence is the core motion of this skill
-- Every exploration matters — short topics get a short session, not no session
-- No unrelated refactoring — only directions that serve the current goal
-
-## What Good Brainstorming Looks Like
-
-A session is going well when one or more of these outputs are emerging. None is mandatory — produce the ones the user's situation calls for. The session is complete when the user says so, not when this list is filled.
+Use only the output shapes that match the current conversation. Do not walk this list as a checklist.
 
 **Reframed problem statement**
-- *What it is*: the user's original framing rewritten with embedded assumptions named and the underlying need stated explicitly
-- *Why it matters*: original framings often prescribe a solution shape that hides the real problem (e.g. "we need to refactor X" hides "X is hard to maintain"). Without reframing, every option that follows solves the wrong problem.
-- *Produce when*: the user's opening statement is a verb-object that prescribes a solution ("refactor X", "switch to Y", "add Z") rather than a description of a need or constraint
+- Use when: the user's opening statement prescribes a solution ("refactor X", "switch to Y", "add Z") rather than stating a need or constraint.
+- Produce: rewrite the framing with embedded assumptions named and the underlying need stated explicitly.
+- Reason: without reframing, every option that follows may solve the wrong problem.
 
 **Distinct options on the table**
-- *What it is*: two or more approaches placed side by side that lead to materially different designs — not variants of one idea
-- *Why it matters*: a single option is not a choice. The user cannot reason about tradeoffs without alternatives to compare against.
-- *Produce when*: the user has named one approach without stating they only want that one; or has described a goal without naming any approach
-- *Watch for*: options that share the same underlying assumption are not distinct — keep diverging
+- Use when: the user has named one approach without saying it is fixed, or has described a goal without naming an approach.
+- Produce: two or more approaches that lead to materially different designs, not variants of one idea.
+- Watch for: if all options share the same underlying assumption, keep diverging.
 
 **Surfaced assumptions**
-- *What it is*: implicit constraints or beliefs the user was treating as fixed, made explicit so they can be questioned
-- *Why it matters*: assumptions left implicit silently exclude entire option spaces. Making them visible expands what the user can consider — even if the user re-confirms the assumption afterward, the confirmation is now deliberate.
-- *Produce when*: the user uses absolute language ("we have to", "we can't", "obviously"), references a system/tool/constraint as fixed without justifying it, or treats a prior decision as non-negotiable
+- Use when: the user uses absolute language ("we have to", "we can't", "obviously"), references a system/tool/constraint as fixed without justifying it, or treats a prior decision as non-negotiable.
+- Produce: implicit constraints or beliefs as explicit assumptions the user can confirm, reject, or revise.
+- Reason: assumptions left implicit silently exclude option spaces.
 
 **Decision factors**
-- *What it is*: the axes along which options differ — e.g. reversibility, blast radius, maintenance cost, time-to-first-value, coupling
-- *Why it matters*: without explicit factors, choosing between options collapses to gut feel. With them, the user can match options to their actual constraints, and can defer the choice on principled grounds.
-- *Produce when*: two or more options are on the table and comparison talk has begun
+- Use when: two or more options are on the table and comparison has begun.
+- Produce: the axes along which options differ, such as reversibility, blast radius, maintenance cost, time-to-first-value, coupling, uncertainty, or stakeholder impact.
+- Reason: explicit factors let the user compare against constraints instead of choosing by gut feel.
 
 **Open questions**
-- *What it is*: what would need to be answered before a confident choice is possible — facts to gather, people to ask, experiments to run
-- *Why it matters*: brainstorming exposes uncertainty. Making the uncertainty itself an output prevents premature commitment and gives the user a legitimate next step that is not "decide now".
-- *Produce when*: a comparison hits a question neither party can answer in the conversation
+- Use when: comparison hits a question neither party can answer in the conversation.
+- Produce: facts to gather, people to ask, experiments to run, or constraints to verify before choosing.
+- Reason: making uncertainty explicit prevents premature commitment.
 
 **Blind spots introduced**
-- *What it is*: perspectives the user is unlikely to reach alone — failure modes, frame locks, etc. (see `references/blind-spots.md`)
-- *Why it matters*: the agent's asymmetric value in brainstorming is breaking the user's cognitive frame. Without injected perspectives, the conversation only reorganizes what the user already thought.
-- *Produce when*: detect signals in `references/blind-spots.md` match the current conversation state
-
-## Failure Signals
-
-Stop and reassess if:
-- You are discussing implementation details (library choices, file organization, syntax) before the root problem is grounded
-- The "options" you have surfaced are variants of the same idea rather than genuinely different approaches — you are not actually diverging
-- You are pushing the user toward a decision they have not asked to make — convergence is the user's call, not yours
+- Use when: detect signals in `references/blind-spots.md` match the current conversation state.
+- Produce: one relevant failure mode, frame lock, missing perspective, inversion, time horizon, or cross-domain analogy.
+- Reason: without injected perspectives, the conversation may only reorganize what the user already thought.
