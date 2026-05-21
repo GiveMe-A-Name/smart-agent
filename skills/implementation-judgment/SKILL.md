@@ -37,6 +37,7 @@ Choose how a code change should land before writing behavior-affecting code. The
 
 - **Treat verification as evidence, not a target.** A passing test suite supports the change only when tests still assert the intended behavior; do not modify tests, snapshots, type suppressions, lint configuration, or verification scope merely to make checks pass.
 - **Keep the diff scoped to the implementation decision.** Do not include adjacent cleanup, opportunistic renames, broad refactors, or unrelated style fixes. Note them separately unless they are required to keep the current change structurally coherent.
+- **Choose the smallest structurally honest intervention.** Patch locally when ownership, contracts, and dependency direction are clear; make a focused structural improvement only when the current change would otherwise deepen a known boundary problem; pause when ownership, caller contracts, migration order, or dependency direction cannot be determined from evidence.
 
 ### Runtime And Performance
 
@@ -46,7 +47,6 @@ Choose how a code change should land before writing behavior-affecting code. The
 - **Parallelize independent I/O when order does not matter.** Sequential independent I/O calls should run concurrently unless ordering or data dependency prevents it.
 
 See `references/judgment-dimensions.md` when a change touches abstraction, complexity placement, failure handling, contracts, dependencies, observability, security, state, or migration.
-See `references/risk-triage.md` when deciding between a narrow patch, focused structural improvement, or pause.
 See `references/performance-dimensions.md` when performance, resource, frontend, database, async, or concurrency impact is part of the change.
 
 Example index:
@@ -56,4 +56,3 @@ Example index:
 | `examples/wrong-abstraction.md` | Repeated or similar code may need separation or consolidation based on change drivers. |
 | `examples/complexity-misplacement.md` | Validation, transformation, or recovery logic is being split across layers. |
 | `examples/implicit-contract-break.md` | A refactor appears signature-safe but may change observed caller behavior. |
-| `examples/test-manipulation.md` | Tests, snapshots, or type checks are tempting to change just to make verification pass. |

@@ -121,7 +121,7 @@ type signature?"
 - `isFeatureEnabled`: used in synchronous template rendering. Cannot become
   async without a cascade of changes.
 
-**Step 2 — Apply the judgment dimension (Contract and Compatibility):**
+**Step 2 — Apply the judgment dimension (Boundary Contract and Dependency Direction):**
 
 - Callers depend on observed behavior (synchronous return, same reference),
   not just the type signature.

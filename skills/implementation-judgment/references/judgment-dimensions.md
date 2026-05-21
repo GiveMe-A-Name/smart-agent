@@ -50,31 +50,25 @@ See `examples/complexity-misplacement.md` for a case where partial validation sp
 - Feature flags, runtime configuration, and clear module boundaries all increase deletability. Deep inheritance hierarchies, global state, and implicit dependencies decrease it.
 - When building something new and uncertain, favor a "big lump" that can be deleted as a whole over many small interlocking pieces that can only be deleted piecewise.
 
-## 5. Contract and Compatibility Awareness
+## 5. Boundary Contract and Dependency Direction
 
-**Question**: What does this change mean for callers? Are implicit contracts being preserved or silently broken?
+**Question**: What behavior does this boundary promise to callers, and which side of the boundary now knows about the other?
 
 **Key signals**:
-- Callers depend on observed behavior, not documented behavior. If a function has always returned an empty array on error (even by accident), callers may rely on that. Changing it to throw is a breaking change regardless of what the docs say.
-- Adding a parameter with a default value looks safe but can still change behavior for callers who relied on the old default path through the code.
-- Side effects are implicit contracts. If a function has always logged, written to a file, or emitted an event, removing that side effect can break callers who depend on it even though it was never part of the explicit API.
-- When refactoring, hold the behavioral boundary constant even if the implementation changes completely. Tests that verify behavior (not implementation) are the safety net here.
-- For public APIs and shared libraries, backwards compatibility is almost always more important than internal cleanliness. Ugly-but-compatible beats clean-but-breaking.
+- Caller contract: identify behavior a caller can observe, including return values, thrown errors, defaults, side effects, ordering, persistence, emitted events, caching, sync/async timing, and reference identity. During a refactor, keep this behavior unchanged unless the task explicitly asks to change it.
+- Treat observed behavior as the contract even when it was never documented. If a function has always returned an empty array on error, callers may rely on that; changing it to throw is a breaking change.
+- A signature-compatible change can still break the contract when it changes the old default path, execution timing, side effects, error behavior, or object identity. Prefer tests that assert caller-observable behavior over tests that assert implementation shape.
+- For public APIs and shared libraries, caller compatibility outranks internal cleanliness unless the task includes a migration or versioning plan.
+- Dependency direction: if `A` imports, calls, constructs, references generated types from, reads configuration for, or otherwise must know about `B`, then `A` depends on `B`. This is a direction: `A -> B`.
+- Prefer dependency edges from volatile or specific code toward stable or general code. Example: `features/billing` may depend on `lib/http`; `lib/http` depending on `features/billing/planRules` is wrong-way because every billing policy change can now force infrastructure changes.
+- Treat a new import, package dependency, service call, generated type, callback, or configuration read across a module/package boundary as a stronger edge than a local dependency because it is harder to remove, test independently, version, and deploy.
+- Before importing a helper "just for one function," inspect the helper's imports and package dependencies; the dependency includes that transitive surface, not only the symbol being called.
+- Circular dependencies are a structural problem, not just a lint warning. They mean two modules cannot be understood, tested, or deployed independently.
+- If two modules must now change together even without an import edge, surface the missing boundary decision: either keep the behavior local, move the shared primitive to a lower stable layer, or make the ownership dependency explicit.
 
 See `examples/implicit-contract-break.md` for a case where a "safe" refactoring breaks callers through implicit behavioral changes.
 
-## 6. Dependency Direction
-
-**Question**: Does this change make the dependency graph simpler or more complex? Are dependencies flowing in the right direction?
-
-**Key signals**:
-- Check the dependency direction: unstable, frequently changing code may depend on stable code; stable infrastructure depending on volatile business logic is the wrong direction.
-- A new import or dependency crossing a package/module boundary is a stronger signal than one within the same module. Cross-boundary dependencies are harder to undo.
-- Circular dependencies are a structural problem, not just a lint warning. They mean two modules cannot be understood, tested, or deployed independently.
-- Before adding a dependency "just for one function," inspect the target function's imports or package dependencies; the new dependency includes that transitive surface, not only the called function.
-- If two modules changed together in this task or must be edited together to preserve behavior, treat them as coupled even without an import edge; either keep the change local or surface the missing boundary decision.
-
-## 7. Performance Awareness
+## 6. Performance Awareness
 
 **Question**: What is the performance impact of this change? Is the change respecting the performance boundaries of the system?
 
@@ -89,7 +83,7 @@ See `examples/implicit-contract-break.md` for a case where a "safe" refactoring 
 
 See `performance-dimensions.md` for deep guidance on each dimension: algorithmic fitness, I/O patterns (including latency reference tables), resource management, optimization judgment, frontend CWV, database query design, and async/concurrency bottlenecks.
 
-## 8. Observability and Operability
+## 7. Observability and Operability
 
 **Question**: When this code fails in production, will the person debugging it at 3am have the information they need?
 
@@ -100,7 +94,7 @@ See `performance-dimensions.md` for deep guidance on each dimension: algorithmic
 - Health checks and readiness signals: If the change affects system readiness (new dependency, new resource requirement), does the health check reflect this?
 - Debuggability under pressure: Could someone unfamiliar with this code, reading only logs and metrics, understand what happened? The audience is a tired on-call engineer, not the original author.
 
-## 9. Security Posture
+## 8. Security Posture
 
 **Question**: Does this change maintain or improve the system's security posture? What attack surface does it introduce?
 
@@ -112,7 +106,7 @@ See `performance-dimensions.md` for deep guidance on each dimension: algorithmic
 - Principle of least privilege: Does the change request only the permissions it needs? Over-privileged code is a larger blast radius when compromised.
 - Cryptographic hygiene: If the change involves encryption, hashing, or token generation, are current algorithms and practices used? Hardcoded secrets, weak hashing (MD5/SHA1 for security), and custom crypto are red flags.
 
-## 10. State Management and Data Integrity
+## 9. State Management and Data Integrity
 
 **Question**: Does this change correctly manage shared state? Will state transitions remain consistent under all conditions — including concurrent access, partial failure, and restart?
 
@@ -125,7 +119,7 @@ See `performance-dimensions.md` for deep guidance on each dimension: algorithmic
 - **Local state and remote state will diverge.** When integrating external services, a successful API call followed by a local crash means the remote side has progressed but your system doesn't know. Design for this — idempotency keys, reconciliation jobs, or explicit "pending" states.
 - **Schema migrations create a dual-state window.** Any migration that changes schema while the application is running creates a window where old code reads new schema (or vice versa). Ensure migrations are backward-compatible with the currently deployed code, or coordinate deployment order explicitly.
 
-## 11. Migration and Backward Compatibility
+## 10. Migration and Backward Compatibility
 
 **Question**: Does this change require a migration — of data, configuration, API consumers, or deployment sequence? Is the migration safe to run in production?
 

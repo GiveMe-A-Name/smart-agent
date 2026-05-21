@@ -1,12 +1,29 @@
 # Abstraction Change Drivers - Separate vs. Consolidate
 
-This contrast pair calibrates both sides of abstraction judgment:
+Read this when similar or repeated code makes extraction tempting, or when a
+review asks to "deduplicate" code that may not share one owner.
 
-- surface-similar code should stay separate when callers change for different reasons
-- repeated logic should be consolidated when callers share the same safety rule, business rule, or lifecycle driver
+Good code uses abstraction to preserve the right change boundary. Do not decide
+from duplication count or surface similarity. Decide from the event that would
+force each caller to change.
 
-The question is not "how many copies exist?" or "do these snippets look similar?"
-The question is: "What event would require each copy to change?"
+---
+
+## Decision Check
+
+Before extracting or consolidating:
+
+- Name each caller and the policy, rule, or lifecycle it owns.
+- For each copy, answer: "What future request would require this code to
+  change?"
+- Consolidate when the same future request should change every copy.
+- Keep separate when different future requests should change different callers.
+- Extract only the stable lower-level primitive when policies differ but share a
+  mechanism.
+
+Risk signal: a shared helper grows options, flags, or conditionals that map
+one-to-one to caller names, routes, products, or use cases. That helper is acting
+as a dispatcher for unrelated policies.
 
 ---
 
@@ -14,60 +31,57 @@ The question is: "What event would require each copy to change?"
 
 **Task:** "Add rate limiting to `/users` and `/search`."
 
-**Current need:**
+```text
+// /users
+limit authenticated users to 100 requests/minute per user
 
-- `/users`: limit authenticated users to 100 requests/minute per user
-- `/search`: limit anonymous traffic to 20 requests/minute per IP
+// /search
+limit anonymous traffic to 20 requests/minute per IP
+```
 
-**Bad move:** create one generic `createRateLimiter(options)` because both endpoints
-"need rate limiting."
+Bad move:
 
 ```typescript
-createRateLimiter({
-  keyExtractor: (req) => req.auth.userId,
-  limit: 100,
-})
-
+createRateLimiter({ keyExtractor: (req) => req.auth.userId, limit: 100 })
 createRateLimiter({
   keyExtractor: (req) => req.ip,
   limit: 20,
-  onLimitExceeded: (req) => logSuspiciousActivity(req.ip),
+  onLimitExceeded: (req) => logIp(req.ip),
 })
 ```
 
-This looks clean, but the two callers change for different reasons:
+Both snippets are "rate limiting," but the change drivers differ:
 
-- The user limiter is quota management. It may need per-plan limits, rate-limit
-  headers, upgrade messaging, or cached fallback behavior.
-- The search limiter is abuse defense. It may need IP reputation, sliding windows,
-  escalation, or automatic blocking.
+- `/users` is quota management. Future changes may add per-plan limits, upgrade
+  messaging, quota headers, or cached fallback behavior.
+- `/search` is abuse defense. Future changes may add IP reputation, escalation,
+  sliding windows, or auto-blocking.
 
-The shared abstraction will accumulate caller-specific options:
+Do not bind these policies behind one option-heavy middleware:
 
 ```typescript
 createRateLimiter({
   keyExtractor,
   limit,
-  windowType,
   onLimitExceeded,
-  returnCachedOnLimit,
   addRateLimitHeaders,
+  returnCachedOnLimit,
   autoBlockAfter,
 })
 ```
 
-**Corrected move:** keep the concerns separate.
+Correct shape:
 
 ```typescript
-// Owns per-user quota enforcement.
 export function userQuotaLimiter() {}
-
-// Owns IP-based abuse defense.
 export function ipDefenseLimiter() {}
 ```
 
-If both later need the same sliding-window primitive, extract that primitive only.
-Do not bind quota management and abuse defense behind one option-heavy middleware.
+If both need the same counter, extract only that primitive:
+
+```typescript
+export function slidingWindowCounter(key: string, windowMs: number) {}
+```
 
 ---
 
@@ -75,9 +89,7 @@ Do not bind quota management and abuse defense behind one option-heavy middlewar
 
 **Task:** "Address path traversal review comments in CLI env-loading flows."
 
-**Current need:**
-
-Three files need to enforce the same rule:
+Three files must enforce the same rule:
 
 ```text
 commands/create.ts
@@ -85,40 +97,28 @@ commands/build.ts
 utils/loadEnv.ts
 ```
 
-The shared rule is: user-controlled or config-controlled paths must not escape the
+Shared rule: user-controlled or config-controlled paths must not escape the
 approved root.
 
-**Bad move:** add a local helper to each file.
+Bad move:
 
 ```typescript
 // commands/create.ts
-function isSubPath(parent: string, child: string): boolean {
-  const relative = path.relative(parent, child)
-  return relative !== '' && !relative.startsWith('..') && !path.isAbsolute(relative)
-}
-```
+return relative !== '' && !relative.startsWith('..')
 
-```typescript
 // commands/build.ts
-function isSubPath(parent: string, child: string): boolean {
-  const relative = path.relative(parent, child)
-  return !relative.startsWith('..') && !path.isAbsolute(relative)
-}
-```
+return !relative.startsWith('..')
 
-```typescript
 // utils/loadEnv.ts
-function isSubPath(parent: string, child: string): boolean {
-  const relative = path.relative(parent, child)
-  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative))
-}
+return relative === '' || !relative.startsWith('..')
 ```
 
-Each patch can satisfy its local review comment, but ownership of one security
-decision has been multiplied. Future changes to symlink handling, empty-path
-semantics, or normalization may update one copy and miss the others.
+Each local helper can satisfy its local review comment, but ownership of one
+security rule has been multiplied. Future changes to symlink handling, empty-path
+semantics, path normalization, or allowed roots can update one copy and miss the
+others.
 
-**Corrected move:** consolidate the shared boundary rule in one owner.
+Correct shape:
 
 ```typescript
 // utils/pathSafety.ts
@@ -128,21 +128,21 @@ export function isPathInside(parent: string, child: string): boolean {
 }
 ```
 
-Then all three call sites use the same helper. If one call site needs a different
-rule, make that difference explicit at the shared boundary rather than hiding it
-inside a copied local helper.
+All call sites use the same helper. If one call site needs different semantics,
+name that distinct rule at the boundary instead of hiding it inside a copied
+local helper.
 
 ---
 
-## The Distinction
+## Apply the Distinction
 
-| Question | Keep separate | Consolidate |
+Use this table as the action boundary:
+
+| Check | Keep separate | Consolidate |
 |---|---|---|
-| Do callers change for the same reason? | No | Yes |
-| What would a future requirement affect? | One concern independently | Every copy of the same rule |
-| Main risk if abstracted/consolidated wrong | Option-heavy abstraction with caller-specific branches | Security or business rule drift across copies |
-| Correct move | Separate implementations; extract only stable primitives | One owner for the shared rule |
+| Future request changes | One caller's policy | Every copy of the same rule |
+| Main risk if wrong | Option-heavy abstraction with caller-specific branches | Rule drift across copied helpers |
+| Correct action | Separate policy owners; extract only stable primitives | One owner for the shared rule |
 
-Use duplication count as a signal, not a verdict. Two copies with different
-change drivers may need separation; three copies of one security rule may need
-one owner immediately.
+Do not extract because two snippets look alike. Do not copy because a helper is
+small. Name the change driver first, then choose the code shape.
