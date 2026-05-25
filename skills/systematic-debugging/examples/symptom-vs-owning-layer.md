@@ -1,75 +1,84 @@
 # Symptom Site vs. Owning Layer
 
-This contrast pair illustrates the most common misidentification in failure
-diagnosis: treating the file or line where the failure surfaces as the layer
-that owns the problem.
+Use this example when a proposed fix targets the stack-trace frame, assertion line, or nearest code before evidence shows that location produced the invalid state.
 
----
+## Base Case: Stack-Trace Anchoring
 
-## Bad Case
+**Observed failure:**
 
-**Failure:**
 ```
 AssertionError: expected {"id": 1, "name": "Alice"} to equal {"id": 1, "name": "alice"}
   at test/user.test.ts:42
 ```
 
-**Diagnosis:**
-"The test at `test/user.test.ts:42` is asserting the wrong value. I'll fix the
-expectation to use `"Alice"` instead of `"alice"`."
+**Invalid diagnosis:**
 
-**What went wrong:**
+The assertion at `test/user.test.ts:42` differs from the received value, so the test expectation should be changed to `"Alice"`.
 
-The symptom site is the assertion line in the test file. The diagnosis stopped
-there and proposed weakening the expectation.
+**Why the diagnosis fails:**
 
-This skips the real question: why is the name coming back as `"Alice"` when the
-test expects `"alice"`? The assertion could be correct — the likely owner is the
-normalization layer that should be lowercasing the name before it reaches the
-response. Changing the assertion removes the symptom but leaves the bug in place.
+The assertion line is the symptom site. It proves where the mismatch surfaced, not which layer owns the capitalization behavior. Changing the expected value weakens the contract before checking whether lowercasing is required.
 
----
+**Corrected diagnosis:**
 
-## Corrected Case
+1. Restate the concrete mismatch: the response returns `"Alice"`, while the assertion expects `"alice"`.
+2. Identify the contract being tested: response names should be normalized to lowercase.
+3. List candidate owning layers: test expectation, fixture setup, serializer, service normalization, or data source.
+4. Check evidence for each plausible candidate before editing.
 
-**Same failure.**
+**Owning layer with evidence:**
 
-**Step 1 — Restate the concrete failing behavior:**
-The response returns `"Alice"` (capitalized), but the test expects `"alice"`
-(lowercase). The assertion is checking a specific normalization contract.
+Nearby tests also assert lowercase names, so the expectation is a real contract. Reading `UserService.serialize()` shows no lowercasing step. The owning layer is `UserService.serialize()`, not `test/user.test.ts:42`.
 
-**Step 2 — Separate symptom site from owning layer:**
-Symptom site: `test/user.test.ts:42` (where the mismatch surfaces).
-Candidate owning layers: the serialization layer, the normalization step in the
-service, or the data layer — not the test itself.
-
-**Step 3 — Check competing explanations:**
-- Expectation wrong? Only if there is no normalization contract. Read the test
-  setup and nearby tests to check whether lowercasing is an established expectation.
-- Implementation wrong? If nearby tests confirm lowercasing is expected, trace
-  whether `UserService` or its serializer applies the transformation.
-- Fixture wrong? Check whether the fixture stores `"Alice"` and bypasses
-  normalization during test setup.
-
-**Step 4 — Owning layer with evidence:**
-Nearby tests at lines 50–60 also assert lowercase names, confirming the contract
-exists. Reading `UserService.serialize()` shows no lowercasing step. The owning
-layer is `UserService.serialize()`, not the test.
-
-**Why this is correct:**
-
-The failure path was traced from assertion → contract confirmation → serializer
-inspection. The owning layer is identified with evidence, not just proximity to
-the stack trace. The test expectation is preserved.
-
----
-
-## The Distinction
-
-| | Bad case | Corrected case |
+| Check | Invalid diagnosis | Corrected diagnosis |
 |---|---|---|
 | Symptom site | `test/user.test.ts:42` | `test/user.test.ts:42` |
-| Identified owner | The test (the symptom site) | `UserService.serialize()` |
-| Competing explanations checked | No | Yes — expectation, implementation, fixture |
-| Evidence used | None — proximity only | Nearby tests + serializer inspection |
-| Edit proposed | Weaken the assertion | Fix the serializer |
+| Ownership claim | Test owns the failure | Serializer owns the missing normalization |
+| Evidence used | Stack-trace proximity only | Nearby tests plus serializer inspection |
+| Edit | Weaken the assertion | Fix `UserService.serialize()` |
+
+## Variant: Bypass Changes Evidence
+
+Use this variant when context says a fixture, mock, helper, migration, import path, or test setup bypasses a normal layer, but the diagnosis still treats the stack-trace function as the owner.
+
+**Observed failure:**
+
+```
+AssertionError: expected 'alice@example.com' to equal 'alice'
+  at UserEmailParser.parse (src/utils/email_parser.ts:15)
+```
+
+**Observed context:**
+
+- `src/utils/email_parser.ts` parses emails and is used by multiple services.
+- `src/services/user.ts` calls the parser on the normal service path.
+- `test/fixtures/user_fixture.ts` creates user objects directly and bypasses the service layer.
+
+**Invalid diagnosis:**
+
+The stack trace points to `UserEmailParser.parse`, and the received value is the full email, so `email_parser.ts` owns the failure.
+
+**Why the diagnosis fails:**
+
+The bypass fact changes what the stack trace proves. If fixture setup bypasses `UserService`, then `UserEmailParser.parse()` may not be called on the fixture path. The stack trace can come from the test's direct verification call rather than from the path that created the bad user object.
+
+**Required recovery action:**
+
+Before editing the stack-trace function, check whether that function is reached on the bypass path.
+
+```
+Normal path:  UserService -> UserEmailParser.parse() -> user.email = 'alice'
+Fixture path: user_fixture.ts -> user.email = 'alice@example.com'
+```
+
+**Owning layer with evidence:**
+
+The fixture path skips `UserService`, so it stores raw email values without parser normalization. The owning layer is `test/fixtures/user_fixture.ts`, not `email_parser.ts`. The parser can still be tested separately, but this failure does not prove parser ownership.
+
+| Check | Invalid diagnosis | Corrected diagnosis |
+|---|---|---|
+| Bypass evidence | Acknowledged but not used | Used to reinterpret the stack trace |
+| Stack-trace meaning | Parser is broken | Parser was called during verification, not fixture setup |
+| Evidence check | Parser return value only | Reachability on the fixture path |
+| Ownership claim | `email_parser.ts` | `test/fixtures/user_fixture.ts` |
+| Edit | Fix parser | Fix fixture setup to apply the normal transformation |

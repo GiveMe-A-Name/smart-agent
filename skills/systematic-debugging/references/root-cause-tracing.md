@@ -2,30 +2,16 @@
 
 ## Overview
 
-Bugs often manifest deep in the call stack. Your instinct is to fix where the error appears — but that's treating a symptom. Trace backward through the call chain until you find the original trigger, then fix at the source.
+Bugs often manifest deep in the call stack. Treat the visible failure line as a symptom until traced evidence shows it produced the invalid state. Trace backward through the call chain until the original trigger is identified, then fix at the source.
 
 ## When to Use
 
-```dot
-digraph when_to_use {
-    "Bug appears deep in stack?" [shape=diamond];
-    "Can trace backwards?" [shape=diamond];
-    "Add instrumentation / isolate more" [shape=box];
-    "Trace to original trigger" [shape=box];
-    "Add defense-in-depth" [shape=box];
-
-    "Bug appears deep in stack?" -> "Can trace backwards?" [label="yes"];
-    "Can trace backwards?" -> "Trace to original trigger" [label="yes"];
-    "Can trace backwards?" -> "Add instrumentation / isolate more" [label="no - need more evidence"];
-    "Trace to original trigger" -> "Add defense-in-depth";
-}
-```
-
-Use when:
-- Error happens deep in execution, not at the entry point
-- Stack trace shows a long call chain
-- Unclear where invalid data originated
-- Need to find which test or caller triggers the problem
+| Observable signal | Why this applies | First action |
+|---|---|---|
+| Error happens deep in execution, not at the entry point | The visible failure may be where invalid state is consumed, not where it is produced | Trace callers backward from the failing operation |
+| Stack trace shows a long call chain | Framework, helper, or adapter frames can hide the project-owned behavior that created the state | Find the first project-owned behavior-changing caller |
+| Invalid data appears at a boundary | The owning layer is the first observed location where the value was produced, transformed, or accepted without validation | Trace the value backward and record each producer or transformer |
+| Failure occurs only for some test, caller, user, or input | A shared operation can be reached by many paths, and only one path may supply the bad state | Instrument the operation or bisect callers/tests |
 
 ## The Tracing Process
 
@@ -99,25 +85,7 @@ The key is the strategy, not a specific helper script: isolate the smallest test
 
 ## Key Principle
 
-```dot
-digraph principle {
-    "Found immediate cause" [shape=ellipse];
-    "Can trace one level up?" [shape=diamond];
-    "Trace backwards" [shape=box];
-    "Is this the source?" [shape=diamond];
-    "Fix at source" [shape=box];
-    "Add validation at each layer" [shape=box];
-
-    "Found immediate cause" -> "Can trace one level up?";
-    "Can trace one level up?" -> "Trace backwards" [label="yes"];
-    "Can trace one level up?" -> "Is this the source?" [label="no"];
-    "Is this the source?" -> "Trace backwards" [label="no"];
-    "Is this the source?" -> "Fix at source" [label="yes"];
-    "Fix at source" -> "Add validation at each layer";
-}
-```
-
-**Never fix just where the error appears.** Trace back to find the original trigger.
+The immediate failing line is only the symptom until evidence shows it produced the invalid state. Before editing the consumer, trace backward until you can name the first observed location where the bad value, call, state, or assumption enters the system; make the primary fix there. Add a boundary check only when traced evidence shows another path can still supply the same invalid state; record that bypass path with the check [because fixing only the consumer can hide the crash while leaving the original trigger executable].
 
 ## Stack Trace Tips
 

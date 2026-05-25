@@ -33,7 +33,7 @@ Debugging is an inverse problem: observe effects, infer causes, and verify the i
 
 Select the mental model from the observable signal. Treat each row as an entry point, not a conclusion; after each action, record what possibility was eliminated. If no possibility was eliminated, change approach.
 
-| What you're seeing | What it suggests | Reach for |
+| Observable signal | What it suggests | Reach for |
 |---|---|---|
 | Clear error message pointing to a specific location | May be a direct hit, but could be symptom site | Trace backward before editing; see **Symptom Site != Owning Layer** |
 | "It used to work" or something changed recently | Regression | Use `git log`, `git bisect`, changelog, config diff, or dependency diff |
@@ -43,7 +43,7 @@ Select the mental model from the observable signal. Treat each row as an entry p
 | Theory formed before a disconfirming test | Confirmation-bias risk | Design an experiment that could disprove the theory |
 | 2+ failed hypotheses with no eliminated cause | Assumptions may be wrong | List assumptions not directly observed and verify the highest-impact one |
 | Error deep in a call stack | Original trigger is upstream | Trace the causal chain backward; see `references/root-cause-tracing.md` |
-| Fix worked but should stay fixed | Need bug-class prevention | Add defense-in-depth where the invalid state enters; see `references/defense-in-depth.md` |
+| Primary fix passes but traced evidence shows the same invalid state can enter through another path | Bug class can recur | Add the smallest boundary check that rejects that invalid state, and record the bypass path it covers |
 | Build fails after dependency update | Version conflict or breaking change | Read the first tooling error, changelog between versions, and lockfile diff |
 | "Works on my machine" but fails in CI/staging | Environment difference | Diff runtime versions, env vars, config sources, flags, and generated artifacts |
 | Code looks correct but behavior is wrong | Config, feature flag, stale artifact, or data state | Print actual resolved config/state, clean caches, and check flags |
@@ -62,16 +62,12 @@ Select the model whose observable signal matches the failure. See `references/me
 ## Supporting Techniques
 
 - `references/root-cause-tracing.md` — tracing backward through a call stack to the original trigger
-- `references/defense-in-depth.md` — after finding root cause, adding validation at multiple layers so the bug class cannot recur
 - `references/condition-based-waiting.md` — when the bug involves timing or async behavior
 - `references/specialized-domains.md` — domain-specific heuristics for distributed systems, performance, concurrency, data/state, build/tooling, and config/environment bugs
-- `references/mental-models.md` — full detail for the five mental models
-- `references/cognitive-traps.md` — cognitive biases that make debugging hard, with countermeasures
+- `references/mental-models.md` — full detail for the five mental models and stuck-loop recovery signals
 
 ## Examples
 
 See `examples/symptom-vs-root-cause.md` when the proposed fix addresses the visible symptom but not the mechanism.
 
-See `examples/symptom-vs-owning-layer.md` when a stack-trace line may be the symptom site rather than the owning layer.
-
-See `examples/fixture-bypass-detection.md` when bypass information is acknowledged but not actually used in the diagnosis.
+See `examples/symptom-vs-owning-layer.md` when a stack-trace line may be the symptom site rather than the owning layer, including when bypass context changes what stack-trace evidence proves.

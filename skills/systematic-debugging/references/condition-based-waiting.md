@@ -4,33 +4,21 @@
 
 Flaky tests often guess at timing with arbitrary delays. This creates race conditions where tests pass on fast machines but fail under load or in CI.
 
-**Core principle:** Wait for the actual condition you care about, not a guess about how long it takes.
+**Core principle:** Wait for the observable condition the assertion depends on, not a guessed duration.
 
 ## When to Use
 
-```dot
-digraph when_to_use {
-    "Test uses setTimeout/sleep?" [shape=diamond];
-    "Testing timing behavior?" [shape=diamond];
-    "Document WHY timeout needed" [shape=box];
-    "Use condition-based waiting" [shape=box];
+| Observable signal | Why this applies | First action |
+|---|---|---|
+| Test sleeps before reading state, output, event, count, or file | The sleep does not prove the asserted condition is true | Replace the sleep with `waitFor` on the asserted condition |
+| Test passes locally but fails under CI, load, or parallel execution | The assertion runs before readiness is observed under slower or concurrent execution | Identify the readiness signal and poll that signal |
+| Test times out while waiting for async work | The async work has an event, state transition, file, count, or returned value that can be checked directly | Wait for that completion signal |
+| Test uses repeated sleeps to wait for multiple async steps | Each step has a separate observable condition | Wait for each condition in sequence |
 
-    "Test uses setTimeout/sleep?" -> "Testing timing behavior?" [label="yes"];
-    "Test uses setTimeout/sleep?" -> "Use condition-based waiting" [label="no"];
-    "Testing timing behavior?" -> "Document WHY timeout needed" [label="yes"];
-    "Testing timing behavior?" -> "Use condition-based waiting" [label="no"];
-}
-```
-
-**Use when:**
-- Tests have arbitrary delays (`setTimeout`, `sleep`, `time.sleep()`)
-- Tests are flaky (pass sometimes, fail under load)
-- Tests timeout when run in parallel
-- Waiting for async operations to complete
-
-**Don't use when:**
-- Testing actual timing behavior (debounce, throttle intervals)
-- Always document WHY if using arbitrary timeout
+| Do not replace with condition-based waiting when | Required action |
+|---|---|
+| The test verifies debounce, throttle, retry interval, polling cadence, or timeout duration | Keep the time-based wait and record the known interval being tested |
+| No observable readiness signal exists yet | Add instrumentation or expose a test-visible signal before replacing the wait |
 
 ## Core Pattern
 
