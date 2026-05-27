@@ -1,6 +1,6 @@
 ---
 name: writing-good-skills
-description: "Write capability skills that teach reusable agent judgment through principles, constraints, and calibrated examples. TRIGGER when creating a new skill or optimizing an existing skill."
+description: "Create and refine capability skills that teach reusable agent judgment through principles, observable constraints, and calibrated examples. Use when creating a new skill, optimizing an existing skill, or improving a skill description."
 ---
 
 # Writing Good Skills
@@ -51,6 +51,8 @@ When creating or optimizing a skill, keep these constraints true throughout the 
 - The frontmatter `description` must let an agent decide whether to load the skill before reading `SKILL.md` or any support files [because skill discovery happens from `name` and `description`; load conditions hidden in the body cannot help the pre-load decision].
 
 - See `references/description-patterns.md` when creating or changing the frontmatter `description`; do not see it for body-only skill edits [because description rules are needed only for pre-load discovery wording, and unconditional reference-chasing wastes context].
+
+- Frontmatter descriptions should default to a positive capability sentence plus a `Use when` clause with observable triggers; add a scope boundary only when a concrete wrong invocation remains after narrowing the positive trigger [because discovery is more reliable when the entry point tells the agent when the skill is relevant instead of making it reason through exclusions].
 
 - Constraints must be verifiable from observable evidence rather than advisory prose; principles must state action-shaping guidance rather than self-judgment prompts.
 

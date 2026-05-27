@@ -8,17 +8,15 @@ The `description` is a discovery field, not a skill summary. It helps the agent 
 
 Use the `description` for pre-load discovery:
 
-Without a boundary:
+Default shape:
 
 ```yaml
-description: "[Capability]. TRIGGER when: [observable invocation state]."
+description: "[Capability]. Use when [observable invocation state]."
 ```
 
-With an optional boundary:
+The capability sentence answers what behavior the skill improves. The `Use when` sentence gives the observable request terms, artifact types, or task states that should make the agent load it.
 
-```yaml
-description: "[Capability]. TRIGGER when: [observable invocation state]. DO NOT TRIGGER when: [optional observable boundary]."
-```
+Avoid negative trigger clauses by default. If the positive trigger would still load the skill for a concrete task it does not own, first narrow the `Use when` clause. Add a short scope boundary only when narrowing would hide a real positive trigger.
 
 Do not put cost-asymmetry persuasion, workflow steps, or skill-body rules in the `description`. If the skill needs richer uncertainty handling, encode it in the main `SKILL.md` as a principle or constraint after the skill has loaded:
 
@@ -28,24 +26,43 @@ Do not put cost-asymmetry persuasion, workflow steps, or skill-body rules in the
 
 ## Description Rules
 
-A good description contains two required parts and one optional boundary part, in this order:
+A good description contains two required parts, in this order:
 
 - **Capability**: one short statement of what behavior the skill improves.
-- **TRIGGER when**: observable conditions that make the skill worth loading.
-- **DO NOT TRIGGER when** (optional): add only for concrete boundary cases that the positive trigger cannot make clear by itself.
+- **Use when**: observable conditions that make the skill worth loading.
+
+Use terms the agent is likely to see in the user request or workspace: file extensions, artifact names, task verbs, domain objects, and task states.
 
 Quote descriptions that contain `: ` so YAML does not parse them as nested keys.
 
+## Calibrated Examples
+
+```yaml
+description: "Extract text and tables from PDF files, fill forms, and merge documents. Use when working with PDF files, forms, or document extraction."
+```
+
+```yaml
+description: "Analyze spreadsheets, create pivot tables, and generate charts. Use when analyzing Excel files, .xlsx files, spreadsheets, or tabular data."
+```
+
+```yaml
+description: "Generate commit messages from git diffs. Use when the user asks for a commit message or help reviewing staged changes."
+```
+
+These work because they name the capability first, then give concrete loading evidence without teaching the workflow.
+
 ## Constraints
 
-- Put the capability and main `TRIGGER when` clause early; UI lists may truncate around 250 characters.
+- Put the capability and main `Use when` clause early; UI lists may truncate around 250 characters.
 - The field limit is 1024 characters; the model can read the full description up to that limit.
 - Do not compress the whole description to 250 characters if doing so removes necessary boundary information.
 - The load decision is made from `name` and `description` before the full `SKILL.md` is loaded.
 
-## Boundary Clause Principles
+## Scope Boundary Principles
 
-`DO NOT TRIGGER` conditions must be based on observable state, not pre-investigation confidence.
+Most descriptions should have no boundary clause. Prefer a narrower positive `Use when` clause over a negative exclusion.
+
+If a boundary is unavoidable, it must be based on observable state, not pre-investigation confidence.
 
 Delete or rewrite conditions that depend on judgments such as:
 
@@ -66,42 +83,44 @@ If a safe-skip condition can only be known after reading files, tracing behavior
 
 Do not hardcode named-skill handoffs in the `description`. If another skill should have loaded first, fix that skill's frontmatter `description` instead of teaching this skill to route to it.
 
-## Good Pattern Without Boundary
+## Good Default Pattern
 
 ```yaml
-description: "Create and refine Codex skills that teach reusable agent judgment. TRIGGER when creating a new skill or optimizing an existing skill."
+description: "Create and refine Codex skills that teach reusable agent judgment. Use when creating a new skill, optimizing an existing skill, or improving a skill description."
 ```
 
 Why it works:
 
 - starts with the capability
 - uses observable state: creating or optimizing a skill
-- omits `DO NOT TRIGGER` because the positive `TRIGGER when` clause is already narrow enough
+- omits a boundary because the positive `Use when` clause is already narrow enough
 - does not explain how to write the skill
 
-## Good Pattern With Boundary
+## Good Pattern With Narrow Positive Trigger
 
 ```yaml
-description: "Evaluate code changes for correctness, design, and risk. TRIGGER when: a diff, staged changes, or PR exists and the task is to review them. DO NOT TRIGGER when: responding to existing review feedback."
+description: "Evaluate code changes for correctness, design, and merge risk. Use when a diff, staged changes, or PR exists and the user asks to review, audit, or judge those changes."
 ```
 
 Why it works:
 
 - starts with the capability
 - uses observable state: diff, staged changes, PR, review task
-- boundary is factual, not impression-based
+- narrows ownership with positive action words: review, audit, judge
 - does not explain how to perform the review
 
-## DO NOT TRIGGER Rule
+## Boundary Rule
 
-Add `DO NOT TRIGGER` only when it prevents a concrete wrong invocation that the positive `TRIGGER when` clause cannot prevent.
+Add a scope boundary only when it prevents a concrete wrong invocation that the positive `Use when` clause cannot prevent.
 
-Before adding it, ask:
+Before adding one, all answers must be yes:
 
-Can the positive `TRIGGER when` clause be narrowed instead?
+- Have you already narrowed the positive `Use when` clause as much as possible without hiding valid trigger cases?
 
-Is the exclusion based on observable state rather than agent confidence or perceived simplicity?
+- Is the boundary based on observable state rather than agent confidence or perceived simplicity?
 
-Would deleting the exclusion make the skill load for a task it does not own?
+- Would deleting the boundary make the skill load for a task it does not own?
 
-If the answer to any question is no, rewrite the positive `TRIGGER when` clause instead of adding `DO NOT TRIGGER`.
+- Can the boundary be phrased as scope or ownership instead of a negative trigger instruction?
+
+If any answer is no, rewrite the positive `Use when` clause instead of adding a boundary.
