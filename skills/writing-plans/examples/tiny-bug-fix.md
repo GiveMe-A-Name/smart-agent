@@ -15,7 +15,7 @@
 > **Summary (Layer 1)**
 > - **Goal:** Expired tokens return Unauthorized instead of Not Found.
 > - **Why:** Users should know their session expired, not think the endpoint is missing.
-> - **Expected outcome:** Expired-token requests return 401.
+> - **End state:** Expired-token requests return 401.
 > - **Impact scope:** Authentication behavior only.
 > - **Size:** Tiny.
 

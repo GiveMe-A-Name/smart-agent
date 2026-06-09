@@ -31,8 +31,12 @@ Check whether the Human Review Section can be approved without codebase knowledg
 
 Block if:
 - it omits the Intent statement
-- it contains file paths, line numbers, function names, method names, implementation-only class/module names, or non-user-visible CLI flags
+- Layer 1 omits End state, or End state is more than one sentence, describes implementation steps instead of the final observable state, or lists multiple concrete deltas that should be in Change Snapshot
+- it contains file paths, line numbers, implementation-only function/method/class/module names, internal APIs, or non-user-visible CLI flags; public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior being approved
 - it describes implementation mechanics without naming the user problem, system behavior, or product/domain concept
+- Change Snapshot appears in a tiny/small plan
+- Change Snapshot is missing when a medium/large plan's intent, assessment, risks, Key Decisions, stop signals, or task outcomes include public/developer-facing contract changes, compatibility expectations, data/contract migrations, restored old behavior, multiple input/output outcomes, or multiple valid interpretations
+- Change Snapshot omits approval-critical visible contract detail, includes implementation detail that belongs in the technical plan, or contains file paths, task references, implementation-only names, or explanatory prose; public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior being approved
 - medium/large plans omit Task Overview, Key Decisions or `None requiring human ratification`, or Conflict Priority when goals can compete
 
 Reason: if the human-facing surface requires codebase knowledge, the user can approve a direction they do not actually understand.

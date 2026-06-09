@@ -53,7 +53,7 @@ Tiny/Small plan body:
 - exact verification command(s) with expected output
 
 Medium/Large plan body:
-- Human Review Section with Intent, Layer 1, Layer 2, Task Overview, Key Decisions or `None requiring human ratification`, and conflict priority when goals can compete
+- Human Review Section with Intent, Layer 1, Layer 2, Change Snapshot when triggered, Task Overview, Key Decisions or `None requiring human ratification`, and conflict priority when goals can compete
 - technical assessment: size, nature, current state, decomposition strategy
 - explicit exclusions
 - risks, contingencies, and revision triggers for the riskiest assumptions
@@ -78,8 +78,13 @@ For detailed decomposition, estimation, contingency, and stop-signal guidance, s
 ## Human Review Section Constraints
 
 - The plan begins with a standalone **Intent** sentence before Layer 1 and before every other field.
-- Layer 1 appears for all sizes; Layer 2, Task Overview, and Key Decisions appear for medium/large.
-- Human Review Section text contains zero file paths, line numbers, function names, method names, implementation-only class/module names, or non-user-visible CLI flags.
+- Layer 1 appears for all sizes and includes **End state** as the only final-state field; Layer 2, Task Overview, and Key Decisions appear for medium/large.
+- End state is a single concise sentence that states what will be true after execution in observable user, developer, or domain terms; it contains no implementation steps, task references, file paths, commands, internal APIs, or implementation-only function/method/class/module names.
+- Do not add Change Snapshot to tiny/small plans.
+- For medium/large plans, add Change Snapshot when plan evidence includes any approval-sensitive visible delta: public/developer-facing contract changes, compatibility expectations, data/contract migrations, restored old behavior, multiple input/output outcomes, or multiple valid interpretations. Omit it only when none of those triggers appear in the intent, assessment, risks, Key Decisions, stop signals, or task outcomes.
+- Change Snapshot contains the minimum complete visible delta needed for approval. Choose the shortest readable form for that delta: scenario bullets, Before/After pairs, a public API/schema/CLI diff, a behavior matrix, or invariants. If the complete approval delta is too large for one compact block, compress dimensions, move implementation detail to the technical plan, surface ratification choices in Key Decisions, or stop for human scoping; do not move approval-critical contract detail out of the Human Review Section [because the frozen human-facing surface is the approved contract].
+- If the Human Review Section exceeds these field limits, revise by deleting lower-value detail or using a more compact snapshot format; do not add explanatory prose [because the human-facing surface is an approval contract, not a second execution plan].
+- Human Review Section text contains zero file paths, line numbers, implementation-only function/method/class/module names, internal APIs, or non-user-visible CLI flags. Public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior being approved.
 - Every Human Review Section bullet names a user-visible, developer-visible, or domain-level outcome. If a sentence requires codebase knowledge to understand, rewrite it using the user problem, system behavior, or product/domain concept.
 - For medium/large, each Task Overview item states what the task achieves and why it comes at that point in the order.
 - Key Decisions list only decisions a reasonable human might choose differently, with alternatives and reasoning. If no such decision exists in a medium/large plan, write `None requiring human ratification` rather than inventing one.

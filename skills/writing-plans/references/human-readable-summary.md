@@ -26,15 +26,53 @@ A short block that lets a human decide "direction correct or not" at a glance:
 
 - **Goal** — one sentence: what are we doing
 - **Why** — one sentence: what problem this solves or what value it adds
-- **Expected outcome** — what the system looks like after execution (user-visible or developer-visible changes, not file paths)
+- **End state** — one concise sentence: what will be true after execution in observable user, developer, or domain terms
 - **Impact scope** — which modules/features/domains are affected (human concepts, not file paths)
 - **Size** — Tiny / Small / Medium / Large
+
+End state is the human's completion anchor. It must not list implementation steps, task names, file paths, commands, internal APIs, or implementation-only function/method/class/module names. If the final state needs multiple concrete deltas, keep End state high-level and use Change Snapshot when triggered.
 
 ## Layer 2: Approach Overview (30-second read)
 
 A short paragraph or bullet list that describes **how** in human terms — the strategy, key steps, and important design decisions. Use domain concepts ("add retry logic to webhook sender"), not code-level references ("modify `notifications/webhook.py:send()`"). Include trade-offs or alternatives considered if they affect scope, user-visible behavior, risk, or dependencies.
 
 Layer 2 passes when it states ordering logic and major trade-offs without file paths or task checklists. If it only lists code edits, rewrite it as strategy: what happens first, why that order reduces risk, and what decision the human is approving.
+
+## Change Snapshot (medium/large only, conditional)
+
+Add Change Snapshot for medium/large plans when any trigger below appears. Omit the field for tiny/small plans and for medium/large plans without these triggers.
+
+Use Change Snapshot when the intent, assessment, risks, Key Decisions, stop signals, or task outcomes include any of these observable triggers:
+- Public/developer-facing contract changes
+- Compatibility expectations or behavior that must remain unchanged
+- Data or contract migrations
+- Restored old behavior
+- Multiple input/output outcomes
+- Multiple valid interpretations of the target behavior
+
+Choose the shortest readable form for the contract:
+- Scenario bullets when behavior depends on runtime conditions
+- Before/After pairs when the change is easiest to compare directly
+- Public API/schema/CLI diffs when developer-facing contracts are the review surface
+- A small behavior matrix when multiple inputs map to different outcomes
+- Invariants when the main risk is preserving existing behavior
+
+Change Snapshot contains the minimum complete visible delta needed for approval. Keep it to one compact block when possible. If the complete approval delta is too large for one compact block, compress dimensions, move implementation detail to the technical plan, surface ratification choices in Key Decisions, or stop for human scoping; do not move approval-critical contract detail out of the Human Review Section.
+
+Do not include file paths, task references, implementation-only names, or explanatory prose. Public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior being approved.
+
+Scenario example:
+> **Change Snapshot**
+> - Job completes with webhook URL: result is delivered to that URL.
+> - Webhook delivery fails temporarily: delivery is retried according to the retry policy.
+> - No webhook URL configured: current job completion behavior stays unchanged.
+
+Public API diff example:
+> **Change Snapshot**
+> | Contract | Before | After |
+> | --- | --- | --- |
+> | `POST /jobs` response | returns job id only | returns job id and webhook delivery status |
+> | `webhook_url` | unsupported | optional field; omitted keeps current behavior |
 
 ## Task Overview (medium/large only)
 
@@ -72,7 +110,7 @@ Omit this field only when no competing goals are named or implied by the plan.
 
 - **All sizes** — Intent Statement always required. It is the first line of the Human Review Section regardless of plan size.
 - **Tiny/Small** — Intent Statement + Layer 1 only. The plan itself is short enough that a human can read it directly.
-- **Medium/Large** — Intent Statement + Layer 1 + Layer 2 + Task Overview + Key Decisions (or `None requiring human ratification`) + Conflict Priority when goals can compete. The technical detail is dense enough that humans need a complete separate entry point.
+- **Medium/Large** — Intent Statement + Layer 1 + Layer 2 + Change Snapshot when triggered + Task Overview + Key Decisions (or `None requiring human ratification`) + Conflict Priority when goals can compete. The technical detail is dense enough that humans need a complete separate entry point.
 
 ## Freeze Rules
 
@@ -86,8 +124,9 @@ The Human Review Section is frozen at approval. Mark it with `[APPROVED — READ
 
 - Use **human concepts**, not code concepts — "notification system" not "`notifications/webhook.py`"
 - Use **outcome language**, not implementation language — "users receive webhook calls when jobs complete" not "POST request is sent in `on_complete` handler"
-- Keep it bounded — Layer 1 has exactly the five fields listed above; Layer 2 is either 3-5 bullets or one paragraph under 120 words
-- **No file paths** in the summary — that's what the technical plan is for
+- Keep it bounded — Layer 1 has exactly the five fields listed above; Layer 2 is either 3-5 bullets or one paragraph under 120 words; Change Snapshot contains only the minimum complete visible delta needed for approval
+- If a field exceeds its limit, revise by deleting lower-value detail or switching to a more compact snapshot format instead of adding explanatory prose
+- **No file paths** in the summary — that's what the technical plan is for. Public/developer-facing endpoint paths are allowed only in Change Snapshot when the API contract is the reviewed behavior.
 
 ---
 
@@ -97,17 +136,17 @@ The Human Review Section is frozen at approval. Mark it with `[APPROVED — READ
 
 > - **Goal:** Fix `auth_middleware.py:47` to return 401 instead of 404
 > - **Why:** `token.exists()` is checked before `token.is_valid()`, causing 404 on the exists path
-> - **Expected outcome:** `authenticate()` returns `HTTPException(status_code=401)` for expired tokens
+> - **End state:** `authenticate()` returns `HTTPException(status_code=401)` for expired tokens
 > - **Impact scope:** `auth_middleware.py`, `tests/test_auth.py`
 > - **Size:** Tiny
 
-**Problems:** Goal names a file and line number. Why describes internal call order. Expected outcome cites a function signature. Impact scope lists file paths. A PM reads this and learns nothing about what was broken or what gets fixed.
+**Problems:** Goal names a file and line number. Why describes internal call order. End state cites a function signature. Impact scope lists file paths. A PM reads this and learns nothing about what was broken or what gets fixed.
 
 ### Good Layer 1 (domain language, outcome-focused)
 
 > - **Goal:** Fix expired tokens returning the wrong error code
 > - **Why:** Users see "not found" errors when their session expires, making them think the feature is broken rather than their login
-> - **Expected outcome:** Expired tokens now correctly return "Unauthorized" so users know to log in again
+> - **End state:** Expired tokens now correctly return "Unauthorized" so users know to log in again
 > - **Impact scope:** Authentication middleware only
 > - **Size:** Tiny
 

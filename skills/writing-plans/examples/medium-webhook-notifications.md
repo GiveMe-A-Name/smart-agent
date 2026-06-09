@@ -15,12 +15,17 @@
 > **Summary (Layer 1)**
 > - **Goal:** Send webhook notifications when jobs complete.
 > - **Why:** Users need job results delivered to external systems automatically.
-> - **Expected outcome:** A completed job POSTs its result to a configured URL and retries transient failures.
+> - **End state:** A completed job delivers its result to a configured webhook URL and retries transient failures.
 > - **Impact scope:** Job completion behavior, configuration, and notification delivery.
 > - **Size:** Medium.
 >
 > **Summary (Layer 2 - Approach)**
 > Build a walking skeleton first: send one hardcoded webhook from the job-completion event before adding configuration and retry behavior. This resolves the main uncertainty early: whether the completion event carries enough data for a useful payload.
+>
+> **Change Snapshot**
+> - Job completes with webhook URL: job result is delivered to that URL.
+> - Webhook delivery fails temporarily: delivery is retried according to the retry policy.
+> - No webhook URL configured: job completion still works without notification delivery.
 >
 > **Task Overview**
 > - **Task 1:** Prove one webhook can fire from job completion before investing in configuration or retries.

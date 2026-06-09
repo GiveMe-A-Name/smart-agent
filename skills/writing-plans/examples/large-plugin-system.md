@@ -15,12 +15,17 @@
 > **Summary (Layer 1)**
 > - **Goal:** Add a user-extensible plugin system for data processors.
 > - **Why:** Users need custom processing behavior without forking or editing the pipeline.
-> - **Expected outcome:** Users place plugin files in a directory; the system discovers, validates, sandboxes, enables, and runs them.
+> - **End state:** Users can place plugin files in a directory, enable valid plugins, and run them safely in the data pipeline.
 > - **Impact scope:** Pipeline execution, plugin infrastructure, configuration, and CLI controls.
 > - **Size:** Large.
 >
 > **Summary (Layer 2 - Approach)**
 > Define the plugin contract first, prove it with one hardcoded no-op plugin, then resolve sandboxing before detailing discovery and CLI behavior. Discovery and CLI stay goal-level until sandboxing reveals whether plugins can be inspected in-process.
+>
+> **Change Snapshot**
+> - Valid plugin enabled: it runs in the pipeline sandbox.
+> - Invalid or unsafe plugin: it is rejected before pipeline execution.
+> - No plugins configured: existing pipeline processing remains unchanged.
 >
 > **Task Overview**
 > - **Task 1:** Define the plugin contract so all later work has a stable boundary.
