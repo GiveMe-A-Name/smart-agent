@@ -105,7 +105,27 @@ Reason: without explicit controls, the executing agent will make scope and trade
 Example issue:
 > Important: The plan touches CLI, config, and pipeline behavior but does not define the plugin interface contract before implementation. Add a contract-first task or an explicit handoff point before parallel work begins.
 
-### 6. Progressive refinement for large plans
+### 6. Concrete Design Sketch
+
+Check whether architecture-sensitive work gives a cold-start executor a concrete code shape before tasks begin.
+
+Block if:
+- the plan introduces a new architecture boundary or owner such as a service, store, component boundary, persistence boundary, data owner, public interface, or cross-layer adapter but has no Concrete Design Sketch
+- the plan changes an existing architecture boundary, ownership boundary, or cross-layer handoff but has no Concrete Design Sketch
+- the plan crosses UI/state/API/persistence, CLI/service/domain, or orchestration/domain-effect boundaries but has no Concrete Design Sketch
+- the user or review packet names architecture expectations or dissatisfaction with prior implementation shape but the plan only lists abstract constraints
+- the sketch contains only advice such as "keep the architecture clean," "use the right layer," or "reuse existing abstractions" without target shape, boundary surfaces, intended flow, ownership, and a shape to avoid
+- the sketch omits any required part: target shape, boundary surfaces, intended flow, ownership, or shape to avoid
+- any required part exists only as a label but does not name concrete modules, boundary surfaces, flow edges, owners, or the counterexample flow it is meant to prevent
+- tasks contradict the sketch or can execute without realizing any part of it
+- the plan includes a sketch but lacks a stop signal for implementation evidence that makes the sketch impossible to follow
+
+Reason: behavior tests can pass while code lands in the wrong layer, so architecture-sensitive plans must transfer the intended code shape instead of relying on the executor's taste.
+
+Example issue:
+> Important: The plan says the form should stay presentation-only, but there is no component/state sketch. Add a Concrete Design Sketch showing which component owns save lifecycle, which service performs the API call, and the form shape to avoid.
+
+### 7. Progressive refinement for large plans
 
 Check whether far-future tasks are detailed only when their inputs are already known.
 
@@ -163,6 +183,7 @@ Return:
 - Assessment evidence: pass/fail
 - Decomposition: pass/fail
 - Risk controls: pass/fail/not applicable
+- Concrete Design Sketch: pass/fail/not applicable
 - Progressive refinement: pass/fail/not applicable
 ```
 

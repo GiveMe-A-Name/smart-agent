@@ -1,13 +1,5 @@
 # Large: Plugin System
 
-**Situation:** Add a plugin system so users can drop custom processors into a directory. Plugins are discovered, validated, sandboxed, and run as part of the data pipeline.
-
-**Assessment**
-- **Size:** Large. Introduces a new architecture concept and affects pipeline execution, configuration, CLI behavior, plugin API, validation, and sandboxing.
-- **Nature:** Architecture change. The plugin interface, loading model, sandboxing boundary, and CLI/config contract must be decided before broad implementation.
-- **Current state:** `pipeline/runner.py` calls hardcoded processors in sequence; `config.yaml` stores configuration; no dynamic loading exists.
-- **Done state:** A sample plugin is discovered, validated, sandboxed, enabled through config/CLI, and executed by the pipeline.
-
 ## Human Review Section
 
 > **Intent:** Let users extend the data pipeline with custom processors without changing core pipeline code.
@@ -42,6 +34,14 @@
 > **Conflict Priority**
 > When extensibility conflicts with host-process safety, prefer host-process safety. Unsafe plugin execution would compromise the pipeline for every user.
 
+**Situation:** Add a plugin system so users can drop custom processors into a directory. Plugins are discovered, validated, sandboxed, and run as part of the data pipeline.
+
+**Assessment**
+- **Size:** Large. Introduces a new architecture concept and affects pipeline execution, configuration, CLI behavior, plugin API, validation, and sandboxing.
+- **Nature:** Architecture change. The plugin interface, loading model, sandboxing boundary, and CLI/config contract must be decided before broad implementation.
+- **Current state:** `pipeline/runner.py` calls hardcoded processors in sequence; `config.yaml` stores configuration; no dynamic loading exists.
+- **Done state:** A sample plugin is discovered, validated, sandboxed, enabled through config/CLI, and executed by the pipeline.
+
 ## Execution Plan
 
 **Decomposition strategy**
@@ -67,13 +67,83 @@ Task 1: Plugin interface
 
 Tasks 4 and 5 may run in parallel only after Task 3 defines the sandboxing contract and their file ownership is separated.
 
+**Stop signals**
+- If the plugin interface cannot support both validation and processing without importing untrusted code in-process, pause before changing the contract.
+- If implementation evidence shows the Concrete Design Sketch cannot be followed, pause before making an architectural divergence.
+
+## Concrete Design Sketch
+
+**Target shape**
+- `plugins/interface.py`: stable plugin protocol, metadata shape, and host-visible data contract.
+- `plugins/noop_plugin.py`: sample plugin used to prove the contract.
+- `plugins/runner.py`: host-side execution facade used by the pipeline runner; Task 2 may call the trusted no-op plugin directly, and Task 3 moves non-core plugin execution behind the sandbox.
+- `plugins/sandbox.py`: after Task 3, the only module allowed to execute non-core plugin code.
+- `pipeline/runner.py`: orchestrates built-in processors and enabled plugin processors; does not discover or sandbox plugins itself.
+- Post-Task-3 provisional slots: discovery/validation modules under `plugins/` and CLI controls under `cli/`; exact filenames and flow are revised after sandboxing is known.
+
+**Boundary surfaces**
+
+```text
+Plugin.process(data: PipelineData) -> PipelineData
+Plugin.validate() -> ValidationResult
+
+PluginMetadata:
+  name
+  version
+  author
+  description
+
+PluginRunner.run(plugin_ref, data) -> PluginRunResult
+```
+
+**Intended flow**
+
+```text
+pipeline_runner.run(data, config):
+  processors = built_in_processors(config)
+  plugins = enabled plugin refs from the post-Task-3 registration contract
+  for processor in processors + plugins:
+    data = plugin_runner.run(processor, data)
+  return data
+
+plugin_runner.run(plugin_ref, data):
+  if plugin_ref is the trusted no-op plugin during Task 2:
+    return plugin_ref.process(data)
+
+  after Task 3:
+    execute non-core plugin code through the chosen sandbox boundary
+    return PluginRunResult or failed_pipeline_result(reason)
+
+Post-Task-3 invariants:
+  discovery produces enabled plugin refs without importing untrusted processors in pipeline_runner
+  plugin_runner executes non-core plugin code only through the chosen sandbox boundary
+```
+
+**Ownership**
+- plugin interface owns the public plugin contract and no loading behavior.
+- pipeline runner owns processor ordering only; it does not import arbitrary plugin files.
+- plugin runner owns the host-facing execution call shape.
+- sandbox owns execution isolation, timeout, crash handling, and filesystem restrictions.
+- discovery and CLI ownership are provisional until Task 3 completes; the revised plan must keep discovery out of host-process execution and CLI out of validation/execution.
+
+**Shape to avoid**
+
+```text
+pipeline_runner.run(data, config):
+  files = list plugin directory
+  import each plugin file in-process
+  call plugin.process(data)
+  catch failures inline
+  update config or CLI output
+```
+
 ## Task 1: Plugin Interface Contract
 
 Defines the boundary before building either side of it.
 
 Files: new interface module and `NoOpPlugin` in `plugins/`; tests in `tests/plugins/`.
 
-- [ ] Define plugin interface with `process(data) -> data` and `validate() -> bool`.
+- [ ] Define plugin interface with `process(data) -> data` and `validate() -> ValidationResult`.
 - [ ] Define plugin metadata fields: name, version, author, description.
 - [ ] Add a no-op plugin that returns data unchanged for testing.
 - [ ] Test interface conformance and metadata access.
@@ -84,10 +154,10 @@ Files: new interface module and `NoOpPlugin` in `plugins/`; tests in `tests/plug
 
 Proves the contract works through real pipeline execution before dynamic loading exists.
 
-Files: `pipeline/runner.py`; integration tests in `tests/plugins/`.
+Files: `pipeline/runner.py`; `plugins/runner.py`; integration tests in `tests/plugins/`.
 
-- [ ] Allow the pipeline runner to accept plugin instances.
-- [ ] Wire the no-op plugin from Task 1 into the pipeline.
+- [ ] Allow the pipeline runner to execute plugins through the `plugins/runner.py` facade.
+- [ ] Wire the no-op plugin from Task 1 through that facade.
 - [ ] Test that pipeline data passes through the plugin correctly.
 - [ ] Run `pytest tests/ -v` -> PASS.
 - [ ] Commit point: one hardcoded plugin runs in the pipeline.
@@ -96,7 +166,7 @@ Files: `pipeline/runner.py`; integration tests in `tests/plugins/`.
 
 Resolves the highest-risk architectural unknown before discovery and CLI are designed in detail.
 
-Files: sandboxing module and tests in `plugins/`.
+Files: `plugins/runner.py`; sandboxing module and tests in `plugins/`.
 
 - [ ] Compare subprocess isolation and restricted globals against filesystem access, timeout, and host-process safety.
 - [ ] Implement the chosen sandboxed runner.
@@ -125,7 +195,11 @@ Files: `cli/plugins.py`; `config.yaml`; CLI tests.
 
 Success signal: `pytest tests/cli/test_plugins.py -v` -> PASS, and enabled plugins are the only ones run by the pipeline.
 
-**Final verification:** Place a sample plugin in the plugin directory, run the pipeline, and confirm the plugin is discovered, validated, sandboxed, enabled, and executed.
+**Final verification:** Run `pytest tests/plugins/ tests/cli/test_plugins.py -v && python scripts/smoke_plugin_pipeline.py fixtures/plugins/noop_plugin.py` -> PASS and prints `sample plugin executed`.
+
+## Execution Log
+
+*(append entries here as each task completes - format: `[YYYY-MM-DD] Task N: what was done and why; key decisions; any failures and how they were fixed`)*
 
 ## Execution Log Example
 

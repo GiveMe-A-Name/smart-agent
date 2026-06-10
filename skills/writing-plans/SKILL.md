@@ -13,6 +13,7 @@ Turn a confirmed implementation target into a right-sized execution plan.
 - **Right-size the artifact to the uncertainty.** Tiny work gets a prose note; small work gets a short ordered list; medium/large work gets a persistent plan with risks, exclusions, stop signals, and handoff detail [because plan structure has cost, and its value comes from reducing ambiguity the executor would otherwise face]
 - **Tasks must deliver behavior or resolve a named uncertainty.** A task that only creates a layer, file category, or scaffolding with no independent verification is a horizontal slice [because integration risk is delayed until the end, where it is most expensive to recover]
 - **Plan the contract, not the implementation recipe.** Specify system promises, inputs, outputs, errors, ownership, and verification; leave library choice, local code shape, and small refactors to execution unless they are already decided constraints [because over-specified plans block execution-time judgment when code evidence changes]
+- **Make architecture visible when architecture can drift.** If multiple plausible code architectures could satisfy the same user direction, include a Concrete Design Sketch with module shape, boundary interfaces, ownership, intended flow, and a shape to avoid [because implementation agents fill unstated architecture with the fastest local path, and tests can pass while code lands in the wrong layer]
 - **Human approval and agent execution need different surfaces.** The Human Review Section uses user/domain language with no file paths; the execution section names exact existing files, directories for new files, first actions, and commands [because humans approve outcomes and tradeoffs, while agents need cold-start instructions]
 - **Detail decays with distance.** Fully detail only tasks whose inputs are known now. Later tasks that depend on findings from earlier tasks stay goal-level with revision triggers [because detailed future steps built on unknown outcomes turn assumptions into instructions]
 
@@ -49,6 +50,7 @@ All plan sizes need a Human Review Section first. See `references/human-readable
 Tiny/Small plan body:
 - assessment sentence: size, nature, relevant code/evidence, main constraint, done state
 - files or areas involved
+- Concrete Design Sketch when the Concrete Design Sketch Gate is triggered
 - ordered steps or prose note at the depth required by size
 - exact verification command(s) with expected output
 
@@ -58,11 +60,37 @@ Medium/Large plan body:
 - explicit exclusions
 - risks, contingencies, and revision triggers for the riskiest assumptions
 - stop signals: concrete conditions that require pausing for human decision
+- Concrete Design Sketch when the Concrete Design Sketch Gate is triggered; place it before the file map and ordered tasks
 - file map: exact existing files for planned modifications; directories/modules for new files when names are not yet certain
 - ordered tasks with purpose line, dependencies, concrete changes, verification, and commit point
 - `## Execution Log` placeholder described in Execution Handoff
 
 For detailed decomposition, estimation, contingency, and stop-signal guidance, see `references/planning-methodology.md` when the plan is medium/large or when a small plan has unresolved sequencing risk.
+
+## Concrete Design Sketch Gate
+
+Include a `## Concrete Design Sketch` section in the execution plan when any observable trigger is present:
+
+- the work introduces a new architecture boundary or owner: service, store, component boundary, persistence boundary, data owner, public interface, or cross-layer adapter
+- the work changes an existing architecture boundary, ownership boundary, or cross-layer handoff
+- the work crosses UI/state/API/persistence, CLI/service/domain, or orchestration/domain-effect boundaries
+- the user has expressed architecture expectations, design preferences, or dissatisfaction with prior implementation shape
+- multiple existing repository patterns could satisfy the same feature and the plan chooses one
+- risks, stop signals, or Key Decisions depend on where code lands or which layer owns a behavior
+
+Omit the section when none of the triggers above are present. The number of edited files is not a trigger by itself: helper modules, companion tests, fixtures, docs, generated files, localized behavior changes, or same-layer control-flow edits inside an established boundary do not require a sketch unless they also change an architecture boundary, ownership boundary, or cross-layer handoff.
+
+The sketch is an agent-to-agent architecture contract, not a full implementation. Write it in code-shaped bullets or pseudocode so a cold-start executor can see the intended structure before editing files. Include:
+
+- **Target shape:** exact existing files/modules to modify and new directories/modules with their responsibilities.
+- **Boundary surfaces:** main function, type, method, component, event, or data-contract shapes that downstream work depends on.
+- **Intended flow:** pseudocode for the call, event, or data path from entry point to effect.
+- **Ownership:** where state, domain logic, validation, persistence, side effects, and orchestration belong; name where they do not belong when that is a likely drift point.
+- **Shape to avoid:** one short counterexample flow that could pass tests but violate the intended architecture.
+
+Do not include full algorithms, incidental variable names, speculative future abstractions, or code that duplicates the task checklist. If a required architecture choice is unknown, add an uncertainty-reduction task or stop signal instead of inventing a sketch. If a plan includes a Concrete Design Sketch, add a stop signal: "If implementation evidence shows the sketch cannot be followed, pause before making an architectural divergence."
+
+If unsure about the expected granularity, read `references/concrete-design-sketch-examples.md`.
 
 ## Task Design Constraints
 
@@ -70,6 +98,7 @@ For detailed decomposition, estimation, contingency, and stop-signal guidance, s
 - Each task is a vertical slice or a named uncertainty-reduction task. It must leave the codebase in a working state.
 - Existing file paths are exact. New files in medium/large plans name the module/directory and responsibility; exact filenames may remain execution-time judgment unless another task depends on them.
 - Planned changes are concrete enough that a cold-start executor can act, but they do not prescribe local implementation details unless those details are part of the approved contract.
+- If a Concrete Design Sketch exists, every architecture-touching task must either implement part of the sketch or resolve a named uncertainty that can revise it.
 - Verification is executable: command plus expected output. Prose such as "run tests" is not a verification step.
 - Cross-boundary work names interfaces, inputs, outputs, error behavior, owner, and handoff point before parallel or dependent tasks begin.
 - The first task passes the cold-start test: read by itself, it names the files or modules to open and the first behavior-changing or uncertainty-resolving action.
@@ -145,6 +174,10 @@ For log entry format, read-only constraints, failed-task recording, and revision
 ## Planning Methodology
 
 For detailed planning guidance, see `references/planning-methodology.md` when task sizing, decomposition, estimation, contingency planning, or stop signals need more detail than the main file provides.
+
+## Concrete Design Sketch Examples
+
+Read `references/concrete-design-sketch-examples.md` when a plan triggers the Concrete Design Sketch Gate and the right pseudocode granularity is unclear. The reference contains backend, frontend, CLI/pipeline, and anti-pattern examples.
 
 ## Example Case References
 
