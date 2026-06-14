@@ -20,11 +20,20 @@ This example shows how to use an existing feature as a map before adding a new o
 
 **Step 3 — Trace the convention**: Events follow a naming pattern, use a base class `WebhookEvent`, register through a central registry, and have integration tests that verify delivery.
 
+**Step 4 — Check data and discovery gates**: The existing event schema defines payload fields, the registry is imported by the webhook dispatcher, and tests load events through the registry rather than instantiating handlers directly.
+
 ---
 
-## Result
+## Working Model
 
-To add `user.deleted`, follow the same pattern: create event definition, add schema, register it, add handler, write tests matching existing test structure. The extension point is the event registry, not the webhook dispatcher.
+- **Analogue**: `user.created` shows the existing webhook-event pattern.
+- **Convention**: event definition, schema, registry entry, handler, and integration test are all part of the feature shape.
+- **Extension point**: the event registry in `events/index.ts`, not the webhook dispatcher.
+- **Data path**: the event payload shape belongs in `schemas/events/` and reaches handlers through the registry-backed dispatcher.
+- **Discovery gate**: event tests and dispatch load registered events from `events/index.ts`, so adding a handler file alone is not discoverable.
+- **Verification path**: write tests matching the existing `tests/events/` integration-test structure.
+
+To add `user.deleted`, follow the same pattern: create event definition, add schema, register it, add handler, and write tests matching existing test structure.
 
 ---
 
@@ -49,7 +58,7 @@ Implementing the feature in an ad-hoc way that ignores existing conventions; mis
 The agent never searched for an existing event type to understand the convention. It found one relevant file (the dispatcher) and assumed the dispatcher was the right extension point. It missed:
 - the event registry in `events/index.ts` — the actual registration mechanism
 - the schema in `schemas/events/` — new events need a schema entry
-- the base class `WebhookEvent` — new events should extend it
+- the base class `WebhookEvent` — new events extend it in the existing pattern
 - the test pattern in `tests/events/` — integration tests verify delivery
 
 The result passes a surface check ("a handler exists") but breaks the convention and will likely fail integration tests.
