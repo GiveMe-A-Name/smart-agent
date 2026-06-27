@@ -11,8 +11,8 @@
 > - **Impact scope:** Job completion behavior, configuration, and notification delivery.
 > - **Size:** Medium.
 >
-> **Summary (Layer 2 - Approach)**
-> Build a walking skeleton first: send one hardcoded webhook from the job-completion event before adding configuration and retry behavior. This resolves the main uncertainty early: whether the completion event carries enough data for a useful payload.
+> **Summary (Layer 2 - Approach and Design Rationale)**
+> Build a walking skeleton first: send one hardcoded webhook from the job-completion event before adding configuration and retry behavior. Design intent: keep job completion responsible for lifecycle state and move delivery policy into notification delivery. This resolves the main uncertainty early: whether the completion event carries enough data for a useful payload.
 >
 > **Change Snapshot**
 > - Job completes with webhook URL: job result is delivered to that URL.
@@ -30,6 +30,55 @@
 >
 > **Conflict Priority**
 > When completeness conflicts with a working subset, prefer the working subset. A configurable webhook is more important than retry behavior.
+>
+> ### Concrete Design Sketch
+>
+> **Design intent**
+> Keep job completion as the lifecycle boundary and move delivery policy into notification delivery so retries, payload formatting, and delivery failure behavior do not spread through job execution.
+>
+> **Target code architecture**
+>
+> ```text
+> Job execution package
+>   completion event boundary
+>   -> depends on notification delivery facade only
+>
+> Notification delivery package
+>   webhook sender
+>   -> depends on retry policy after Task 3
+>   -> depends on HTTP client adapter
+>
+> Configuration package
+>   webhook destination and retry settings only
+> ```
+>
+> Dependency direction stays one-way: job execution calls notification delivery; notification delivery does not import job-runner internals or global config ownership.
+>
+> **Resulting responsibility shape**
+> - Job completion: detects completion and delegates notification when a webhook URL exists.
+> - Webhook sender: builds the payload and performs delivery.
+> - Retry behavior: owns transient vs. permanent failure classification after Task 3.
+> - Configuration: stores the optional webhook URL only.
+>
+> **Main flow**
+>
+> ```text
+> job completes -> optional webhook URL lookup -> notification delivery
+> -> retry classification when enabled -> delivery result recorded for logs/tests
+> ```
+>
+> **Boundaries changed or preserved**
+> - Job completion does not build payloads, perform HTTP calls, or implement retry.
+> - Notification delivery does not own job lifecycle state.
+> - Retry logic does not know job-runner event details.
+> - Configuration supplies destination settings; it does not trigger delivery.
+>
+> **Misalignment shape**
+>
+> ```text
+> Job completion reads config, builds payloads, posts webhooks, retries failures,
+> and decides logging behavior inline.
+> ```
 
 **Situation:** When a job completes, the system should POST the job result to a user-configured webhook URL.
 
@@ -54,62 +103,7 @@
 **Stop signals**
 - If `on_complete` does not provide enough data for a useful payload, pause before designing a workaround.
 - If retry requires a new external dependency, pause before adding it.
-- If implementation evidence shows the Concrete Design Sketch cannot be followed, pause before making an architectural divergence.
-
-## Concrete Design Sketch
-
-**Target shape**
-- `job_runner.py`: completion boundary only; reads completion event and delegates notification.
-- `notifications/webhook_sender.py`: builds webhook payload and sends HTTP request.
-- `notifications/webhook_retry.py`: owns retry classification and retry loop after Task 3.
-- `config.yaml`: stores optional webhook URL.
-
-**Boundary surfaces**
-
-```text
-webhook_sender.notify(job_result, webhook_url) -> DeliveryResult
-webhook_retry.send_with_retry(send_once, retry_policy) -> DeliveryResult
-```
-
-**Intended flow**
-
-```text
-job_runner.on_complete(job_result):
-  webhook_url = config.webhook_url
-  if webhook_url is absent:
-    continue completion without notification
-
-  result = webhook_sender.notify(job_result, webhook_url)
-  record notification result for logs/tests
-
-webhook_sender.notify(job_result, webhook_url):
-  payload = to_webhook_payload(job_result)
-  send_once = () => http_client.post(webhook_url, payload)
-  return webhook_retry.send_with_retry(send_once, retry_policy)
-
-webhook_retry.send_with_retry(send_once, retry_policy):
-  retry transient 5xx failures
-  do not retry permanent 4xx failures
-```
-
-Task 1 may call `http_client.post` directly inside `webhook_sender.notify`; Task 3 must replace that temporary direct send with the final retry flow above.
-
-**Ownership**
-- `job_runner.py` does not build payloads, perform HTTP calls, or implement retry.
-- webhook sender does not read global config.
-- retry logic does not know job-runner event details.
-- config supplies the webhook URL only; it does not own delivery behavior.
-
-**Shape to avoid**
-
-```text
-job_runner.on_complete(job_result):
-  read config
-  build payload
-  POST webhook
-  retry failures inline
-  decide logging behavior
-```
+- If implementation evidence requires changing the approved job-completion vs. notification-delivery responsibility split, pause before revising the plan.
 
 **File map**
 - `job_runner.py`: wire notification into completion handling.

@@ -11,8 +11,8 @@
 > - **Impact scope:** Pipeline execution, plugin infrastructure, configuration, and CLI controls.
 > - **Size:** Large.
 >
-> **Summary (Layer 2 - Approach)**
-> Define the plugin contract first, prove it with one hardcoded no-op plugin, then resolve sandboxing before detailing discovery and CLI behavior. Discovery and CLI stay goal-level until sandboxing reveals whether plugins can be inspected in-process.
+> **Summary (Layer 2 - Approach and Design Rationale)**
+> Define the plugin contract first, prove it with one hardcoded no-op plugin, then resolve sandboxing before detailing discovery and CLI behavior. Design intent: keep pipeline execution stable while moving untrusted extension behavior behind an explicit plugin boundary. Discovery and CLI stay goal-level until sandboxing reveals whether plugins can be inspected in-process.
 >
 > **Change Snapshot**
 > - Valid plugin enabled: it runs in the pipeline sandbox.
@@ -33,6 +33,61 @@
 >
 > **Conflict Priority**
 > When extensibility conflicts with host-process safety, prefer host-process safety. Unsafe plugin execution would compromise the pipeline for every user.
+>
+> ### Concrete Design Sketch
+>
+> **Design intent**
+> Keep the core pipeline stable and host-safe while allowing user extension through an explicit plugin contract and sandboxed execution boundary.
+>
+> **Target code architecture**
+>
+> ```text
+> Pipeline package
+>   pipeline runner
+>   -> depends on plugin runner facade only
+>
+> Plugin package
+>   plugin contract
+>   plugin runner facade
+>   sandbox boundary
+>   discovery and validation after sandboxing is known
+>
+> CLI/config package
+>   plugin enablement controls
+>   -> depends on discovery/registration results, not plugin execution internals
+> ```
+>
+> Dependency direction stays one-way: pipeline execution calls the plugin runner facade; it does not import arbitrary plugin files, discovery details, or sandbox implementation directly.
+>
+> **Resulting responsibility shape**
+> - Plugin contract: defines the host-visible processor behavior and metadata expectations.
+> - Sample plugin: proves the contract without dynamic loading.
+> - Plugin runner: gives the pipeline one host-side execution facade.
+> - Sandbox: becomes the only responsibility allowed to execute non-core plugin code after Task 3.
+> - Pipeline runner: orders built-in processors and enabled plugin processors; it does not discover, validate, or sandbox plugins itself.
+> - Discovery, validation, CLI, and config: remain provisional until sandboxing determines whether plugin inspection can happen in-process.
+>
+> **Main flow**
+>
+> ```text
+> pipeline execution -> built-in processors -> enabled plugin refs
+> -> plugin runner -> sandboxed plugin execution after Task 3
+> -> pipeline result or controlled plugin failure
+> ```
+>
+> **Boundaries changed or preserved**
+> - Plugin contract owns the public plugin behavior shape and no loading behavior.
+> - Pipeline runner owns processor ordering only; it does not import arbitrary plugin files.
+> - Plugin runner owns the host-facing execution handoff.
+> - Sandbox owns execution isolation, timeout, crash handling, and filesystem restrictions.
+> - Discovery and CLI ownership are provisional until Task 3 completes; the revised plan keeps discovery out of host-process execution and CLI out of validation/execution.
+>
+> **Misalignment shape**
+>
+> ```text
+> Pipeline execution lists plugin directories, imports plugin files in-process,
+> calls plugin code directly, catches failures inline, and updates config or CLI output.
+> ```
 
 **Situation:** Add a plugin system so users can drop custom processors into a directory. Plugins are discovered, validated, sandboxed, and run as part of the data pipeline.
 
@@ -69,73 +124,7 @@ Tasks 4 and 5 may run in parallel only after Task 3 defines the sandboxing contr
 
 **Stop signals**
 - If the plugin interface cannot support both validation and processing without importing untrusted code in-process, pause before changing the contract.
-- If implementation evidence shows the Concrete Design Sketch cannot be followed, pause before making an architectural divergence.
-
-## Concrete Design Sketch
-
-**Target shape**
-- `plugins/interface.py`: stable plugin protocol, metadata shape, and host-visible data contract.
-- `plugins/noop_plugin.py`: sample plugin used to prove the contract.
-- `plugins/runner.py`: host-side execution facade used by the pipeline runner; Task 2 may call the trusted no-op plugin directly, and Task 3 moves non-core plugin execution behind the sandbox.
-- `plugins/sandbox.py`: after Task 3, the only module allowed to execute non-core plugin code.
-- `pipeline/runner.py`: orchestrates built-in processors and enabled plugin processors; does not discover or sandbox plugins itself.
-- Post-Task-3 provisional slots: discovery/validation modules under `plugins/` and CLI controls under `cli/`; exact filenames and flow are revised after sandboxing is known.
-
-**Boundary surfaces**
-
-```text
-Plugin.process(data: PipelineData) -> PipelineData
-Plugin.validate() -> ValidationResult
-
-PluginMetadata:
-  name
-  version
-  author
-  description
-
-PluginRunner.run(plugin_ref, data) -> PluginRunResult
-```
-
-**Intended flow**
-
-```text
-pipeline_runner.run(data, config):
-  processors = built_in_processors(config)
-  plugins = enabled plugin refs from the post-Task-3 registration contract
-  for processor in processors + plugins:
-    data = plugin_runner.run(processor, data)
-  return data
-
-plugin_runner.run(plugin_ref, data):
-  if plugin_ref is the trusted no-op plugin during Task 2:
-    return plugin_ref.process(data)
-
-  after Task 3:
-    execute non-core plugin code through the chosen sandbox boundary
-    return PluginRunResult or failed_pipeline_result(reason)
-
-Post-Task-3 invariants:
-  discovery produces enabled plugin refs without importing untrusted processors in pipeline_runner
-  plugin_runner executes non-core plugin code only through the chosen sandbox boundary
-```
-
-**Ownership**
-- plugin interface owns the public plugin contract and no loading behavior.
-- pipeline runner owns processor ordering only; it does not import arbitrary plugin files.
-- plugin runner owns the host-facing execution call shape.
-- sandbox owns execution isolation, timeout, crash handling, and filesystem restrictions.
-- discovery and CLI ownership are provisional until Task 3 completes; the revised plan must keep discovery out of host-process execution and CLI out of validation/execution.
-
-**Shape to avoid**
-
-```text
-pipeline_runner.run(data, config):
-  files = list plugin directory
-  import each plugin file in-process
-  call plugin.process(data)
-  catch failures inline
-  update config or CLI output
-```
+- If implementation evidence requires changing the approved split between pipeline execution, plugin contract, plugin runner, and sandboxing, pause before revising the plan.
 
 ## Task 1: Plugin Interface Contract
 

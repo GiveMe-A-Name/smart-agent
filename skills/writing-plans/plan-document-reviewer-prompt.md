@@ -5,7 +5,7 @@ Use this guidance when a plan requires independent review. The reviewer checks w
 ## Review Contract
 
 The reviewer must read the plan as an execution artifact with two audiences:
-- the human-facing section must let the user approve intent, scope, and strategy without codebase knowledge
+- the human-facing section must let the user approve intent, scope, rationale, trade-offs, and strategy without codebase knowledge
 - the execution section must let an agent start work cold without relying on the planning conversation
 
 The review is not a rewrite request. It identifies blocking gaps, explains why each gap can break execution, and gives the smallest concrete correction needed.
@@ -27,19 +27,22 @@ Sub-agent context is intentionally incomplete. Do not infer unstated user goals,
 
 ### 1. Human approval surface
 
-Check whether the Human Review Section can be approved without codebase knowledge.
+Check whether the Human Review Section can be approved and understood without codebase knowledge.
 
 Block if:
 - it omits the Intent statement
 - Layer 1 omits End state, or End state is more than one sentence, describes implementation steps instead of the final observable state, or lists multiple concrete deltas that should be in Change Snapshot
-- it contains file paths, line numbers, implementation-only function/method/class/module names, internal APIs, or non-user-visible CLI flags; public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior being approved
+- Layer 2 reads as a task checklist or code-edit sequence instead of approach and design rationale: strategy, why the strategy fits the goal and evidence, what property it protects, and why the order matters
+- it contains exact files-to-edit, line numbers, implementation-only function/method/class/module names, internal APIs, or non-user-visible CLI flags; stable package names, directory-level architecture anchors, public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior or target architecture being approved
 - it describes implementation mechanics without naming the user problem, system behavior, or product/domain concept
 - Change Snapshot appears in a tiny/small plan
 - Change Snapshot is missing when a medium/large plan's intent, assessment, risks, Key Decisions, stop signals, or task outcomes include public/developer-facing contract changes, compatibility expectations, data/contract migrations, restored old behavior, multiple input/output outcomes, or multiple valid interpretations
 - Change Snapshot omits approval-critical visible contract detail, includes implementation detail that belongs in the technical plan, or contains file paths, task references, implementation-only names, or explanatory prose; public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior being approved
+- meaningful responsibility ownership, compatibility, abstraction, dependency, rollout, or scope tradeoffs affect the design direction but are absent from Layer 2, Key Decisions, Conflict Priority, or another human-readable approval field
+- a triggered Concrete Design Sketch is outside the Human Review Section or appears after Situation Assessment, risks, stop signals, file maps, or task checklists
 - medium/large plans omit Task Overview, Key Decisions or `None requiring human ratification`, or Conflict Priority when goals can compete
 
-Reason: if the human-facing surface requires codebase knowledge, the user can approve a direction they do not actually understand.
+Reason: if the human-facing surface requires codebase knowledge or hides rationale, the user can approve a direction they do not actually understand.
 
 Example issue:
 > Important: Layer 1 says "modify `auth_middleware.py:47` before `authenticate()` returns." This is implementation detail, not approval language. Replace it with the user-visible behavior: "expired sessions return Unauthorized instead of Not Found."
@@ -107,23 +110,27 @@ Example issue:
 
 ### 6. Concrete Design Sketch
 
-Check whether architecture-sensitive work gives a cold-start executor a concrete code shape before tasks begin.
+Check whether solution-shape-sensitive work lets a plan reader understand what kind of code or system the agent is about to create before Situation Assessment, file maps, and task checklists.
 
 Block if:
 - the plan introduces a new architecture boundary or owner such as a service, store, component boundary, persistence boundary, data owner, public interface, or cross-layer adapter but has no Concrete Design Sketch
 - the plan changes an existing architecture boundary, ownership boundary, or cross-layer handoff but has no Concrete Design Sketch
 - the plan crosses UI/state/API/persistence, CLI/service/domain, or orchestration/domain-effect boundaries but has no Concrete Design Sketch
 - the user or review packet names architecture expectations or dissatisfaction with prior implementation shape but the plan only lists abstract constraints
-- the sketch contains only advice such as "keep the architecture clean," "use the right layer," or "reuse existing abstractions" without target shape, boundary surfaces, intended flow, ownership, and a shape to avoid
-- the sketch omits any required part: target shape, boundary surfaces, intended flow, ownership, or shape to avoid
-- any required part exists only as a label but does not name concrete modules, boundary surfaces, flow edges, owners, or the counterexample flow it is meant to prevent
-- tasks contradict the sketch or can execute without realizing any part of it
-- the plan includes a sketch but lacks a stop signal for implementation evidence that makes the sketch impossible to follow
+- multiple plausible solution shapes could satisfy the same outcome but the plan does not explain why the chosen shape was selected
+- the sketch is not a `### Concrete Design Sketch` subsection inside the Human Review Section
+- the sketch contains only advice such as "keep the architecture clean," "use the right layer," or "reuse existing abstractions" without design intent, target code architecture, resulting responsibility shape, main flow, boundaries changed or preserved, and a misalignment shape
+- the sketch omits any required part: design intent, target code architecture, resulting responsibility shape, main flow, boundaries changed or preserved, or misalignment shape
+- target code architecture does not show the post-change topology: main packages/modules/layers, entrypoint roles, shared seams, dependency direction, and ownership boundaries
+- any required part exists only as a label but does not explain responsibility blocks, flow edges, dependency direction, ownership, or the counterexample shape it is meant to reveal
+- the sketch uses line numbers, implementation-only function names, private interface details, exact edit lists, or task steps instead of reader-facing architecture, responsibility, boundary, and flow language
+- tasks or file maps contradict the sketch's responsibility shape without a revision trigger or stop signal
+- the plan includes a sketch but lacks a stop signal for implementation evidence that would require changing the approved solution shape
 
-Reason: behavior tests can pass while code lands in the wrong layer, so architecture-sensitive plans must transfer the intended code shape instead of relying on the executor's taste.
+Reason: behavior tests can pass while code lands in a shape the human would not have approved, so solution-shape-sensitive plans must make design intent and resulting structure visible before execution detail.
 
 Example issue:
-> Important: The plan says the form should stay presentation-only, but there is no component/state sketch. Add a Concrete Design Sketch showing which component owns save lifecycle, which service performs the API call, and the form shape to avoid.
+> Important: The plan says the form should stay presentation-only, but there is no component/state sketch. Add a Concrete Design Sketch explaining that the page owns save lifecycle, the form owns local draft state only, the service performs the API call, and direct form-owned API/global-state behavior would indicate misalignment.
 
 ### 7. Progressive refinement for large plans
 

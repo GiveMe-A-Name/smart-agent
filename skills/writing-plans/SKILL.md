@@ -13,8 +13,8 @@ Turn a confirmed implementation target into a right-sized execution plan.
 - **Right-size the artifact to the uncertainty.** Tiny work gets a prose note; small work gets a short ordered list; medium/large work gets a persistent plan with risks, exclusions, stop signals, and handoff detail [because plan structure has cost, and its value comes from reducing ambiguity the executor would otherwise face]
 - **Tasks must deliver behavior or resolve a named uncertainty.** A task that only creates a layer, file category, or scaffolding with no independent verification is a horizontal slice [because integration risk is delayed until the end, where it is most expensive to recover]
 - **Plan the contract, not the implementation recipe.** Specify system promises, inputs, outputs, errors, ownership, and verification; leave library choice, local code shape, and small refactors to execution unless they are already decided constraints [because over-specified plans block execution-time judgment when code evidence changes]
-- **Make architecture visible when architecture can drift.** If multiple plausible code architectures could satisfy the same user direction, include a Concrete Design Sketch with module shape, boundary interfaces, ownership, intended flow, and a shape to avoid [because implementation agents fill unstated architecture with the fastest local path, and tests can pass while code lands in the wrong layer]
-- **Human approval and agent execution need different surfaces.** The Human Review Section uses user/domain language with no file paths; the execution section names exact existing files, directories for new files, first actions, and commands [because humans approve outcomes and tradeoffs, while agents need cold-start instructions]
+- **Make design intent and solution shape visible before decomposition.** If multiple plausible designs could satisfy the same user direction, explain why this approach was chosen and what responsibility shape the code or system should have after the change [because humans need to approve the agent's interpretation of the problem and design direction, not just the final behavior]
+- **Human approval and agent execution need different surfaces.** The Human Review Section uses user/domain language and architecture anchors, while the execution section names exact existing files, directories for new files, first actions, and commands [because humans approve intent, scope, rationale, architecture shape, and tradeoffs, while agents need cold-start instructions]
 - **Detail decays with distance.** Fully detail only tasks whose inputs are known now. Later tasks that depend on findings from earlier tasks stay goal-level with revision triggers [because detailed future steps built on unknown outcomes turn assumptions into instructions]
 
 ## Situation Assessment Gate
@@ -45,22 +45,21 @@ Special ambiguity checks:
 
 ## Plan Shape
 
-All plan sizes need a Human Review Section first. See `references/human-readable-summary.md` when writing or revising that section's fields, freeze rules, or examples.
+All plan sizes need a Human Review Section first. When the Concrete Design Sketch Gate is triggered, the sketch is a `### Concrete Design Sketch` subsection inside the Human Review Section, immediately after the human summary/decision fields and before technical assessment. See `references/human-readable-summary.md` when writing or revising that section's fields, freeze rules, or examples.
 
 Tiny/Small plan body:
 - assessment sentence: size, nature, relevant code/evidence, main constraint, done state
 - files or areas involved
-- Concrete Design Sketch when the Concrete Design Sketch Gate is triggered
 - ordered steps or prose note at the depth required by size
 - exact verification command(s) with expected output
 
 Medium/Large plan body:
-- Human Review Section with Intent, Layer 1, Layer 2, Change Snapshot when triggered, Task Overview, Key Decisions or `None requiring human ratification`, and conflict priority when goals can compete
+- Human Review Section with Intent, Layer 1, Layer 2 Approach and Design Rationale, Change Snapshot when triggered, Task Overview, Key Decisions or `None requiring human ratification`, conflict priority when goals can compete, and Concrete Design Sketch when triggered
+- Concrete Design Sketch appears inside the Human Review Section before any technical assessment, risks, stop signals, file map, or task checklist [because it explains the approved solution shape to the plan reader before agent-facing evidence and execution controls begin]
 - technical assessment: size, nature, current state, decomposition strategy
 - explicit exclusions
 - risks, contingencies, and revision triggers for the riskiest assumptions
-- stop signals: concrete conditions that require pausing for human decision
-- Concrete Design Sketch when the Concrete Design Sketch Gate is triggered; place it before the file map and ordered tasks
+- stop signals: concrete conditions that require pausing for human decision, including conditions that would change the approved outcome, rationale, or solution shape
 - file map: exact existing files for planned modifications; directories/modules for new files when names are not yet certain
 - ordered tasks with purpose line, dependencies, concrete changes, verification, and commit point
 - `## Execution Log` placeholder described in Execution Handoff
@@ -69,28 +68,31 @@ For detailed decomposition, estimation, contingency, and stop-signal guidance, s
 
 ## Concrete Design Sketch Gate
 
-Include a `## Concrete Design Sketch` section in the execution plan when any observable trigger is present:
+Include a `### Concrete Design Sketch` subsection inside the Human Review Section when the chosen solution shape is approval-relevant, meaning a plan reader could approve the outcome while misunderstanding what kind of code or system the agent is about to create. Observable triggers:
 
 - the work introduces a new architecture boundary or owner: service, store, component boundary, persistence boundary, data owner, public interface, or cross-layer adapter
 - the work changes an existing architecture boundary, ownership boundary, or cross-layer handoff
 - the work crosses UI/state/API/persistence, CLI/service/domain, or orchestration/domain-effect boundaries
 - the user has expressed architecture expectations, design preferences, or dissatisfaction with prior implementation shape
 - multiple existing repository patterns could satisfy the same feature and the plan chooses one
+- the plan moves, splits, combines, or creates responsibilities even if public behavior stays simple
+- task ordering depends on first establishing a target responsibility shape before filling in behavior
 - risks, stop signals, or Key Decisions depend on where code lands or which layer owns a behavior
 
 Omit the section when none of the triggers above are present. The number of edited files is not a trigger by itself: helper modules, companion tests, fixtures, docs, generated files, localized behavior changes, or same-layer control-flow edits inside an established boundary do not require a sketch unless they also change an architecture boundary, ownership boundary, or cross-layer handoff.
 
-The sketch is an agent-to-agent architecture contract, not a full implementation. Write it in code-shaped bullets or pseudocode so a cold-start executor can see the intended structure before editing files. Include:
+The sketch is a reader-facing explanation of the chosen solution shape, not an execution checklist or implementation constraint. Write it so a plan reader can understand what the solution is doing, why that shape fits the design intent, and what the code architecture or system architecture will look like after the change. Because the sketch is part of the Human Review Section, use stable architecture anchors such as package names, module areas, layers, entrypoint roles, public seams, dependency direction, and ownership boundaries. Do not use line numbers, implementation-only function names, private interface details, task steps, or exact edit lists. Include:
 
-- **Target shape:** exact existing files/modules to modify and new directories/modules with their responsibilities.
-- **Boundary surfaces:** main function, type, method, component, event, or data-contract shapes that downstream work depends on.
-- **Intended flow:** pseudocode for the call, event, or data path from entry point to effect.
-- **Ownership:** where state, domain logic, validation, persistence, side effects, and orchestration belong; name where they do not belong when that is a likely drift point.
-- **Shape to avoid:** one short counterexample flow that could pass tests but violate the intended architecture.
+- **Design intent:** the property this shape protects, such as compatibility, responsibility clarity, rollback safety, reuse of an existing pattern, or keeping a layer simple.
+- **Target code architecture:** the post-change topology: main packages/modules/layers, which depend on which, which own entrypoints, which own shared capabilities, and which boundaries must remain one-way. This is an architecture map, not a file map.
+- **Resulting responsibility shape:** the responsibility blocks that will exist after the change, including which responsibilities move, split, combine, appear, or stay unchanged.
+- **Main flow:** the user action, event, data, or control path across those responsibility blocks from entry point to effect.
+- **Boundaries changed or preserved:** which layer or owner is responsible for state, domain logic, validation, persistence, side effects, and orchestration after the change.
+- **Misalignment shape:** one short counterexample shape that could satisfy tests or visible behavior but would reveal the agent misunderstood the approved design direction.
 
-Do not include full algorithms, incidental variable names, speculative future abstractions, or code that duplicates the task checklist. If a required architecture choice is unknown, add an uncertainty-reduction task or stop signal instead of inventing a sketch. If a plan includes a Concrete Design Sketch, add a stop signal: "If implementation evidence shows the sketch cannot be followed, pause before making an architectural divergence."
+Do not include full algorithms, incidental variable names, step-by-step task instructions, speculative future abstractions, file maps, or interface detail whose only audience is the executor. Stable package names, public contract names, and directory-level architecture anchors are allowed when they are needed for the human to understand the target code architecture; exact files-to-edit belong in File Map. If a required solution-shape choice is unknown, surface it in Key Decisions, add an uncertainty-reduction task, or add a stop signal instead of inventing a sketch.
 
-If unsure about the expected granularity, read `references/concrete-design-sketch-examples.md`.
+If unsure about the expected solution-shape granularity, read `references/concrete-design-sketch-examples.md`.
 
 ## Task Design Constraints
 
@@ -98,7 +100,7 @@ If unsure about the expected granularity, read `references/concrete-design-sketc
 - Each task is a vertical slice or a named uncertainty-reduction task. It must leave the codebase in a working state.
 - Existing file paths are exact. New files in medium/large plans name the module/directory and responsibility; exact filenames may remain execution-time judgment unless another task depends on them.
 - Planned changes are concrete enough that a cold-start executor can act, but they do not prescribe local implementation details unless those details are part of the approved contract.
-- If a Concrete Design Sketch exists, every architecture-touching task must either implement part of the sketch or resolve a named uncertainty that can revise it.
+- If a Concrete Design Sketch exists, every architecture-touching task must either preserve the approved responsibility shape or resolve a named uncertainty that can revise it.
 - Verification is executable: command plus expected output. Prose such as "run tests" is not a verification step.
 - Cross-boundary work names interfaces, inputs, outputs, error behavior, owner, and handoff point before parallel or dependent tasks begin.
 - The first task passes the cold-start test: read by itself, it names the files or modules to open and the first behavior-changing or uncertainty-resolving action.
@@ -108,15 +110,17 @@ If unsure about the expected granularity, read `references/concrete-design-sketc
 
 - The plan begins with a standalone **Intent** sentence before Layer 1 and before every other field.
 - Layer 1 appears for all sizes and includes **End state** as the only final-state field; Layer 2, Task Overview, and Key Decisions appear for medium/large.
+- When triggered, Concrete Design Sketch appears inside the Human Review Section after the human summary/decision fields and before `## Situation Assessment` or any execution-facing section.
 - End state is a single concise sentence that states what will be true after execution in observable user, developer, or domain terms; it contains no implementation steps, task references, file paths, commands, internal APIs, or implementation-only function/method/class/module names.
+- Layer 2 states the approach and design rationale: what strategy the plan uses, why that strategy fits the goal and current evidence, what property it protects, and why the order matters. It is not a task checklist.
 - Do not add Change Snapshot to tiny/small plans.
 - For medium/large plans, add Change Snapshot when plan evidence includes any approval-sensitive visible delta: public/developer-facing contract changes, compatibility expectations, data/contract migrations, restored old behavior, multiple input/output outcomes, or multiple valid interpretations. Omit it only when none of those triggers appear in the intent, assessment, risks, Key Decisions, stop signals, or task outcomes.
 - Change Snapshot contains the minimum complete visible delta needed for approval. Choose the shortest readable form for that delta: scenario bullets, Before/After pairs, a public API/schema/CLI diff, a behavior matrix, or invariants. If the complete approval delta is too large for one compact block, compress dimensions, move implementation detail to the technical plan, surface ratification choices in Key Decisions, or stop for human scoping; do not move approval-critical contract detail out of the Human Review Section [because the frozen human-facing surface is the approved contract].
 - If the Human Review Section exceeds these field limits, revise by deleting lower-value detail or using a more compact snapshot format; do not add explanatory prose [because the human-facing surface is an approval contract, not a second execution plan].
-- Human Review Section text contains zero file paths, line numbers, implementation-only function/method/class/module names, internal APIs, or non-user-visible CLI flags. Public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior being approved.
+- Human Review Section text contains no exact files-to-edit, line numbers, implementation-only function/method/class/module names, internal APIs, or non-user-visible CLI flags. Stable package names, directory-level architecture anchors, public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior or target architecture being approved.
 - Every Human Review Section bullet names a user-visible, developer-visible, or domain-level outcome. If a sentence requires codebase knowledge to understand, rewrite it using the user problem, system behavior, or product/domain concept.
 - For medium/large, each Task Overview item states what the task achieves and why it comes at that point in the order.
-- Key Decisions list only decisions a reasonable human might choose differently, with alternatives and reasoning. If no such decision exists in a medium/large plan, write `None requiring human ratification` rather than inventing one.
+- Key Decisions list only decisions a reasonable human might choose differently, with alternatives and reasoning. Include responsibility ownership, compatibility, abstraction, dependency, rollout, and scope tradeoffs when they materially affect the design direction. If no such decision exists in a medium/large plan, write `None requiring human ratification` rather than inventing one.
 - If medium/large goals can compete, Conflict Priority appears in the Human Review Section.
 
 ---
@@ -151,9 +155,9 @@ Do not treat the sub-agent verdict as authoritative. The blocking threshold depe
 
 ## Human Review Section
 
-Every plan document starts with a **Human Review Section** — a self-contained block written for human approval, not agent execution. Place it at the very top, before the assessment and technical tasks. This section is a contract: once approved, it is frozen and must never be modified for any reason.
+Every plan document starts with a **Human Review Section** — a self-contained block written for human approval and understanding, not agent execution. Place it at the very top, before the assessment and technical tasks. This section is a contract: once approved, it is frozen and must never be modified for any reason.
 
-The Human Review Section must open with a one-sentence **Intent** statement before all other fields. This is the alignment checkpoint: the user reads it first, confirms or corrects direction, then decides whether to review the rest.
+The Human Review Section must open with a one-sentence **Intent** statement before all other fields. This is the alignment checkpoint: the user reads it first, confirms or corrects direction, then decides whether to review the rationale, tradeoffs, and solution shape.
 
 For fields, scaling rules, freeze semantics, and Before/After examples — see `references/human-readable-summary.md`.
 
@@ -177,7 +181,7 @@ For detailed planning guidance, see `references/planning-methodology.md` when ta
 
 ## Concrete Design Sketch Examples
 
-Read `references/concrete-design-sketch-examples.md` when a plan triggers the Concrete Design Sketch Gate and the right pseudocode granularity is unclear. The reference contains backend, frontend, CLI/pipeline, and anti-pattern examples.
+Read `references/concrete-design-sketch-examples.md` when a plan triggers the Concrete Design Sketch Gate and the right solution-shape granularity is unclear. The reference contains backend, frontend, CLI/pipeline, and anti-pattern examples.
 
 ## Example Case References
 
