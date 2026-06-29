@@ -33,13 +33,14 @@ Block if:
 - it omits the Intent statement
 - Layer 1 omits End state, or End state is more than one sentence, describes implementation steps instead of the final observable state, or lists multiple concrete deltas that should be in Change Snapshot
 - Layer 2 reads as a task checklist or code-edit sequence instead of approach and design rationale: strategy, why the strategy fits the goal and evidence, what property it protects, and why the order matters
-- it contains exact files-to-edit, line numbers, implementation-only function/method/class/module names, internal APIs, or non-user-visible CLI flags; stable package names, directory-level architecture anchors, public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior or target architecture being approved
+- outside `### Detailed Design`, it contains exact files-to-edit, line numbers, implementation-only function/method/class/module names, internal APIs, or non-user-visible CLI flags; stable package names, directory-level architecture anchors, public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior or target architecture being approved
+- inside `### Detailed Design`, it omits solution-critical stable internal contract names, compact contract/data shapes, or pseudocode needed to approve the design, or includes exact files-to-edit, line-level edits, task steps, private helper details, or exhaustive private APIs
 - it describes implementation mechanics without naming the user problem, system behavior, or product/domain concept
 - Change Snapshot appears in a tiny/small plan
 - Change Snapshot is missing when a medium/large plan's intent, assessment, risks, Key Decisions, stop signals, or task outcomes include public/developer-facing contract changes, compatibility expectations, data/contract migrations, restored old behavior, multiple input/output outcomes, or multiple valid interpretations
 - Change Snapshot omits approval-critical visible contract detail, includes implementation detail that belongs in the technical plan, or contains file paths, task references, implementation-only names, or explanatory prose; public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior being approved
 - meaningful responsibility ownership, compatibility, abstraction, dependency, rollout, or scope tradeoffs affect the design direction but are absent from Layer 2, Key Decisions, Conflict Priority, or another human-readable approval field
-- a triggered Concrete Design Sketch is outside the Human Review Section or appears after Situation Assessment, risks, stop signals, file maps, or task checklists
+- a triggered Detailed Design is outside the Human Review Section or appears after Situation Assessment, risks, stop signals, file maps, or task checklists
 - medium/large plans omit Task Overview, Key Decisions or `None requiring human ratification`, or Conflict Priority when goals can compete
 
 Reason: if the human-facing surface requires codebase knowledge or hides rationale, the user can approve a direction they do not actually understand.
@@ -108,29 +109,34 @@ Reason: without explicit controls, the executing agent will make scope and trade
 Example issue:
 > Important: The plan touches CLI, config, and pipeline behavior but does not define the plugin interface contract before implementation. Add a contract-first task or an explicit handoff point before parallel work begins.
 
-### 6. Concrete Design Sketch
+### 6. Detailed Design
 
-Check whether solution-shape-sensitive work lets a plan reader understand what kind of code or system the agent is about to create before Situation Assessment, file maps, and task checklists.
+Check whether solution-design-sensitive work lets a plan reader understand what abstractions, flows, contracts, and key logic the agent is about to create before Situation Assessment, file maps, and task checklists.
 
 Block if:
-- the plan introduces a new architecture boundary or owner such as a service, store, component boundary, persistence boundary, data owner, public interface, or cross-layer adapter but has no Concrete Design Sketch
-- the plan changes an existing architecture boundary, ownership boundary, or cross-layer handoff but has no Concrete Design Sketch
-- the plan crosses UI/state/API/persistence, CLI/service/domain, or orchestration/domain-effect boundaries but has no Concrete Design Sketch
+- the plan introduces a new architecture boundary or owner such as a service, store, component boundary, persistence boundary, data owner, public interface, or cross-layer adapter but has no Detailed Design
+- the plan changes an existing architecture boundary, ownership boundary, or cross-layer handoff but has no Detailed Design
+- the plan crosses UI/state/API/persistence, CLI/service/domain, or orchestration/domain-effect boundaries but has no Detailed Design
+- the plan introduces or changes approval-critical algorithms, branching logic, reconciliation behavior, retry behavior, fallback behavior, conflict resolution, scheduling, parsing, validation, authorization, migration, or state transitions but has no Detailed Design
 - the user or review packet names architecture expectations or dissatisfaction with prior implementation shape but the plan only lists abstract constraints
 - multiple plausible solution shapes could satisfy the same outcome but the plan does not explain why the chosen shape was selected
-- the sketch is not a `### Concrete Design Sketch` subsection inside the Human Review Section
-- the sketch contains only advice such as "keep the architecture clean," "use the right layer," or "reuse existing abstractions" without design intent, target code architecture, resulting responsibility shape, main flow, boundaries changed or preserved, and a misalignment shape
-- the sketch omits any required part: design intent, target code architecture, resulting responsibility shape, main flow, boundaries changed or preserved, or misalignment shape
+- the design is not a `### Detailed Design` subsection inside the Human Review Section
+- the design contains only advice such as "keep the architecture clean," "use the right layer," or "reuse existing abstractions" without design intent, abstraction design, target code architecture, resulting responsibility shape, main flow, contract/data shape when approval-relevant, key logic pseudocode when approval-relevant, boundaries changed or preserved, and a misalignment shape
+- the design omits any required part: design intent, abstraction design when abstractions change, architecture diagram when two or more abstractions or a new cross-boundary abstraction are involved, target code architecture, resulting responsibility shape, main flow, contract/data shape when approval-relevant, key logic pseudocode when approval-relevant, boundaries changed or preserved, or misalignment shape
+- the plan introduces or changes an abstraction, interface, service, store, adapter, provider, strategy, coordinator, registry, factory, hook, context, domain object, state owner, or extension point but the design does not name the abstraction, its owned responsibility, why it exists, and what it replaces, wraps, extends, or avoids
+- the design contains two or more abstractions or a new cross-boundary abstraction but lacks a Mermaid or compact ASCII architecture diagram showing call/data flow, dependency direction, and ownership boundaries
+- the plan introduces approval-critical branching, fallback, retry, conflict resolution, migration, state transition, validation, or orchestration behavior but the design omits pseudocode or an equivalent compact logic description
+- the design uses vague abstraction labels such as "manager", "service", or "handler" without naming concrete responsibility and caller relationship
 - target code architecture does not show the post-change topology: main packages/modules/layers, entrypoint roles, shared seams, dependency direction, and ownership boundaries
 - any required part exists only as a label but does not explain responsibility blocks, flow edges, dependency direction, ownership, or the counterexample shape it is meant to reveal
-- the sketch uses line numbers, implementation-only function names, private interface details, exact edit lists, or task steps instead of reader-facing architecture, responsibility, boundary, and flow language
-- tasks or file maps contradict the sketch's responsibility shape without a revision trigger or stop signal
-- the plan includes a sketch but lacks a stop signal for implementation evidence that would require changing the approved solution shape
+- the design uses line numbers, exact edit lists, task steps, full production code, incidental variable names, or exhaustive private APIs instead of reader-facing architecture, responsibility, boundary, flow, contract/data shape, and pseudocode
+- tasks or file maps contradict the design's abstraction model, flow, contract/data shape, or key logic without a revision trigger or stop signal
+- the plan includes a design but lacks a stop signal for implementation evidence that would require changing the approved solution design
 
-Reason: behavior tests can pass while code lands in a shape the human would not have approved, so solution-shape-sensitive plans must make design intent and resulting structure visible before execution detail.
+Reason: behavior tests can pass while code lands in a design the human would not have approved, so solution-design-sensitive plans must make design intent, abstractions, flows, and approval-critical logic visible before execution detail.
 
 Example issue:
-> Important: The plan says the form should stay presentation-only, but there is no component/state sketch. Add a Concrete Design Sketch explaining that the page owns save lifecycle, the form owns local draft state only, the service performs the API call, and direct form-owned API/global-state behavior would indicate misalignment.
+> Important: The plan says retry belongs to notification delivery, but the Detailed Design has no retry flow or pseudocode. Add a compact design showing job completion -> notification delivery -> retry policy -> sender, then include pseudocode for retryable vs. permanent failures and the anti-shape where job completion owns retry directly.
 
 ### 7. Progressive refinement for large plans
 
@@ -190,7 +196,7 @@ Return:
 - Assessment evidence: pass/fail
 - Decomposition: pass/fail
 - Risk controls: pass/fail/not applicable
-- Concrete Design Sketch: pass/fail/not applicable
+- Detailed Design: pass/fail/not applicable
 - Progressive refinement: pass/fail/not applicable
 ```
 

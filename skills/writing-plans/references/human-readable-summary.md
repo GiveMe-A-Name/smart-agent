@@ -6,11 +6,13 @@ The Human Review Section is the human's approval-understanding surface. It is wr
 
 The execution detail (task checklists, file paths, verification commands) lives below the Human Review Section. Agents work there. Humans may read it, but they are not required to.
 
+When a maintainer needs to approve how the solution is designed, put an RFC-style `### Detailed Design` inside the Human Review Section. It should describe the abstraction model, architecture diagram, important data/contract shapes, key flow, and pseudocode for approval-critical logic. Keep exact files, line-level edits, and task sequencing below the Human Review Section.
+
 The section must let the human answer these alignment questions before execution starts:
 - Is this the problem I meant?
 - Is this the outcome and impact scope I want?
 - Do I understand the strategy and why this plan uses it?
-- Do I understand what shape the code or system will have after this plan?
+- Do I understand the solution design, including major abstractions, flows, contracts, and key logic?
 - Are the important trade-offs, excluded alternatives, and conflict priorities visible?
 - Do I know what the agent should preserve if implementation gets messy?
 
@@ -65,7 +67,7 @@ Choose the shortest readable form for the contract:
 - A small behavior matrix when multiple inputs map to different outcomes
 - Invariants when the main risk is preserving existing behavior
 
-Change Snapshot contains the minimum complete visible delta needed for approval. Keep it to one compact block when possible. If the complete approval delta is too large for one compact block, compress dimensions, move implementation detail to the technical plan, surface ratification choices in Key Decisions, or stop for human scoping; do not move approval-critical contract detail out of the Human Review Section. Change Snapshot answers what visible behavior changes; Layer 2 and Concrete Design Sketch answer why this approach and shape are being used.
+Change Snapshot contains the minimum complete visible delta needed for approval. Keep it to one compact block when possible. If the complete approval delta is too large for one compact block, compress dimensions, move implementation detail to the technical plan, surface ratification choices in Key Decisions, or stop for human scoping; do not move approval-critical contract detail out of the Human Review Section. Change Snapshot answers what visible behavior changes; Layer 2 and Detailed Design answer why this approach and shape are being used.
 
 Do not include file paths, task references, implementation-only names, or explanatory prose. Public/developer-facing endpoints, fields, schema names, config keys, event names, CLI options, public SDK/plugin methods, and contract names are allowed only when they are the behavior being approved.
 
@@ -115,19 +117,13 @@ When two plan goals can conflict, state the tiebreaker in the Human Review Secti
 
 Omit this field only when no competing goals are named or implied by the plan.
 
-## Concrete Design Sketch (conditional)
+## Detailed Design (conditional)
 
-When the Concrete Design Sketch Gate is triggered, place `### Concrete Design Sketch` inside the Human Review Section, after the summary/decision fields and before `## Situation Assessment`. This placement is intentional: the sketch belongs to approval understanding, not to the execution checklist.
+When the Detailed Design Gate is triggered, place `### Detailed Design` inside the Human Review Section, after the summary/decision fields and before `## Situation Assessment`. This placement is intentional: the design belongs to approval understanding, not to the execution checklist.
 
-The sketch answers: "what solution shape and code architecture am I approving?" It uses reader-facing architecture, responsibility, boundary, and flow language:
-- **Design intent:** what this structure is protecting
-- **Target code architecture:** the post-change topology: main packages/modules/layers, entrypoint roles, shared seams, dependency direction, and ownership boundaries. This is an architecture map, not a file map.
-- **Resulting responsibility shape:** which responsibility blocks exist after the change
-- **Main flow:** how the user action, event, data, or control path moves through those blocks
-- **Boundaries changed or preserved:** what owns state, validation, persistence, side effects, orchestration, or presentation
-- **Misalignment shape:** what implementation shape would satisfy behavior while showing the design was misunderstood
+The design answers: "what technical solution am I approving?" Use the canonical field list in `SKILL.md` under `## Detailed Design Gate`. This reference explains placement and writing boundaries; the main skill owns the required contents so the field list does not drift.
 
-Do not use task references, line numbers, implementation-only function names, private interface details, or exact edit lists in the sketch. Stable package names, public contract names, and directory-level architecture anchors are allowed when they are needed to show the target code architecture. Exact files-to-edit belong in the File Map, not the Human Review Section.
+Do not use task references, line numbers, exact edit lists, full production code, incidental variable names, or exhaustive private APIs in the design. Stable package names, public/internal contract names, directory-level architecture anchors, compact data shapes, and pseudocode are allowed when they are needed to show the target solution. Exact files-to-edit belong in the File Map, not the Human Review Section.
 
 ---
 
@@ -135,7 +131,7 @@ Do not use task references, line numbers, implementation-only function names, pr
 
 - **All sizes** — Intent Statement always required. It is the first line of the Human Review Section regardless of plan size.
 - **Tiny/Small** — Intent Statement + Layer 1 only. The plan itself is short enough that a human can read it directly.
-- **Medium/Large** — Intent Statement + Layer 1 + Layer 2 Approach and Design Rationale + Change Snapshot when triggered + Task Overview + Key Decisions (or `None requiring human ratification`) + Conflict Priority when goals can compete + Concrete Design Sketch when triggered. The technical detail is dense enough that humans need a complete separate entry point.
+- **Medium/Large** — Intent Statement + Layer 1 + Layer 2 Approach and Design Rationale + Change Snapshot when triggered + Task Overview + Key Decisions (or `None requiring human ratification`) + Conflict Priority when goals can compete + Detailed Design when triggered. The technical detail is dense enough that humans need a complete separate entry point.
 
 ## Freeze Rules
 
@@ -152,7 +148,7 @@ The Human Review Section is frozen at approval. Mark it with `[APPROVED — READ
 - Use **rationale language**, not task-list language, in Layer 2 — "prove the event path before adding retry because payload availability is the main uncertainty" not "edit sender, then config, then retry"
 - Keep it bounded — Layer 1 has exactly the five fields listed above; Layer 2 is either 3-5 bullets or one paragraph under 140 words; Change Snapshot contains only the minimum complete visible delta needed for approval
 - If a field exceeds its limit, revise by deleting lower-value detail or switching to a more compact snapshot format instead of adding explanatory prose
-- **No exact files-to-edit** in the Human Review Section — that's what the technical plan is for. Stable package names and directory-level architecture anchors are allowed in Concrete Design Sketch when they are needed to show the approved code architecture.
+- **No exact files-to-edit** in the Human Review Section — that's what the technical plan is for. Stable package names, directory-level architecture anchors, compact contract/data shapes, and pseudocode are allowed in Detailed Design when they are needed to show the approved solution.
 
 ---
 

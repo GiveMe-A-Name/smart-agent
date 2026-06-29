@@ -34,10 +34,17 @@
 > **Conflict Priority**
 > When extensibility conflicts with host-process safety, prefer host-process safety. Unsafe plugin execution would compromise the pipeline for every user.
 >
-> ### Concrete Design Sketch
+> ### Detailed Design
 >
 > **Design intent**
 > Keep the core pipeline stable and host-safe while allowing user extension through an explicit plugin contract and sandboxed execution boundary.
+>
+> **Architecture diagram**
+>
+> ```text
+> pipeline runner -> plugin runner facade -> sandbox boundary -> plugin code
+> CLI/config -> discovery and validation -> plugin metadata
+> ```
 >
 > **Target code architecture**
 >
@@ -73,6 +80,29 @@
 > pipeline execution -> built-in processors -> enabled plugin refs
 > -> plugin runner -> sandboxed plugin execution after Task 3
 > -> pipeline result or controlled plugin failure
+> ```
+>
+> **Contract/data shape**
+> - Plugin metadata: plugin id, version, supported input type, declared capabilities.
+> - Plugin contract: validate input compatibility; process one pipeline record or batch and return transformed output or controlled failure.
+> - Plugin execution result: success, validation failure, timeout, sandbox violation, or plugin crash.
+>
+> **Key logic pseudocode**
+>
+> ```text
+> before pipeline execution:
+>   discover enabled plugin refs
+>   validate metadata without running processing logic
+>   reject invalid or unsafe plugins
+>
+> during pipeline execution:
+>   run built-in processors
+>   for each enabled plugin ref:
+>     result = plugin runner executes through sandbox boundary
+>     if result is controlled plugin failure:
+>       apply configured failure policy
+>     else if result violates sandbox:
+>       stop plugin execution and report unsafe plugin
 > ```
 >
 > **Boundaries changed or preserved**

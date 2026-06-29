@@ -31,10 +31,19 @@
 > **Conflict Priority**
 > When completeness conflicts with a working subset, prefer the working subset. A configurable webhook is more important than retry behavior.
 >
-> ### Concrete Design Sketch
+> ### Detailed Design
 >
 > **Design intent**
 > Keep job completion as the lifecycle boundary and move delivery policy into notification delivery so retries, payload formatting, and delivery failure behavior do not spread through job execution.
+>
+> **Architecture diagram**
+>
+> ```text
+> job completion -> notification delivery facade -> webhook sender
+>                                                -> retry policy
+>                                                -> HTTP client adapter
+> configuration -> webhook destination settings
+> ```
 >
 > **Target code architecture**
 >
@@ -65,6 +74,29 @@
 > ```text
 > job completes -> optional webhook URL lookup -> notification delivery
 > -> retry classification when enabled -> delivery result recorded for logs/tests
+> ```
+>
+> **Contract/data shape**
+> - Webhook payload: job id, terminal status, result summary, completion timestamp.
+> - Delivery result: delivered, skipped because no URL, transient failure retried, or permanent failure not retried.
+> - Retry classification: 5xx and network timeouts are transient; 4xx responses are permanent for this iteration.
+>
+> **Key logic pseudocode**
+>
+> ```text
+> on job completed:
+>   if webhook URL is absent:
+>     record "notification skipped"
+>     return
+>
+>   payload = build payload from completion event
+>   result = send payload
+>
+>   while result is transient failure and retry budget remains:
+>     wait according to retry policy
+>     result = send payload again
+>
+>   record final delivery result
 > ```
 >
 > **Boundaries changed or preserved**
