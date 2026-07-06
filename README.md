@@ -1,11 +1,10 @@
 # smart-agent
 
-`smart-agent` is an open repository of reusable agent skills, role definitions, and engineering judgment frameworks.
+`smart-agent` is an open repository of reusable agent skills and engineering judgment frameworks.
 
-The project is organized around two primary concepts:
+The project is organized around one primary concept:
 
 - `skills/`: modular skill packages that define when an agent should invoke a capability, what it is responsible for, and how success is judged
-- `agents/`: agent role definitions that shape higher-level working style and decision-making behavior
 
 Rather than being a conventional application repository, this project serves as a structured knowledge and prompt asset library for agent-driven software engineering workflows.
 
