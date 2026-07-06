@@ -13,9 +13,11 @@ Rather than being a conventional application repository, this project serves as 
 
 ```text
 .
-├── agents/          # Agent role definitions
 ├── skills/          # Reusable skill packages
+└── README.md        # Repository overview and maintainer entry point
 ```
+
+Most maintained content lives under `skills/`. Each skill directory is intentionally small at the top level so that an agent can first read `SKILL.md`, then pull in only the examples, references, or templates required for the task.
 
 ## What Is a Skill?
 
@@ -40,21 +42,14 @@ The repository already contains skills covering common engineering workflows, in
 - `brainstorming`: turning early ideas into reviewable designs
 - `implementation-judgment`: applying structural judgment before writing behavior-changing code
 - `systematic-debugging`: finding root causes instead of patching symptoms
+- `systematic-research`: validating external information through source-backed research
 - `technical-communication`: writing technical documents that are clear and actionable
 - `understanding-codebases`: building code-backed understanding before making changes
 - `code-review`: performing structured review of code changes
-
-## Getting Started
-
-If you are new to the repository, a good reading order is:
-
-1. `skills/understanding-codebases/SKILL.md`
-2. `skills/implementation-judgment/SKILL.md`
-3. `skills/technical-communication/SKILL.md`
-4. `skills/systematic-debugging/SKILL.md`
-5. `skills/code-review/SKILL.md`
-
-This sequence gives a representative view of how the repository approaches investigation, implementation, communication, debugging, and review.
+- `receiving-code-review`: evaluating reviewer feedback before accepting or pushing back
+- `reviewing-plans`: checking implementation plans for fit, risk, and executability
+- `writing-good-skills`: designing compact, reusable skill instructions
+- `writing-plans`: turning settled goals into scoped, verifiable execution plans
 
 ## Installation
 
@@ -84,36 +79,3 @@ Notes:
 - `-g` installs to the user-level skill directory instead of the current project
 - `--list` shows discoverable skills without installing them
 - `--skill <name>` installs only the named skill instead of the whole repository
-
-## Adding a New Skill
-
-New skills generally follow the existing directory pattern:
-
-```text
-skills/<skill-name>/
-├── SKILL.md
-├── examples/
-├── references/
-└── templates/
-```
-
-At minimum, a new `SKILL.md` should define:
-
-- trigger conditions
-- capability boundaries
-- invariants or operating constraints
-- completion criteria
-- common failure signals
-
-## Use Cases
-
-This repository is best suited for:
-
-- maintaining a reusable set of agent skills
-- encoding engineering judgment, not just tool usage instructions
-- standardizing workflows for design, implementation, debugging, review, and documentation
-- serving as a prompt and guidance library for agent-based development systems
-
-## Project Status
-
-At the top level, the repository does not currently expose a conventional application entrypoint, build pipeline, or package manager manifest. Based on the current structure, it should be understood as a curated repository of agent guidance assets rather than a directly runnable product.
