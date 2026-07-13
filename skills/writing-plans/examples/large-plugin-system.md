@@ -1,125 +1,34 @@
 # Large: Plugin System
 
-## Human Review Section
+## Decision Brief
 
-> **Intent:** Let users extend the data pipeline with custom processors without changing core pipeline code.
->
-> **Summary (Layer 1)**
-> - **Goal:** Add a user-extensible plugin system for data processors.
-> - **Why:** Users need custom processing behavior without forking or editing the pipeline.
-> - **End state:** Users can place plugin files in a directory, enable valid plugins, and run them safely in the data pipeline.
-> - **Impact scope:** Pipeline execution, plugin infrastructure, configuration, and CLI controls.
-> - **Size:** Large.
->
-> **Summary (Layer 2 - Approach and Design Rationale)**
-> Define the plugin contract first, prove it with one hardcoded no-op plugin, then resolve sandboxing before detailing discovery and CLI behavior. Design intent: keep pipeline execution stable while moving untrusted extension behavior behind an explicit plugin boundary. Discovery and CLI stay goal-level until sandboxing reveals whether plugins can be inspected in-process.
->
-> **Change Snapshot**
-> - Valid plugin enabled: it runs in the pipeline sandbox.
-> - Invalid or unsafe plugin: it is rejected before pipeline execution.
-> - No plugins configured: existing pipeline processing remains unchanged.
->
-> **Task Overview**
-> - **Task 1:** Define the plugin contract so all later work has a stable boundary.
-> - **Task 2:** Prove the contract works through the pipeline with one hardcoded plugin.
-> - **Task 3:** Decide and implement sandboxing before building dynamic discovery on top of it.
-> - **Task 4:** Discover and validate plugins using the sandboxing constraints from Task 3.
-> - **Task 5:** Add CLI/config controls after discovery and validation behavior is known.
->
-> **Key Decisions**
-> - **Plugin contract:** Standard `process` and `validate` methods plus metadata -> chosen because pipeline execution and validation both need explicit entry points.
-> - **Sandboxing decision point:** Decide after an early spike, not in the abstract -> chosen because subprocess vs. restricted globals changes discovery, validation, and CLI design.
-> - **Progressive refinement:** Keep Tasks 4-5 goal-level until sandboxing is known -> chosen to avoid detailed instructions built on an unproven isolation model.
->
-> **Conflict Priority**
-> When extensibility conflicts with host-process safety, prefer host-process safety. Unsafe plugin execution would compromise the pipeline for every user.
->
-> ### Detailed Design
->
-> **Design intent**
-> Keep the core pipeline stable and host-safe while allowing user extension through an explicit plugin contract and sandboxed execution boundary.
->
-> **Architecture diagram**
->
-> ```text
-> pipeline runner -> plugin runner facade -> sandbox boundary -> plugin code
-> CLI/config -> discovery and validation -> plugin metadata
-> ```
->
-> **Target code architecture**
->
-> ```text
-> Pipeline package
->   pipeline runner
->   -> depends on plugin runner facade only
->
-> Plugin package
->   plugin contract
->   plugin runner facade
->   sandbox boundary
->   discovery and validation after sandboxing is known
->
-> CLI/config package
->   plugin enablement controls
->   -> depends on discovery/registration results, not plugin execution internals
-> ```
->
-> Dependency direction stays one-way: pipeline execution calls the plugin runner facade; it does not import arbitrary plugin files, discovery details, or sandbox implementation directly.
->
-> **Resulting responsibility shape**
-> - Plugin contract: defines the host-visible processor behavior and metadata expectations.
-> - Sample plugin: proves the contract without dynamic loading.
-> - Plugin runner: gives the pipeline one host-side execution facade.
-> - Sandbox: becomes the only responsibility allowed to execute non-core plugin code after Task 3.
-> - Pipeline runner: orders built-in processors and enabled plugin processors; it does not discover, validate, or sandbox plugins itself.
-> - Discovery, validation, CLI, and config: remain provisional until sandboxing determines whether plugin inspection can happen in-process.
->
-> **Main flow**
->
-> ```text
-> pipeline execution -> built-in processors -> enabled plugin refs
-> -> plugin runner -> sandboxed plugin execution after Task 3
-> -> pipeline result or controlled plugin failure
-> ```
->
-> **Contract/data shape**
-> - Plugin metadata: plugin id, version, supported input type, declared capabilities.
-> - Plugin contract: validate input compatibility; process one pipeline record or batch and return transformed output or controlled failure.
-> - Plugin execution result: success, validation failure, timeout, sandbox violation, or plugin crash.
->
-> **Key logic pseudocode**
->
-> ```text
-> before pipeline execution:
->   discover enabled plugin refs
->   validate metadata without running processing logic
->   reject invalid or unsafe plugins
->
-> during pipeline execution:
->   run built-in processors
->   for each enabled plugin ref:
->     result = plugin runner executes through sandbox boundary
->     if result is controlled plugin failure:
->       apply configured failure policy
->     else if result violates sandbox:
->       stop plugin execution and report unsafe plugin
-> ```
->
-> **Boundaries changed or preserved**
-> - Plugin contract owns the public plugin behavior shape and no loading behavior.
-> - Pipeline runner owns processor ordering only; it does not import arbitrary plugin files.
-> - Plugin runner owns the host-facing execution handoff.
-> - Sandbox owns execution isolation, timeout, crash handling, and filesystem restrictions.
-> - Discovery and CLI ownership are provisional until Task 3 completes; the revised plan keeps discovery out of host-process execution and CLI out of validation/execution.
->
-> **Misalignment shape**
->
-> ```text
-> Pipeline execution lists plugin directories, imports plugin files in-process,
-> calls plugin code directly, catches failures inline, and updates config or CLI output.
-> ```
+**Intent:** Let users extend the data pipeline with custom processors without modifying or forking core pipeline code.
 
-**Situation:** Add a plugin system so users can drop custom processors into a directory. Plugins are discovered, validated, sandboxed, and run as part of the data pipeline.
+**Outcome:** Users can discover, enable, validate, and safely run compatible plugins while pipelines without plugins keep their existing behavior.
+
+**Scope:** Plugin contracts, isolated execution, discovery, configuration, CLI controls, and pipeline integration; host-process safety takes priority over extension flexibility.
+
+**Visible Changes:**
+- Valid enabled plugin: run it through the isolated plugin boundary.
+- Invalid or unsafe plugin: reject it before it can affect pipeline execution.
+- No plugin configured: preserve current pipeline processing.
+
+**Approval Needed:** Approve an explicit plugin contract and an isolation-first architecture; select the concrete sandbox mechanism only after an early spike compares subprocess isolation with restricted in-process execution.
+
+**Primary Risk:** The sandbox mechanism determines whether discovery and validation may inspect plugin code in-process, so their detailed design must remain provisional until the spike completes.
+
+## Design Review
+
+The pipeline depends only on a host-owned plugin runner. Untrusted plugin code executes beyond a sandbox boundary; discovery and CLI consume metadata and registration results rather than importing or invoking plugins directly.
+
+```text
+pipeline runner -> plugin runner -> sandbox boundary -> plugin code
+CLI/config -> discovery and validation -> plugin metadata/registration
+```
+
+The plugin contract exposes metadata, input validation, and processing. Execution returns success, validation failure, timeout, sandbox violation, or plugin crash so the host can apply an explicit failure policy without leaking plugin exceptions into core pipeline control flow.
+
+The material alternative is direct in-process loading. It is rejected as the default shape because it gives discovery and pipeline execution access to untrusted imports before isolation is established. The spike may choose subprocess or restricted in-process isolation, but it must preserve the one-way dependency and prevent the pipeline runner from discovering, importing, or sandboxing plugins itself.
 
 **Assessment**
 - **Size:** Large. Introduces a new architecture concept and affects pipeline execution, configuration, CLI behavior, plugin API, validation, and sandboxing.
@@ -135,10 +44,15 @@
 - **Risk first:** sandboxing is the biggest unknown and must be settled before discovery and CLI details.
 - **Progressive refinement:** Tasks 1-3 are detailed; Tasks 4-5 stay goal-level until Task 3 completes.
 
-**Risk analysis**
-1. Wrong plugin contract forces rework across pipeline, discovery, validation, and CLI. Resolve in Task 1.
-2. Sandboxing constraints can change how plugins are loaded and inspected. Resolve in Task 3.
-3. Validation may need to happen without importing plugin code in-process. Detail Task 4 only after Task 3.
+**Execution risks and plan-internal responses**
+1. **Risk:** The executable plugin contract may couple static compatibility checks to plugin imports, exposing untrusted code before isolation. **Contingency:** keep compatibility data in host-readable metadata if doing so preserves the approved contract and isolation boundary.
+2. **Risk:** Restricted in-process execution may fail the filesystem, timeout, or crash-containment checks. **Contingency:** use subprocess isolation; both mechanisms are inside the approved sandbox boundary.
+3. **Risk:** Task 4's module split depends on the chosen sandbox, so detailed files selected now may be wrong. **Revision trigger:** keep it goal-level and refine its files and handoff after Task 3 without moving discovery or imports into the pipeline runner.
+
+**Explicit exclusions**
+- No plugin marketplace, dependency installer, or remote plugin distribution.
+- No hot reload of plugins during a running pipeline.
+- No direct plugin access to host configuration or pipeline internals.
 
 **Dependency graph**
 
@@ -156,11 +70,19 @@ Tasks 4 and 5 may run in parallel only after Task 3 defines the sandboxing contr
 - If the plugin interface cannot support both validation and processing without importing untrusted code in-process, pause before changing the contract.
 - If implementation evidence requires changing the approved split between pipeline execution, plugin contract, plugin runner, and sandboxing, pause before revising the plan.
 
+**File map**
+- `pipeline/runner.py`: call the host-owned plugin runner without discovering or importing plugins.
+- `config.yaml`: store plugin enablement after sandbox and discovery constraints are known.
+- `plugins/`: own the contract, runner, sandbox, discovery, and validation responsibilities.
+- `cli/plugins.py`: expose list, enable, and disable controls after registration is stable.
+- `tests/plugins/`: cover contract, pipeline integration, sandbox, and discovery behavior.
+- `tests/cli/test_plugins.py`: prove CLI controls affect the enabled plugin set.
+
 ## Task 1: Plugin Interface Contract
 
 Defines the boundary before building either side of it.
 
-Files: new interface module and `NoOpPlugin` in `plugins/`; tests in `tests/plugins/`.
+Files: new `plugins/interface.py`; new `plugins/noop.py`; new `tests/plugins/test_interface.py`.
 
 - [ ] Define plugin interface with `process(data) -> data` and `validate() -> ValidationResult`.
 - [ ] Define plugin metadata fields: name, version, author, description.
@@ -173,7 +95,9 @@ Files: new interface module and `NoOpPlugin` in `plugins/`; tests in `tests/plug
 
 Proves the contract works through real pipeline execution before dynamic loading exists.
 
-Files: `pipeline/runner.py`; `plugins/runner.py`; integration tests in `tests/plugins/`.
+Depends on: Task 1's plugin interface and `NoOpPlugin`.
+
+Files: `pipeline/runner.py`; new `plugins/runner.py`; new `tests/plugins/test_pipeline.py`.
 
 - [ ] Allow the pipeline runner to execute plugins through the `plugins/runner.py` facade.
 - [ ] Wire the no-op plugin from Task 1 through that facade.
@@ -185,7 +109,9 @@ Files: `pipeline/runner.py`; `plugins/runner.py`; integration tests in `tests/pl
 
 Resolves the highest-risk architectural unknown before discovery and CLI are designed in detail.
 
-Files: `plugins/runner.py`; sandboxing module and tests in `plugins/`.
+Depends on: Task 2's host-side runner facade.
+
+Files: `plugins/runner.py`; new `plugins/sandbox.py`; new `tests/plugins/test_sandbox.py`.
 
 - [ ] Compare subprocess isolation and restricted globals against filesystem access, timeout, and host-process safety.
 - [ ] Implement the chosen sandboxed runner.
@@ -210,7 +136,7 @@ Goal: Let users list, enable, and disable discovered plugins.
 
 Depends on: Task 3 sandboxing constraints and the registration shape from Task 4.
 
-Files: `cli/plugins.py`; `config.yaml`; CLI tests.
+Files: `cli/plugins.py`; `config.yaml`; `tests/cli/test_plugins.py`.
 
 Success signal: `pytest tests/cli/test_plugins.py -v` -> PASS, and enabled plugins are the only ones run by the pipeline.
 
@@ -219,25 +145,3 @@ Success signal: `pytest tests/cli/test_plugins.py -v` -> PASS, and enabled plugi
 ## Execution Log
 
 *(append entries here as each task completes - format: `[YYYY-MM-DD] Task N: what was done and why; key decisions; any failures and how they were fixed`)*
-
-## Execution Log Example
-
-```text
-[2026-04-06] Task 1: complete. `PluginBase`, `PluginMetadata`, and `NoOpPlugin`
-were defined. `PipelineData` moved to `plugins/interface.py` to avoid a circular
-import: `plugins/` must not import from `pipeline/` at module load time.
-
-[2026-04-07] Task 3: failed first attempt. Restricted globals blocked `open`,
-`socket`, and `__import__`, but `pytest tests/plugins/test_sandbox.py::test_filesystem_access`
-failed because `importlib.import_module` bypassed the block. Switched to subprocess
-isolation with JSON stdin/stdout. `pytest tests/plugins/test_sandbox.py -v` -> PASS.
-
-Plan revision triggered. Because plugins are now out-of-process and stateless from
-the host perspective, Task 4 must validate via subprocess and discovery must read
-metadata from a manifest file without importing plugin code. Task 5 must operate
-through config only; in-process plugin introspection is not available.
-
-[2026-04-08] Task 4: failed. `pytest tests/plugins/test_discovery.py::test_invalid_plugin_rejected`
-hung because a plugin's `validate()` called `input()`. Added a 5s sandbox timeout;
-timed-out plugins are rejected as invalid. `pytest tests/plugins/ -v` -> PASS.
-```

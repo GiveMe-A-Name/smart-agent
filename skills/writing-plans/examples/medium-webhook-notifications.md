@@ -1,129 +1,38 @@
 # Medium: Webhook Notifications
 
-## Human Review Section
+## Decision Brief
 
-> **Intent:** Let users receive real-time job-completion notifications in their own systems without polling.
->
-> **Summary (Layer 1)**
-> - **Goal:** Send webhook notifications when jobs complete.
-> - **Why:** Users need job results delivered to external systems automatically.
-> - **End state:** A completed job delivers its result to a configured webhook URL and retries transient failures.
-> - **Impact scope:** Job completion behavior, configuration, and notification delivery.
-> - **Size:** Medium.
->
-> **Summary (Layer 2 - Approach and Design Rationale)**
-> Build a walking skeleton first: send one hardcoded webhook from the job-completion event before adding configuration and retry behavior. Design intent: keep job completion responsible for lifecycle state and move delivery policy into notification delivery. This resolves the main uncertainty early: whether the completion event carries enough data for a useful payload.
->
-> **Change Snapshot**
-> - Job completes with webhook URL: job result is delivered to that URL.
-> - Webhook delivery fails temporarily: delivery is retried according to the retry policy.
-> - No webhook URL configured: job completion still works without notification delivery.
->
-> **Task Overview**
-> - **Task 1:** Prove one webhook can fire from job completion before investing in configuration or retries.
-> - **Task 2:** Move the URL into configuration after the event path is proven.
-> - **Task 3:** Add retry behavior last, once the sender and config path are stable.
->
-> **Key Decisions**
-> - **Delivery scope:** Single webhook target vs. multiple targets -> choose one target for this iteration to keep behavior reviewable.
-> - **Retry scope:** Simple client-side retry vs. queue-backed delivery -> choose client-side retry because webhook delivery is useful but not critical job infrastructure.
->
-> **Conflict Priority**
-> When completeness conflicts with a working subset, prefer the working subset. A configurable webhook is more important than retry behavior.
->
-> ### Detailed Design
->
-> **Design intent**
-> Keep job completion as the lifecycle boundary and move delivery policy into notification delivery so retries, payload formatting, and delivery failure behavior do not spread through job execution.
->
-> **Architecture diagram**
->
-> ```text
-> job completion -> notification delivery facade -> webhook sender
->                                                -> retry policy
->                                                -> HTTP client adapter
-> configuration -> webhook destination settings
-> ```
->
-> **Target code architecture**
->
-> ```text
-> Job execution package
->   completion event boundary
->   -> depends on notification delivery facade only
->
-> Notification delivery package
->   webhook sender
->   -> depends on retry policy after Task 3
->   -> depends on HTTP client adapter
->
-> Configuration package
->   webhook destination and retry settings only
-> ```
->
-> Dependency direction stays one-way: job execution calls notification delivery; notification delivery does not import job-runner internals or global config ownership.
->
-> **Resulting responsibility shape**
-> - Job completion: detects completion and delegates notification when a webhook URL exists.
-> - Webhook sender: builds the payload and performs delivery.
-> - Retry behavior: owns transient vs. permanent failure classification after Task 3.
-> - Configuration: stores the optional webhook URL only.
->
-> **Main flow**
->
-> ```text
-> job completes -> optional webhook URL lookup -> notification delivery
-> -> retry classification when enabled -> delivery result recorded for logs/tests
-> ```
->
-> **Contract/data shape**
-> - Webhook payload: job id, terminal status, result summary, completion timestamp.
-> - Delivery result: delivered, skipped because no URL, transient failure retried, or permanent failure not retried.
-> - Retry classification: 5xx and network timeouts are transient; 4xx responses are permanent for this iteration.
->
-> **Key logic pseudocode**
->
-> ```text
-> on job completed:
->   if webhook URL is absent:
->     record "notification skipped"
->     return
->
->   payload = build payload from completion event
->   result = send payload
->
->   while result is transient failure and retry budget remains:
->     wait according to retry policy
->     result = send payload again
->
->   record final delivery result
-> ```
->
-> **Boundaries changed or preserved**
-> - Job completion does not build payloads, perform HTTP calls, or implement retry.
-> - Notification delivery does not own job lifecycle state.
-> - Retry logic does not know job-runner event details.
-> - Configuration supplies destination settings; it does not trigger delivery.
->
-> **Misalignment shape**
->
-> ```text
-> Job completion reads config, builds payloads, posts webhooks, retries failures,
-> and decides logging behavior inline.
-> ```
+**Intent:** Let users receive job-completion results in their own systems without polling.
 
-**Situation:** When a job completes, the system should POST the job result to a user-configured webhook URL.
+**Outcome:** A configured webhook receives the completed job result, transient delivery failures are retried, and jobs without a webhook keep their current completion behavior.
+
+**Scope:** Job completion notifications, webhook configuration, and delivery resilience; no signing, multiple targets, or management UI.
+
+**Visible Changes:**
+- Webhook configured: deliver the job result to that URL.
+- Temporary delivery failure: retry within a bounded policy.
+- No webhook configured: complete the job without notification delivery.
+
+**Approval Needed:** Support one webhook target with bounded in-process retry for this iteration; do not introduce multi-target or queue-backed delivery.
+
+**Primary Risk:** The existing completion event may not contain enough data for the promised payload; prove that path before building configuration or retry behavior.
+
+## Design Review
+
+Job completion remains responsible only for lifecycle state and delegates optional delivery to notification delivery, which owns payload formatting, HTTP behavior, and bounded retry. Notification failure does not change the completed job state.
+
+The material alternative is queue-backed delivery. It is excluded from this iteration because it adds durable infrastructure and a different reliability contract; if bounded in-process retry cannot meet the approved delivery behavior, stop rather than introducing a queue implicitly.
 
 **Assessment**
 - **Size:** Medium. Introduces a new notification concept and crosses job execution, configuration, HTTP behavior, and tests.
 - **Nature:** Feature. No existing webhook system; config and retry decisions are needed.
 - **Current state:** `job_runner.py` fires an `on_complete` event; config lives in `config.yaml`; no HTTP client is currently used.
-- **Done state:** A completed job sends the expected payload to a configured URL, retries on transient failure, and tests pass.
+- **Done state:** A completed job sends the expected payload to a configured URL, retries transient delivery failures within the approved bound, remains completed when delivery ultimately fails, and performs no delivery when no webhook is configured.
 
 ## Execution Plan
 
 **Decomposition strategy**
-- **Walking skeleton first:** connect job completion to one POST before adding config or retry.
+- **Safe walking skeleton first:** connect job completion to one config-gated POST while preserving no-config behavior.
 - **Risk-first ordering:** validate the `on_complete` event payload before building dependent behavior.
 - **Vertical slicing:** every task adds verifiable behavior.
 
@@ -132,53 +41,49 @@
 - No multiple webhook targets per job.
 - No webhook management UI; URL is config-only.
 
+**Execution risks and plan-internal responses**
+- **Risk:** Task 2's retry wiring may depend on the event payload and config-gated handoff proven in Task 1, making its current internal call shape premature. **Revision trigger:** refine that call shape after Task 1, provided the approved lifecycle/notification ownership and delivery behavior remain unchanged.
+
 **Stop signals**
-- If `on_complete` does not provide enough data for a useful payload, pause before designing a workaround.
-- If retry requires a new external dependency, pause before adding it.
+- If Task 1 confirms the Primary Risk, pause before designing a workaround.
+- If bounded retry violates the existing completion-latency contract or requires a new external dependency, pause before changing the approved reliability approach.
 - If implementation evidence requires changing the approved job-completion vs. notification-delivery responsibility split, pause before revising the plan.
 
 **File map**
 - `job_runner.py`: wire notification into completion handling.
 - `config.yaml`: add webhook URL configuration.
-- `notifications/`: create webhook sender module and retry module.
-- `tests/notifications/`: add notification tests.
+- `notifications/webhook.py`: create the webhook sender.
+- `notifications/retry.py`: add retry policy after the delivery path is proven.
+- `tests/notifications/test_webhook.py`: cover payload, configuration, and retry behavior.
+- `tests/test_job_runner.py`: prove notification failures do not change completed job state.
 
-## Task 1: Walking Skeleton
+## Task 1: Config-Gated Walking Skeleton
 
-Proves the completion event can produce one webhook payload end-to-end.
+Proves the completion event can produce one webhook payload end-to-end without changing behavior when no webhook is configured.
 
-Files: `job_runner.py`; new webhook sender module in `notifications/`; tests in `tests/notifications/`.
+Files: `job_runner.py`; `config.yaml`; new `notifications/webhook.py`; `tests/notifications/test_webhook.py`; `tests/test_job_runner.py`.
 
-- [ ] Create a sender with `notify(job_result, webhook_url)` and pass a hardcoded URL from the completion path.
-- [ ] Mock HTTP and assert the POST payload contains the job result fields.
-- [ ] Call the sender from the job-completion path.
-- [ ] Run `pytest tests/notifications/ -v` -> PASS.
-- [ ] Commit point: a completed job triggers one hardcoded webhook.
-
-## Task 2: Configuration
-
-Makes the proven webhook path usable without code changes.
-
-Files: `config.yaml`; webhook sender from Task 1; `job_runner.py`.
-
-- [ ] Add webhook URL configuration.
-- [ ] Read the URL from config instead of using a hardcoded value.
-- [ ] Skip webhook creation when the URL is absent.
+- [ ] Add an optional webhook URL configuration with no configured default.
+- [ ] Create `notifications/webhook.py` with `notify(job_result, webhook_url)` and call it from job completion only when the URL is present.
+- [ ] Mock HTTP and assert a configured URL receives the expected job result payload.
 - [ ] Add a no-config test proving no webhook is sent.
-- [ ] Run `pytest tests/ -v` -> PASS.
-- [ ] Commit point: webhook delivery is config-driven.
+- [ ] Run `pytest tests/notifications/test_webhook.py tests/test_job_runner.py -v` -> PASS.
+- [ ] Commit point: configured jobs send one webhook; unconfigured jobs preserve existing completion behavior.
 
-## Task 3: Retry Behavior
+## Task 2: Retry Behavior
 
 Adds resilience after the event path and configuration are stable.
 
-Files: webhook sender, retry module, and notification tests.
+Depends on: Task 1's config-gated delivery path and payload contract.
+
+Files: `notifications/webhook.py`; new `notifications/retry.py`; `tests/notifications/test_webhook.py`; `tests/test_job_runner.py`.
 
 - [ ] Retry transient 5xx failures with backoff.
 - [ ] Do not retry permanent 4xx failures.
-- [ ] Add tests for retry, no-retry, and success-after-retry.
-- [ ] Run `pytest tests/notifications/ -v` -> PASS.
-- [ ] Commit point: retry behavior is complete.
+- [ ] Add tests for retry, no-retry, success-after-retry, retry exhaustion, and network exceptions.
+- [ ] Prove retry exhaustion and network exceptions leave the job in its completed state while recording final notification failure.
+- [ ] Run `pytest tests/notifications/test_webhook.py tests/test_job_runner.py -v` -> PASS.
+- [ ] Commit point: delivery failures are bounded and never rewrite completed job lifecycle state.
 
 **Final verification:** Run `pytest tests/ -v && python scripts/smoke_webhook.py --url http://127.0.0.1:9000/webhook` -> PASS and prints `received expected webhook payload`.
 
