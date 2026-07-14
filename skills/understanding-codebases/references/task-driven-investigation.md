@@ -1,44 +1,23 @@
-# Task-Driven Working Models
+# Task-Driven Investigation
 
-Different tasks need different working-model slices before implementation. The sections below name the minimum relationships to establish, not a fixed sequence. Skip a slice only when repository evidence already establishes it; add a slice when a lookup reveals an unresolved caller, data source, override, convention, or verification gate.
+Use the task type to prioritize evidence. These are prompts, not mandatory checklists.
 
-## Fixing a Bug
+## Bug or unexpected behavior
 
-Before editing, name these working-model slices:
-- **Symptom boundary**: the error message, wrong output, failing test, or user-visible behavior to change.
-- **Reproduction path**: the entry point, test path, log path, or operation that can produce the symptom.
-- **Divergence point**: where actual behavior first differs from expected behavior.
-- **Data/config contributors**: inputs, state, fixtures, defaults, flags, or config values that can produce the same symptom.
-- **Affected consumers**: callers or users that rely on the current behavior, including those that may depend on the bug if the behavior is longstanding.
-- **Verification path**: the test that already fails, the missing test that would fail before the fix, or the smallest new test that would fail before the fix.
+Establish the symptom and expected contract, reproduce or trace one failing path, find the first divergence, and account for the data, configuration, state, and consumers that could produce the same symptom. Prefer a failing check or focused reproduction as the verification surface.
 
-## Adding a Feature
+## Feature or extension
 
-Before editing, name these working-model slices:
-- **Analogue**: at least one similar feature, unless search shows none exists.
-- **Convention**: file location, naming, registration, error handling, logging, validation, fixture, and test patterns used by the analogue.
-- **Extension point**: the registry, router, schema, provider, plugin point, base class, or generator where the new feature plugs in.
-- **Data path**: how data enters, changes shape, and reaches the new behavior.
-- **Shared utilities**: helpers, base classes, test builders, or generators used by the analogue and applicable to the new feature.
-- **Discovery gates**: build, package, generated-code, lint, fixture, or test configuration that controls whether new code is included.
-- **Verification path**: tests, fixtures, snapshots, generated files, or docs that analogous features update.
+Trace one analogous feature when available: its owner, registration or discovery mechanism, data path, contracts, and tests. Record whether the pattern is an enforced mechanism, a repeated convention, or merely one example. If no analogue exists, fall back to module boundaries and explicit contracts.
 
-## Understanding for Refactoring
+## Refactoring context
 
-Before editing, name these working-model slices:
-- **Current contract**: inputs, outputs, exceptions, side effects, ordering, and persistence behavior callers rely on.
-- **Consumer set**: direct callers, implementations, or references affected by the refactor.
-- **Preserved behavior**: what must remain identical after the refactor.
-- **Preparation boundary**: which edits are behavior-preserving preparation and which edit changes behavior, if any.
-- **Verification path**: tests or checks that prove behavior was preserved.
-- **Risk boundary**: consumers or dynamic paths not traced, and why they are outside the current edit.
+Map the current contract, callers, side effects, ordering, state ownership, and verification that exposes preserved behavior. Identify where responsibilities currently live and any demonstrated boundary tension. Do not decide whether or how to refactor.
 
-## Understanding Architecture or "How Does X Work"
+## Architecture or explanation
 
-Before explaining or changing architecture, name these working-model slices:
-- **Module boundary**: the package, service, layer, or subsystem that owns the behavior.
-- **Entry path**: one concrete request, command, job, event, or library call traced end to end.
-- **Contracts**: public APIs, interfaces, schemas, or persisted data shapes between layers.
-- **Communication path**: how layers call each other or exchange data.
-- **Intent source**: README, ADR, design doc, commit history, or tests that explain why the shape exists, if such evidence is present.
-- **Change relevance**: which part of the architecture constrains the current task and which parts were intentionally left untraced.
+Trace one representative request, command, event, or library call across module boundaries. Explain the current structure, runtime collaboration, key contracts, and supported design intent. Bound variants not traced.
+
+## When design intent matters
+
+Consult intent evidence when the structure seems deliberate, surprising, historically constrained, or relevant to a proposed responsibility boundary. Prefer ADRs and design docs, then tests and schemas, then change history and comments. Label intent as documented, inferred, conflicting, or unknown; do not turn a plausible story into fact.
