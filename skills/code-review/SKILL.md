@@ -1,96 +1,66 @@
 ---
 name: code-review
-description: "Evaluate changed code for correctness, design, and merge risk. TRIGGER when a diff, staged changes, local changes, or PR exists and the task is to review, audit, approve, or judge the changed code. DO NOT TRIGGER when no changed code exists or the task is responding to existing review feedback rather than evaluating the change."
+description: "Evaluate code changes by reconstructing their intent, behavior, affected contracts, and merge risk. Use when a diff, staged or local changes, or a PR exists and the user asks to review, audit, approve, or judge those changes."
 ---
 
 # Code Review
 
-Review changed code as a merge decision, not a style pass. The highest-value findings are problems with the change itself: wrong direction, wrong abstraction, broken contract, missing caller impact, unsafe rollout, or verification that does not prove the behavior.
+Build an evidence-backed model of the change before producing findings. A review is not a scan of changed lines: first understand what behavior is meant to change, locate the logic that makes that behavior happen, and trace what the decision can affect. Use that model to judge design and merge risk before examining local polish.
 
 ## Principles
 
-- **Review the change, not only the diff.** A diff shows what moved; it does not show caller contracts, existing invariants, or whether the change solves the stated problem [because many regressions are created in unchanged code that now receives different inputs, errors, ordering, or side effects].
-- **Start with direction before implementation.** A clean implementation of the wrong change is still a merge blocker. Check Layer 0 and Layer 1 before cataloging Layer 2-3 polish [because lower-layer comments can imply approval of a change that should not land].
-- **Treat descriptions as intent, not proof.** PR descriptions, commit messages, issue text, and author claims explain what the change is trying to do; code and tests prove whether it does that.
-- **Claim only the code you inspected.** For every function, method, query, module, test, or API named in a finding or verdict reason, open the surrounding implementation. Findings and verdicts must be grounded in files, functions, callers, tests, or checks read in this session. A finding based only on a hunk, filename, function name, or author description is not grounded. If changed files were not reviewed, state the coverage limit.
-- **Findings need evidence and consequence.** Every issue must name the layer, file/line, specific defect, and why it matters to correctness, security, data, compatibility, operability, or maintainability.
-- **Severity follows merge risk.** Critical means the change must not merge as-is: data loss, security hole, broken existing functionality, blocking regression, or a Layer 0/1 flaw that invalidates the change. Important means should fix unless the owner explicitly accepts the risk. Minor means author discretion.
+- **Review intent, mechanism, and contracts together.** Reconstruct the intended behavior, determine how the implementation changes it, and compare that result with existing caller-visible contracts [because a plausible implementation can solve the wrong problem or break behavior outside the diff].
+- **Navigate from the change outward.** Start with the overall purpose and scope, inspect the semantic center next, then follow relevant callers, consumers, state, side effects, and verification before reviewing the remaining files [because the important review order follows behavior and risk, not filename or diff order].
+- **Find semantic centers, not the largest hunks.** For each independent behavior delta, prioritize the branch, state transition, boundary, contract, or orchestration point that decides it; do not force unrelated behavior paths into one model [because a design error at a semantic center invalidates otherwise-correct supporting edits].
+- **Derive risks from concrete impact paths.** Trace a changed decision to a reachable input, caller, consumer, state, deployment condition, or failure mode and then to an observable consequence [because generic checklists produce hypothetical warnings without showing that the change can cause them].
+- **Treat descriptions as hypotheses and tests as evidence.** PR text, issues, commit messages, names, and comments help recover intent but do not prove behavior; tests help only when their assertions would fail if the intended contract broke.
+- **Spend review attention by consequence.** Surface wrong direction, misplaced responsibility, broken contracts, unsafe state or rollout, and behavioral defects before maintainability or style [because local polish must not hide a change that should be redesigned or must not merge].
 
 ## Constraints
 
-- Do not perform a code review without changed code to inspect. If no diff, local changes, staged changes, or PR exists, this skill does not apply.
-- Before reviewing implementation details, identify the intended change from the PR description, commit messages, issue text, or changed file list. If the intent cannot be stated from available evidence, make that a Layer 0 issue or ask for clarification.
-- If the change modifies a public interface, exported type/function, API endpoint, event, schema, config shape, CLI flag, error contract, side effect, or call pattern, inspect at least one caller, consumer, or compatibility boundary before approving.
-- Do not give feedback on unrelated code outside the diff unless the changed code directly depends on it or breaks its contract. If adjacent code is merely messy, omit it or mention it as out of scope.
-- Apply specialized lenses only when the diff triggers them. If a lens affects a finding, name the lens; if a high-risk lens is triggered and produces no finding, note what was checked.
-- If repository merge gates or touched-area checks exist, report their status as Passed, Failed, or Not run. Do not return `Ready to merge` while a relevant recorded check failed.
-- Do not implement fixes while reviewing unless the user explicitly asks for changes rather than review.
-- Do not use this skill to decide how to respond to existing review feedback. That task reviews a feedback exchange, not the changed code itself.
+### Understanding Gate
 
-## Layered Review
+- Do not review without changed code to inspect. A review request without a diff, local or staged changes, or a PR is missing its subject.
+- Before recording findings, establish a change model from repository evidence containing:
+  - the intended observable behavior and its evidence source;
+  - the semantic center and current owner for each material behavior delta;
+  - the behavior or contract delta;
+  - affected callers, consumers, state, side effects, or operational boundaries relevant to the change;
+  - material unknowns that could change the assessment.
+- Open the primary changed implementation and enough surrounding code to explain how the changed behavior is reached. Do not form the model from the description, file list, hunk, symbol name, or test alone.
+- If intent evidence is absent or conflicts with the implementation, label intent as unknown or conflicting. Do not invent product priorities, architectural direction, or author motivation.
 
-Review from the highest-impact layer downward. If Layer 0 or Layer 1 blocks the change, surface that before spending review budget on Layer 3 polish.
+### Design Gate
 
-| Layer | Question | Signals |
-|---|---|---|
-| **0: Change Justification** | Should this change exist? | Problem is real and evidenced; direction matches product/system trajectory; scope is focused; no unrelated changes bundled. |
-| **1: Design and Approach** | Is this the right solution? | Simpler alternative exists; abstraction is over/under-built; caller impact, migration, dependency, or rollout effects are traced; system health improves rather than degrades. |
-| **2: Implementation Correctness** | Does the code do what it claims? | Logic, edge cases, error handling, concurrency, security, state, and caller compatibility work under realistic inputs and failure modes. |
-| **3: Maintainability and Tests** | Will this hold up? | Tests fail when behavior breaks; code remains understandable; complexity, naming, docs, and test structure do not hide future defects. |
+- Before judging local implementation details, identify the repository component currently making each affected decision and compare the new placement with the dependency, state, and contract boundaries exercised by the change.
+- A design concern must cite the repository evidence that establishes the current owner, boundary, convention, migration direction, or simpler supported mechanism. A different design preference is not a defect.
+- If the change alters a public interface, exported symbol, API, event, schema, config, error behavior, side effect, ordering, identity, or persistent state, search for repository-visible callers and consumers, inspect those that can observe the delta, and state external or uninspected consumers as coverage limits before approval.
+- If a design flaw would replace or invalidate substantial implementation work, report it before lower-impact findings.
 
-Severity calibration:
+### Risk Gate
 
-| Severity | What qualifies | Verdict impact |
-|---|---|---|
-| **Critical** | Data loss, security vulnerability, broken existing functionality, blocking regression, or Layer 0/1 invalidation | `Not ready` |
-| **Important** | Missing error handling, test gap, unmet requirement, design concern, untraced caller impact, risky rollout gap | `Ready with fixes` or `Not ready` depending on blast radius |
-| **Minor** | Style, naming, documentation, localized readability, non-blocking cleanup | Author discretion |
+- Every finding must identify the changed decision, the reachable condition under which it fails, the observable consequence, and the supporting file/line or check. Omit claims whose path or consequence cannot be grounded.
+- Do not report unrelated defects outside the diff unless the change directly exercises them or violates their contract.
+- If the repository exposes tests or merge gates for the touched behavior, inspect their status. Report each executed check as passed or failed and touched-area checks not executed as not run; never imply verification that did not occur.
+- State coverage limits when changed files, consumers, runtime behavior, or checks were not inspected. A coverage limit is uncertainty, not evidence that a defect exists.
+- Do not implement fixes during a review unless the user also asks for changes.
 
-## Review Lenses
+## Review Output
 
-- **Security:** auth, authorization, permissions, secrets, crypto, user data access, payments, file upload, deletion, user-controlled input, elevated privileges.
-- **Performance:** query shape, caching, concurrency, batching, variable-size iteration, request/response hot paths, data pipelines.
-- **Migration/Data Safety:** schema, persisted data shape, rollout ordering, compatibility across versions, backfill, rollback, config format.
-- **Dependency:** added/removed/bumped packages, SDKs, build tooling, transitive dependency shifts, external service clients.
-- **API Design:** public endpoints, RPCs, events, CLI flags, config schema, exported functions, exported types, error formats.
-- **AI-generated code:** generated markers, large repetitive edits, mechanically repeated patterns, machine-produced comments/prose, suspiciously plausible external API calls, tests that assert mocks or restate implementation.
+Use `templates/review-output.md` for a complete review. Keep the result proportional to the evidence and lead with the highest merge risk.
 
-See `references/specialized-lenses.md` when a triggered lens needs deeper domain checks.
-See `references/ai-generated-code.md` when generated-code signals are present.
-See `references/user-review-standards.md` when a finding maps to deep modules, self-explanatory interfaces, abstraction timing, DRY, open/closed design, or complexity sources.
-See `references/layered-review-depth.md` when the layer to inspect first is unclear or the change spans multiple layers.
+Minimum content:
 
-## Output
+- **Change Model:** intent, semantic center, behavior or contract delta, affected boundaries, and material unknowns.
+- **Design Assessment:** whether the change shape is sound and the evidence supporting that judgment.
+- **Findings:** concrete issues ordered by merge risk, or an explicit statement that none were found.
+- **Verification and Coverage:** checks passed, failed, or not run, plus material inspection limits.
+- **Verdict:** include `Ready to merge`, `Ready with fixes`, or `Not ready` when the user asks for an approval or merge decision.
 
-Use `templates/review-output.md` for the full structure when writing a complete review.
+For each finding include the file/line, what fails, the triggering path or condition, why it matters, and a fix direction when the evidence supports one. Omit optional polish unless the user requests it or it materially affects future defect risk.
 
-Minimum output:
+## Calibration Examples
 
-- **Change Assessment:** Layer 0-1 assessment, even when no issue is found.
-- **Issues:** grouped by severity, or an explicit statement that no issues were found.
-- **Automated Checks:** pass/fail/not-run status when merge gates or touched-area checks exist.
-- **Verdict:** exactly one of `Ready to merge`, `Ready with fixes`, or `Not ready`.
-
-Each issue must include:
-
-- layer
-- file/line
-- lens or user-defined standard when it is part of the reasoning
-- what is wrong
-- why it matters
-- fix when the issue does not already determine the required change
-
-## Stop And Revise
-
-Stop and revise the review if any condition is true:
-
-- Layer 0-1 assessment was formed only from the PR description and file list without opening the primary changed files.
-- A finding names a function, method, query, module, or behavior whose surrounding implementation was not read.
-- A changed public interface, schema, API, event, config, CLI flag, or error contract was approved without checking a caller or consumer.
-- All findings are Layer 3 or Minor while Layers 0-1 were not checked.
-- A finding lacks layer, file/line, what is wrong, or why it matters.
-- A triggered high-risk lens is absent from the review with no finding and no note about what was checked.
-- A Critical finding is labeled Important or Minor.
-- The verdict is `Ready with fixes` while a Critical finding remains.
-- The verdict is `Ready to merge` while a relevant recorded automated check failed.
-- The review claims coverage over changed files that were not read.
+- **Positive:** A serializer stops emitting a field. The semantic center is the response construction, but the review continues to endpoint callers and client consumers. A finding is valid when a consumer still requires the field and the review can show the resulting failure.
+- **Boundary:** A PR description says only "refactor handler." The reviewer may reconstruct the behavior-preserving mechanism from code and tests, but must not claim the refactor conflicts with product direction without roadmap, issue, history, or repository evidence.
+- **Failure:** A reviewer comments on names and duplicated lines before noticing that authorization moved from a server boundary into a caller-controlled branch. The review must be revised because it evaluated local polish before the behavior owner and trust boundary.
