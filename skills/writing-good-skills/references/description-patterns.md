@@ -1,126 +1,54 @@
 # Description Patterns
 
-Use this reference when creating or optimizing a skill's frontmatter `description`.
+Use this reference whenever creating or changing a skill's frontmatter `description`.
 
-The `description` is a discovery field, not a skill summary. It helps the agent decide whether to load the skill before the full `SKILL.md` is available. The main `SKILL.md` teaches the capability after loading.
+The description is a discovery interface. Before reading `SKILL.md`, the agent uses it to decide whether the capability could improve the current task. Describe user intent and observable task state, not the skill's internal workflow.
 
-## Description Shape
-
-Use the `description` for pre-load discovery:
-
-Default shape:
+## Default Shape
 
 ```yaml
-description: "[Capability]. Use when [observable invocation state]."
+description: "[Capability]. Use when [observable requests, artifacts, or task states]."
 ```
 
-The capability sentence answers what behavior the skill improves. The `Use when` sentence gives the observable request terms, artifact types, or task states that should make the agent load it.
+A useful description contains:
 
-Avoid negative trigger clauses by default. If the positive trigger would still load the skill for a concrete task it does not own, first narrow the `Use when` clause. Add a short scope boundary only when narrowing would hide a real positive trigger.
+- **Capability**: the behavior the skill improves.
+- **Trigger evidence**: terms, artifacts, requests, or task states visible before loading the body.
+- **Boundary**, only when a realistic near miss remains after narrowing the positive trigger.
 
-Do not put cost-asymmetry persuasion, workflow steps, or skill-body rules in the `description`. If the skill needs richer uncertainty handling, encode it in the main `SKILL.md` as a principle or constraint after the skill has loaded:
+Front-load the capability and strongest triggers. Use concrete nouns and verbs likely to appear in real requests. Keep workflow steps, rationale, and post-load decisions in the body.
 
-```markdown
-- When [safe skip condition] is not confirmed from evidence, continue applying this skill [because the cost of a short extra reasoning pass is lower than the cost of missing the capability when it is needed].
-```
-
-## Description Rules
-
-A good description contains two required parts, in this order:
-
-- **Capability**: one short statement of what behavior the skill improves.
-- **Use when**: observable conditions that make the skill worth loading.
-
-Use terms the agent is likely to see in the user request or workspace: file extensions, artifact names, task verbs, domain objects, and task states.
-
-Quote descriptions that contain `: ` so YAML does not parse them as nested keys.
-
-## Calibrated Examples
+## Examples
 
 ```yaml
-description: "Extract text and tables from PDF files, fill forms, and merge documents. Use when working with PDF files, forms, or document extraction."
+description: "Analyze spreadsheets, modify formulas and formatting, and create charts. Use when working with .xlsx, .xls, .csv, or tabular spreadsheet data."
 ```
 
 ```yaml
-description: "Analyze spreadsheets, create pivot tables, and generate charts. Use when analyzing Excel files, .xlsx files, spreadsheets, or tabular data."
+description: "Evaluate changed code for correctness, design, and merge risk. Use when a diff, staged changes, or pull request exists and the task is to review, audit, or judge those changes."
 ```
 
-```yaml
-description: "Generate commit messages from git diffs. Use when the user asks for a commit message or help reviewing staged changes."
-```
+The second example does not trigger on every mention of code or pull requests; it owns evaluation of an existing change.
 
-These work because they name the capability first, then give concrete loading evidence without teaching the workflow.
+## Boundary Rules
 
-## Constraints
+Prefer a precise positive trigger over a list of exclusions. Add a boundary only when all three are true:
 
-- Put the capability and main `Use when` clause early; UI lists may truncate around 250 characters.
-- The field limit is 1024 characters; the model can read the full description up to that limit.
-- Do not compress the whole description to 250 characters if doing so removes necessary boundary information.
-- The load decision is made from `name` and `description` before the full `SKILL.md` is loaded.
+1. A realistic adjacent task shares the description's keywords.
+2. Loading this skill for that task would add the wrong method or cost.
+3. The distinction is observable before loading `SKILL.md`.
 
-## Scope Boundary Principles
+Do not use perceived simplicity, confidence, or risk as pre-load conditions when they require investigation. Do not route to named skills from the description; each skill should describe its own ownership.
 
-Most descriptions should have no boundary clause. Prefer a narrower positive `Use when` clause over a negative exclusion.
+## Trigger Evaluation
 
-If a boundary is unavoidable, it must be based on observable state, not pre-investigation confidence.
+Create realistic prompts covering:
 
-Delete or rewrite conditions that depend on judgments such as:
+- direct requests and indirect phrasings that should trigger;
+- terse and context-heavy prompts;
+- the capability embedded in a larger task;
+- near misses with overlapping artifacts or terminology;
+- adjacent tasks owned by a different capability.
 
-- obvious
-- simple
-- trivial
-- tiny
-- already clear
-- low risk
+Run prompts multiple times when selection is nondeterministic. Revise general categories, not individual test wording, and keep unseen validation prompts to detect overfitting.
 
-These words let the agent skip the skill using the same shallow judgment the skill is meant to protect against.
-
-If a safe-skip condition can only be known after reading files, tracing behavior, or checking the artifact, do not put it in the frontmatter `description`; express it as a constraint in the main `SKILL.md`:
-
-```markdown
-- Stop applying this skill only after confirming the entire change is limited to one function and has no callers outside the file.
-```
-
-Do not hardcode named-skill handoffs in the `description`. If another skill should have loaded first, fix that skill's frontmatter `description` instead of teaching this skill to route to it.
-
-## Good Default Pattern
-
-```yaml
-description: "Create and refine Codex skills that teach reusable agent judgment. Use when creating a new skill, optimizing an existing skill, or improving a skill description."
-```
-
-Why it works:
-
-- starts with the capability
-- uses observable state: creating or optimizing a skill
-- omits a boundary because the positive `Use when` clause is already narrow enough
-- does not explain how to write the skill
-
-## Good Pattern With Narrow Positive Trigger
-
-```yaml
-description: "Evaluate code changes for correctness, design, and merge risk. Use when a diff, staged changes, or PR exists and the user asks to review, audit, or judge those changes."
-```
-
-Why it works:
-
-- starts with the capability
-- uses observable state: diff, staged changes, PR, review task
-- narrows ownership with positive action words: review, audit, judge
-- does not explain how to perform the review
-
-## Boundary Rule
-
-Add a scope boundary only when it prevents a concrete wrong invocation that the positive `Use when` clause cannot prevent.
-
-Before adding one, all answers must be yes:
-
-- Have you already narrowed the positive `Use when` clause as much as possible without hiding valid trigger cases?
-
-- Is the boundary based on observable state rather than agent confidence or perceived simplicity?
-
-- Would deleting the boundary make the skill load for a task it does not own?
-
-- Can the boundary be phrased as scope or ownership instead of a negative trigger instruction?
-
-If any answer is no, rewrite the positive `Use when` clause instead of adding a boundary.

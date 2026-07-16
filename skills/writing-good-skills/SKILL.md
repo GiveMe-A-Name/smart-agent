@@ -1,69 +1,77 @@
 ---
 name: writing-good-skills
-description: "Create and refine capability skills that teach reusable agent judgment through principles, observable constraints, and calibrated examples. Use when creating a new skill, optimizing an existing skill, or improving a skill description."
+description: "Create and refine capability skills that turn unstable agent behavior into reusable, discoverable, and verifiable task-specific capability. Use when creating or optimizing a skill, reviewing its scope or instructions, improving its description, or testing whether it adds value."
 ---
 
 # Writing Good Skills
 
-Write skills as reusable capability guides that teach judgment
+Write capability skills that improve agent behavior, not merely valid `SKILL.md` files.
 
-A skill is evaluated for judgment quality, not format compliance. 
-The value is in the operating model: understanding what principles should shape decisions, what constraints must hold, and where the capability ends. A well-written skill still guides an agent when followed out of order, partially read, or applied to a case its author never imagined.
-A well-written SOP is not a failure. The failure is using SOPs for judgment tasks: a fixed workflow freezes the agent's choices before it has seen the case, replacing context-sensitive judgment with step execution and blocking simpler, more accurate, or more adaptive solutions.
+A qualified capability skill turns a general agent's unstable performance on a coherent class of tasks into reusable, discoverable, and verifiable specialized capability. The best skill uses the least knowledge, process, and tooling that matches the task's fragility while producing the greatest counterfactual net benefit over no skill or the previous version.
 
-## The Reader Is an Agent
+## Start From A Capability Gap
 
-A SKILL.md is read and executed by another agent — not a human. This single fact constrains every language choice. Two consequences follow, and the Principles and Constraints below apply them.
+Ground the skill in real evidence: execution traces, repeated corrections, domain artifacts, project conventions, failure cases, or successful task demonstrations. State what the target agent gets wrong, misses, or reinvents without the skill. If the agent already performs the target tasks reliably, do not create guidance for them.
 
-**Agents do not judge by atmosphere.**
+Trace every candidate instruction or resource to an observed failure, an explicit requirement, or a discriminating evaluation case. Start with the smallest intervention that could change those outcomes. Keep plausible but unobserved neighboring risks out of the first version; do not turn a narrow failure set into a comprehensive domain handbook.
 
-Words like "ensure", "be thorough", "carefully consider", "as appropriate", "well-understood" delegate the check back to the reading agent's own judgment. But the reason the skill exists is that the agent's self-judgment is unreliable in exactly this situation — otherwise no skill would be needed. Atmosphere language asks the agent to exercise the very capability the skill was written to compensate for, which is why it silently fails.
+Define one coherent task family rather than one answer or a broad topic. Instances belong together when they need substantially the same specialized knowledge, decisions, tools, and success criteria. Split unrelated responsibilities; merge fragments that must be loaded together to complete one task.
 
-Every constraint the agent must verify — boundary, evidence requirement, red line, or stop condition — must be confirmable from observable evidence already seen: call sites read, tests run, files opened, user statements made.
+See `references/judgment-dimensions.md` when the capability gap, task-family boundary, control level, or compatibility risk is unclear.
 
-Test: can the reading agent answer yes/no to this condition without exercising the very judgment the skill is meant to protect?
-- Pass: "Stop if you have not traced the call chain to a behavior-changing function" — checkable against actions taken.
-- Fail: "Ensure the code is well-understood" — only the unreliable self-judgment can answer.
+## Match Control To Fragility
 
-**Agents generalize from causal models, not from rules or examples alone.**
+Choose the instruction form independently for each part of the task:
 
-A skill is invoked in situations its author never imagined. An agent that knows a rule but not the mechanism behind it will fail to apply it in a structurally identical case that does not match the surface pattern — and will rationalize its way around the rule when the surface pattern looks different enough.
+| Task condition | Preferred form |
+|---|---|
+| Several approaches are valid and context determines the choice | principles, heuristics, and tradeoffs |
+| A preferred pattern exists but variation is legitimate | a default with an explicit escape condition, template, or parameterized procedure |
+| Steps are easy to omit or depend on prior state | a checklist with observable gates |
+| Order or consistency determines correctness or safety | an exact workflow or tested script |
+| Mechanical work is repeatedly reimplemented | a reusable script with explicit inputs, outputs, dependencies, and errors |
 
-Every frontmatter load condition, principle, or constraint that must generalize to novel scenarios must include the mechanism — the chain from "if this happens" to "this specific kind of downstream harm follows". Examples illustrate the mechanism; they do not substitute for it.
+Explain why only when the reason helps the agent adapt a judgment to unseen cases or prevents it from rationalizing around a rule. Give direct instructions for fixed mechanical operations. Do not freeze a variable judgment task into one workflow, and do not leave a fragile operation to vague advice.
 
-Test: shown only the rule and its stated reason, could the reading agent derive the right action in a scenario the author never imagined? If the right action requires "getting the spirit" of the rule, the causal model is missing — write it inline.
+## Package Only Missing Knowledge
 
-These two consequences are why the verifiable-language and inline-rationale rules below exist. When in doubt about a specific phrasing, return here.
+Include what changes behavior: domain procedures, project-specific facts, non-obvious gotchas, preferred tools, decision criteria, validation gates, examples, templates, or deterministic helpers. Omit generic explanations the target agent already handles.
 
-## Principles
+Prefer one working default over a menu of equivalent options. Use examples to calibrate a rule or boundary, not to substitute for the reusable method. When existing wording, examples, or workflows induce unwanted behavior, remove that inducement before adding a counter-rule.
 
-- A capability skill is built from two primary parts: **Principles** and **Constraints**. Principles guide the agent toward the intended judgment and action; constraints define boundaries, non-goals, red lines, and observable stop conditions that keep the agent from doing the wrong work [because agents do not carry stable task-specific judgment or reliable self-awareness across contexts: principles provide the positive policy they can generalize from, while constraints externalize the negative checks that prevent rationalization, scope drift, and unverifiable self-judgment].
-- **Design for unreliable introspection**: handle weak model self-awareness through the two-part structure only. Principles state the causal policy the agent should follow; constraints state observable boundaries, evidence requirements, red lines, and stop conditions. A principle that says "think carefully before acting" has failed because it relies on self-judgment; a constraint that says "before acting, confirm you have read the affected call sites" has succeeded because it replaces self-judgment with evidence.
-- Skills teach judgment; they do not encode orchestration or hide routing graphs [because explicit skill handoffs can mask that the routed skill's frontmatter `description` is too broad, too narrow, or unclear; fix that description instead of teaching another skill to route to it].
-- The main `SKILL.md` must follow progressive disclosure: keep the decision-critical rules an agent needs to execute the skill in the main file, and reserve support files for expanded examples, templates, references, scripts, or assets [because agents read skills under limited attention, so the first file must expose the decision-critical principles and constraints without forcing a deep reference chase]. See `examples/progressive-disclosure-examples.md` when the inline-vs-support boundary is unclear, the main file is becoming long or repetitive, or a support-file pointer lacks a read condition; do not see it for edits unrelated to progressive disclosure.
-- **Remove inducements before adding counter-rules**: when an existing skill causes unwanted behavior because its wording, examples, or workflow make that behavior the obvious move, first name the inducing source and delete or neutralize it [because adding a counter-rule can keep the unwanted behavior salient and make the skill revolve around the behavior it should stop teaching]. Add a new constraint only when the behavior remains a real scope edge after the inducement is removed and the constraint can name an observable wrong-action condition.
-- **Inline rationale rule**: not every principle or constraint needs a "why," but any rule that could be rationalized away or misapplied in a new scenario must include the causal mechanism. Required: frontmatter load conditions, non-obvious principles, and non-obvious constraints. Test: would an agent in a new scenario correctly apply this rule without knowing why it exists? If no → add inline rationale. Format: append the reason as a clause — "never add abstraction without a second caller [because premature abstraction creates coupling without evidence of need]."
+Use progressive disclosure:
 
-## Constraints
+- Keep the capability's core method and always-needed gotchas in `SKILL.md`.
+- Put conditional detail and lookup material in focused `references/` files.
+- Put reusable output material in `assets/` and deterministic operations in `scripts/`.
+- Give every support-file pointer an observable read condition.
 
-When creating or optimizing a skill, keep these constraints true throughout the edit. Verify them from the edited skill or conversation evidence; if any constraint is violated, revise the skill.
+See `examples/progressive-disclosure-examples.md` when deciding what stays in `SKILL.md` or how to point to support files.
 
-- The frontmatter `description` must let an agent decide whether to load the skill before reading `SKILL.md` or any support files [because skill discovery happens from `name` and `description`; load conditions hidden in the body cannot help the pre-load decision].
+## Make The Skill Discoverable
 
-- See `references/description-patterns.md` when creating or changing the frontmatter `description`; do not see it for body-only skill edits [because description rules are needed only for pre-load discovery wording, and unconditional reference-chasing wastes context].
+Write the frontmatter `description` for the pre-load decision. It must identify both the capability and observable request, artifact, or task states that make the skill useful. Test realistic should-trigger prompts and near-miss should-not-trigger prompts; keyword overlap alone is not a valid boundary.
 
-- Frontmatter descriptions should default to a positive capability sentence plus a `Use when` clause with observable triggers; add a scope boundary only when a concrete wrong invocation remains after narrowing the positive trigger [because discovery is more reliable when the entry point tells the agent when the skill is relevant instead of making it reason through exclusions].
+See `references/description-patterns.md` whenever creating or changing the description.
 
-- Constraints must be verifiable from observable evidence rather than advisory prose; principles must state action-shaping guidance rather than self-judgment prompts.
+## Verify Counterfactual Net Benefit
 
-- Examples or support-file pointers must cover both positive use and boundary/failure cases.
+Compare the skill against no skill or the previous version on realistic tasks in clean contexts. Include varied phrasings, unseen instances, edge cases, and adjacent tasks where the skill should remain inactive. Repeat runs when model variance could change the result.
 
-- Do not name another skill as the next action instead of fixing that skill's own frontmatter `description` or local constraints.
+Measure what the skill buys and costs: task success, output quality, trigger accuracy, harmful scope expansion, token use, elapsed time, and compatibility failures. Use executable checks for mechanical outcomes and blind or human review for qualities that cannot be reduced to assertions. Read traces to distinguish missing knowledge from ambiguous, excessive, or conflicting instructions.
 
-- Do not add a new constraint, counter-rule, or `Do not use` rule to suppress behavior induced by existing wording, examples, or workflow. First name and remove or neutralize the inducing source; add a constraint only if the behavior remains a real scope boundary after that.
+Remove content that passes equally well without the skill. Add guidance only when a remaining failure identifies a missing decision, fact, gate, example, or deterministic operation. Revise or retire a skill that adds no meaningful benefit, costs more than it buys, or causes negative transfer. Do not call a skill qualified from format compliance or a plausible-looking draft alone.
 
-- Do not leave advisory prose where an observable condition or explicit red line is needed.
+See `references/evaluation-patterns.md` when behavior can be exercised or two versions need comparison.
 
----
+## Completion Standard
 
-See `references/judgment-dimensions.md` when a skill creation or review needs deeper diagnosis than the main Principles and Constraints provide.
+Before finishing, confirm from the artifact and available evidence:
+
+- A specific without-skill failure or unstable behavior justifies the skill.
+- The scope is one reusable task family, not an instance answer or topic dump.
+- Each instruction's freedom matches the fragility of the decision or operation.
+- Every included rule, example, reference, or script supplies missing capability.
+- Every included item traces to gap evidence, a requirement, or a discriminating test.
+- The description separates intended triggers from realistic near misses.
+- Evaluation shows net benefit, or the skill is explicitly marked unverified with the next discriminating test identified.

@@ -1,104 +1,55 @@
 # Progressive Disclosure Examples
 
-Use these examples when editing a skill and deciding what must stay in the main `SKILL.md` versus what should move into `examples/`, `references/`, `templates/`, `scripts/`, or `assets/`.
+Use these examples when deciding what stays in `SKILL.md` or how to point to support files.
 
-Do not read this file for every skill edit. Read it only when the inline-vs-support boundary is unclear, the main file is becoming long or repetitive, or a support-file pointer lacks a read condition.
+Each layer must work at its decision point:
 
-Progressive disclosure means each layer remains useful on its own:
-- frontmatter `description` decides whether the skill loads
-- main `SKILL.md` guides execution through `## Principles` and `## Constraints`
-- support files deepen specific cases only after the agent has a reason to see them
+- metadata supports discovery;
+- `SKILL.md` supplies the core method for every invocation;
+- support files add conditional knowledge, executable operations, or output material.
 
-## Example 1: Give Every Support File A Read Condition
+## Give Every Pointer A Read Condition
 
-Bad pointer:
+Weak:
 
 ```markdown
-See `examples/` for more.
 See `references/` for details.
 ```
 
-Why this fails:
+The agent cannot tell whether reading more will help.
 
-The pointer does not say what task state makes the extra file worth reading. The agent will either chase references by default and waste context, or skip them when the example is needed.
-
-Better pointer:
+Strong:
 
 ```markdown
-See `examples/progressive-disclosure-examples.md` when deciding what stays in the main `SKILL.md` versus what moves to examples or references.
+Read `references/api-errors.md` when the API returns a non-2xx response or the response schema differs from the documented success shape.
 ```
 
-Better support-file see:
+The condition is visible during execution and the file's purpose is explicit.
+
+## Keep Unrecognized Gotchas Inline
+
+Weak split:
 
 ```markdown
-Use these examples when editing a skill and deciding what must stay in the main `SKILL.md` versus what should move into `examples/`, `references/`, `templates/`, `scripts/`, or `assets/`.
+Read `references/query-rules.md` when special query handling is needed.
 ```
 
-Observable test:
+If the agent does not know that deleted users remain in the table, it cannot recognize that special handling is needed.
 
-Every support-file pointer should answer: "What observable edit state makes this file useful now?"
-
-## Example 2: Choose The Support Folder By Job
-
-Bad split:
-
-```text
-references/
-  skill-template.md
-  good-description.md
-  rewrite-description.py
-  progressive-disclosure-notes.md
-```
-
-Why this fails:
-
-Everything was moved out of the main file, but the support layer is not organized by how the agent uses it. The agent has to inspect filenames to discover whether a file should be read, copied, compared, or executed.
-
-Better split:
-
-```text
-references/
-  description-patterns.md       # read for rules and edge cases
-examples/
-  progressive-disclosure-examples.md  # compare bad/better structures
-templates/
-  skill-template.md             # copy or adapt as a scaffold
-scripts/
-  validate_skill.py             # execute for deterministic checks
-```
-
-Observable test:
-
-If the agent must see a support file to learn what kind of object it is, the folder choice is not doing enough work.
-
-## Example 3: Move Expanded Rationale Only After The Rule Is Self-Contained
-
-Bad split:
+Strong main-file rule:
 
 ```markdown
-## Principles
-
-- Skills teach judgment; they do not encode orchestration.
-
-See the routing reference for why.
+The `users` table uses soft deletion. Include `deleted_at IS NULL` unless the user explicitly requests inactive accounts.
 ```
 
-Why this fails:
+Move a long field map or schema to a reference, but keep the gotcha that determines whether to consult it in the main file.
 
-The visible principle is too weak to generalize. The support file contains the causal model, so an agent can obey the rule in familiar cases but rationalize around it in new cases.
+## Choose The Resource By Runtime Job
 
-Better main-file shape:
+- `references/`: facts or procedures the agent reads only for a known case.
+- `scripts/`: deterministic or repeatedly reimplemented operations.
+- `assets/`: templates and materials copied or transformed into outputs.
+- `examples/`: contrasts used to calibrate a choice or boundary.
 
-```markdown
-- Skills teach judgment; they do not encode orchestration or hide routing graphs [because explicit skill handoffs can mask that the routed skill's frontmatter `description` is too broad, too narrow, or unclear; fix that description instead of teaching another skill to route to it].
-```
+Do not duplicate the same rule across layers. The main file should remain usable when optional resources are never opened.
 
-Better support-file role:
-
-```markdown
-Use this reference when a draft already names other skills as next actions and you need contrast examples for rewriting those references into local principles or constraints.
-```
-
-Observable test:
-
-The main rule should still be actionable if the support file is never opened. The support file may add cases and rewrites, but it must not contain the only reason the rule exists.
