@@ -1,69 +1,42 @@
 ---
 name: receiving-code-review
-description: "Evaluate existing review feedback before action. TRIGGER when PR comments, inline annotations, pasted suggestions, screenshots, or reviewer-agent output exist and the task is deciding whether to accept, push back, clarify, or implement them. DO NOT TRIGGER when reviewing code changes directly, requesting a review, or applying feedback that has already been evaluated and accepted."
+description: "Judge existing code-review feedback by its value to the current change. Use when PR comments, inline annotations, pasted suggestions, screenshots, or reviewer-agent findings already exist and the task is deciding what should affect the current change, what needs user attention, and what should not be acted on."
 ---
 
 # Receiving Code Review
 
-Evaluate review feedback as claims, not instructions. A reviewer comment usually contains three separable parts: an **observation** about what the code does, a **premise** about what the code should optimize for, and a **proposed change**. Verify each part independently before acting.
+Filter review feedback through the current change's intent and risk before acting. A technically plausible comment is not automatically valuable to the change, and a real issue is not automatically worth fixing now.
 
-Use three evidence sources: explicit intent, repository evidence, and architectural constraints. Explicit intent can come from the current conversation, PR description, issue, design doc, commit message, code comments, tests, or prior user or maintainer decisions. If intent cannot be traced, mark intent unknown and clarify instead of inventing it.
+## Establish the Decision Frame
 
-## Principles
+Identify what the change is intended to achieve, what behavior or contracts it must preserve, its stated non-goals, and the material risks it introduces or exposes. Use the conversation, issue or PR description, tests, code, and prior maintainer decisions as evidence. Do not invent intent that cannot be traced.
 
-- Reviewer authority is not evidence. Human, automated, and agent-written reviews all require verification against the codebase and stated intent.
-- A correct observation can still lead to a wrong premise or harmful proposed change.
-- Collaboration is not compliance. Accept, push back, and clarify are all valid outcomes when they are evidence-backed.
-- Clarification is a decision when the missing answer changes whether the fix applies, where it lands, or which contract it touches.
-- Multiple reviewers converging on an issue increases the signal, but does not replace evidence.
-- Do not use performative agreement or gratitude as a substitute for evaluation. State the decision and the evidence.
+For each feedback item, ask only what is needed to decide:
 
-## Constraints
+- **Consequence:** What materially happens if this is not addressed?
+- **Relevance:** Does it affect the change's intended behavior, contracts, safety, verification, or regression risk?
+- **Scope:** Was it introduced or exposed by this change, or is it pre-existing, adjacent, stylistic, or speculative?
+- **Proportionality:** Does the proposed remedy reduce a concrete risk enough to justify its churn, regression risk, complexity, and maintenance cost?
 
-- Assign each feedback item exactly one current decision: **Accept**, **Push back**, or **Clarify**.
-- Before accepting a non-mechanical suggestion, cite the code, test, usage, or platform evidence that makes the observation technically correct.
-- For design or architecture feedback, cite the explicit intent source used to evaluate the premise. If no intent source exists, choose Clarify unless the item is an independent bug, security issue, or correctness problem.
-- Accept only when the suggestion is technically correct and aligned with intent, identifies a bug or security issue regardless of intent, or improves clarity without changing behavior.
-- Push back when the suggestion breaks existing behavior, contradicts established intent, adds unsupported generality, violates repository constraints, or is technically wrong for this stack.
-- Pushback must name the reviewer's premise and the contradicting evidence or constraint. Do not use "I prefer it this way" as the reason.
-- Clarify when the suggestion has multiple plausible interpretations, requires a design-intent change, or depends on context that is not present. The question must name the competing interpretations and the implementation choice that depends on the answer.
-- If one feedback item depends on an unresolved clarification, mark it blocked or dependent. Independent bug fixes can proceed only when they remain correct under every plausible clarification outcome.
-- For accepted non-trivial changes, decide the landing shape before editing code: responsibility boundary, interface impact, contract impact, and test coverage. Mechanical fixes can proceed directly.
-- Do not write "you're right", "great point", "thanks", or equivalent agreement-signaling. Use direct language such as "Fixed by...", "I will change...", "I do not think this should change because...", or "I need to clarify...".
+Verify load-bearing claims against repository evidence. Check actual callers, tests, supported platforms, and extension points before accepting claims about reuse, testability, compatibility, or future flexibility. Reviewer confidence, authority, or convergence is signal, not evidence.
 
-## Decision Checks
+When useful, separate the comment's **observation**, **premise**, and **proposed change**. One may be valid while the others are not. In particular, accepting a concern does not require accepting the proposed remedy.
 
-Use `references/evaluation-criteria.md` when a comment mixes problem, preference, scope, and value claims.
+## Choose a Disposition
 
-- **Bug, logic, security, data loss**: verify against code and tests; these can be valid even when intent is unclear.
-- **Design or architecture**: compare the premise with explicit intent and local boundaries. A different architecture is not automatically better.
-- **Style or naming**: author's call unless a style guide, local convention, or public API consistency requires the change.
-- **Over-engineering or testability**: grep for actual call sites, tests, and extension points before adding abstraction. If no usage evidence exists, the benefit is hypothetical.
-- **Reviewer confusion**: improve code clarity when the confusion is reasonable, even if the proposed fix is wrong.
+Assign one current disposition:
 
-Apply the claim split to common review shapes:
-- "Extract this for testability" means verify current tests, likely callers, and whether the abstraction would actually be exercised.
-- "This should live in middleware" means verify the current error-handling contract and whether middleware would change caller-visible behavior.
-- "This does not support X" means verify whether the code supports X, then separately verify whether X is an explicit goal.
+- **Address now:** The item materially affects the change's intent or risk, and the response is proportionate. Proceed only within the user's existing authorization.
+- **Escalate:** The item may materially affect correctness, safety, contracts, or design intent, but resolving it requires a scope, architecture, or product decision the agent is not authorized to make. Ask the smallest decision-changing question before related work.
+- **Advisory:** The issue is evidence-backed and has a concrete consequence, but it does not block the current intent or is not proportionate to handle in this change. Surface it without modifying code, expanding scope, creating TODOs, or opening follow-up work unless the user authorizes that action.
+- **Decline:** The item is preference-driven, speculative, unsupported, unrelated to meaningful risk, or has negative net value. Do not act on it. Explain only when the reviewer or user needs the decision.
 
-## Multiple Reviewers
+An independent security, data-loss, crash, or correctness risk can require Address now or Escalate even when it predates the change. Do not use scope as a reason to hide a material risk.
 
-Use `references/multi-reviewer.md` when feedback volume, overlap, or contradiction changes the decision process.
+Do not transfer every low-value comment to the user. Use Advisory only when a future decision could reasonably change because of the information; otherwise Decline it.
 
-Triage before processing linearly when comments span multiple severity levels or can invalidate each other:
-1. Blocking correctness, security, data loss, or crash risks.
-2. Design-level feedback that can change whether the approach should exist or where the work belongs.
-3. Implementation feedback such as error handling, local correctness, tests, and maintainability.
-4. Style and preference feedback.
-
-Surface contradictions instead of silently choosing one reviewer. Identify the goal each reviewer optimizes for, check whether a synthesis satisfies both goals, and escalate only when the goals conflict or intent authority is needed. If design-level rework is accepted, do not spend time fixing style in code that will be replaced.
+Read `references/evaluation-criteria.md` when relevance, scope, consequence, or proportionality is hard to distinguish. Read `references/multi-reviewer.md` when comments overlap, contradict each other, or a higher-level decision may invalidate lower-level feedback. Read `references/response-language.md` only when drafting reviewer-facing replies.
 
 ## Output
 
-For each feedback item, produce:
-- **Decision**: Accept, Push back, or Clarify.
-- **Evidence**: code, test, usage, platform, or intent source used for the decision.
-- **Reasoning**: why the observation, premise, and proposed change are valid or invalid.
-- **Response**: the concise reviewer-facing wording, when a response is needed.
-
-Use `references/response-language.md` when drafting reviewer-facing replies. Reply in the original thread when the review system supports inline replies.
+For non-obvious items, report the **Disposition** and the load-bearing **Basis**. For Advisory, state the finding, why it is not being handled now, and the concrete consequence. Draft a reviewer-facing response only when one is needed.

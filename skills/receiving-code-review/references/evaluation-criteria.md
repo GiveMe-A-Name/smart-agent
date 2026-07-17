@@ -1,46 +1,49 @@
 # Evaluation Criteria
 
-Five dimensions for evaluating a review comment before deciding Accept / Push back / Clarify. Apply relevant ones — not a fixed sequence.
+Use the relevant dimensions when a feedback item's value to the current change is unclear. This is a judgment lens, not a fixed sequence.
 
-## 1. Problem-Driven vs. Preference-Driven
+## Intent and Risk Relevance
 
-Classify before anything else.
+Determine whether the feedback affects what the change must achieve or preserve. Relevant effects include caller-visible behavior, contracts, security, data integrity, compatibility, verification, and material regression risk.
 
-| Signal | Classification | Default |
-|--------|---------------|---------|
-| "Crashes in X scenario", "security hole", "returns wrong result for Y" | Problem-driven | Evaluate further |
-| "I'd name this differently", "cleaner", "I prefer this style" | Preference-driven | Author's call — Push back unless style guide mandates |
+An issue may be real without being relevant to the current change. Distinguish current-change risk from pre-existing debt, adjacent cleanup, stylistic preference, and hypothetical future needs. Independently material security, data-loss, crash, or correctness risks must still be surfaced.
 
-## 2. Consequence Test
+## Consequence Test
 
-Ask: **if this is not fixed, what happens?**
+Ask: **what materially happens if this is not addressed now?**
 
-- Bug / security issue / measurable degradation → should be addressed
-- Personal preference / aesthetic difference → optional
+- Incorrect behavior, broken contract, security exposure, data loss, crash, or measurable degradation is consequential.
+- A maintenance concern is consequential only when the affected code, callers, or near-term change path makes the cost concrete.
+- Aesthetic preference, abstract purity, or unsupported future flexibility has no established consequence.
 
-## 3. Evidence First
+If the consequence cannot be made concrete from available evidence, do not promote the item merely because the suggestion sounds reasonable.
 
-Before any judgment:
-1. Read the code being commented on
-2. Grep for actual usage patterns referenced in the comment
-3. Locate design intent source — commit messages, PR description, prior conversation
+## Evidence Test
 
-Judge against code evidence, not the comment's framing.
+Read the commented code and inspect the evidence needed by the claim:
 
-**Common failure mode**: skipping the code read and grep when the reviewer's framing sounds plausible. A plausible framing is not evidence. "This should be extracted for testability" sounds reasonable — but if nothing currently calls the suggested abstraction, "testability" is a hypothetical benefit with real churn cost. Every usage claim needs to be grounded in the actual codebase before accepting.
+- callers and tests for reuse or testability claims;
+- observable behavior and contracts for correctness claims;
+- supported environments for compatibility claims;
+- issue, PR, conversation, or prior decisions when the judgment depends on intent.
 
-## 4. Scope Classification
+Do not require explicit intent when repository behavior and constraints already resolve the decision. Clarify only when missing intent would materially change the disposition.
 
-| Scope | Threshold | Action |
-|-------|-----------|--------|
-| Implementation-level (local logic, naming, bug fix) | Standard | Decide after evidence check |
-| Architecture-level (layer boundaries, module responsibilities, global patterns) | High — requires clear design intent conflict to push back | Escalate to human partner if intent is unclear; if no human partner is reachable, default to Clarify |
+## Proportionality Test
 
-## 5. Value Assessment
+Compare concrete benefit and risk reduction against churn, regression risk, abstraction, indirection, and maintenance cost. Prefer the response that protects the current intent without speculative generality.
 
-Before accepting, verify both:
+Signals of negative net value include:
 
-- **Benefit**: Does it fix a real problem? Improve correctness, clarity, or maintainability?
-- **Cost + Risk**: Churn volume? Regression risk? Complexity added?
+- an abstraction without a current shared rule or consumer;
+- future-proofing without a stated requirement or extension point;
+- moving local behavior across layers without reducing current risk;
+- expanding the change for architectural neatness;
+- a remedy whose complexity exceeds the consequence it prevents.
 
-Accept only when benefit clearly outweighs cost + risk.
+## Disposition Test
+
+- **Address now** when the item is relevant, consequential, and proportionate.
+- **Escalate** when it may be material but requires an unauthorized intent, scope, or architecture decision.
+- **Advisory** when it is real and potentially useful later but should not affect the current change.
+- **Decline** when it lacks evidence, material consequence, relevance, or positive net value.
