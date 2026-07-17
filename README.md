@@ -46,7 +46,6 @@ The repository already contains skills covering common engineering workflows, in
 - `understanding-codebases`: building code-backed understanding before making changes
 - `code-review`: performing structured review of code changes
 - `receiving-code-review`: evaluating reviewer feedback before accepting or pushing back
-- `reviewing-plans`: checking implementation plans for fit, risk, and executability
 - `writing-good-skills`: designing compact, reusable skill instructions
 - `writing-plans`: turning settled goals into scoped, verifiable execution plans
 
