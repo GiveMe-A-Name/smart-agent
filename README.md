@@ -39,7 +39,7 @@ Some skills also include supporting materials such as:
 
 The repository already contains skills covering common engineering workflows, including:
 
-- `brainstorming`: turning early ideas into reviewable designs
+- `brainstorming`: collaboratively exploring open ideas and problems to make the possibility space clearer
 - `implementation-judgment`: applying structural judgment before writing behavior-changing code
 - `systematic-debugging`: finding root causes instead of patching symptoms
 - `systematic-research`: turning external topics and questions into clear, comprehensive, evidence-grounded mental models and reports

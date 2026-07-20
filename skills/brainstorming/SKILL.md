@@ -1,62 +1,45 @@
 ---
 name: brainstorming
-description: "Explore an open idea or problem to surface options, assumptions, and decision factors — let the user's thinking become clearer. TRIGGER when: user opens a topic for collaborative exploration, describes a goal without naming a solution, asks 'how should we approach X' or 'should we do X or Y', or presents alternatives without choosing."
+description: "Collaboratively explore an open idea or problem by reframing it, expanding possible directions, surfacing assumptions, and connecting perspectives. Use when the user explicitly wants to brainstorm, think through an unresolved idea, explore possibilities, or compare directions before deciding. Do not use merely because an implementation request omits the solution."
 ---
 
 # Brainstorming
 
-Use this skill to improve the user's decision state while the topic is still open. The output is clearer thinking: grounded problem framing, distinct options, surfaced assumptions, decision factors, and uncertainty that can be acted on.
+Brainstorming makes an open idea or problem clearer. It does not need to end in a decision, design, or maximum number of ideas.
 
-## Principles
+## How to contribute
 
-- **Hold the problem open before narrowing.** When shape, scope, tradeoff, or approach is still unresolved, surface alternatives, assumptions, and decision factors before reducing the conversation to one path [because premature narrowing turns unexplored assumptions into wrong interfaces, missing constraints, or implementation work that has to be undone].
-- **Ground the need before evaluating solutions.** If the user's framing prescribes an action such as "refactor X", "switch to Y", or "add Z", restate the underlying need and named assumptions before comparing approaches [because solution-shaped framings can hide the actual problem the options must solve].
-- **Put materially different options on the table.** Offer approaches that differ in design, scope, ownership, cost, reversibility, or risk; do not count cosmetic variations of one approach as options [because the user cannot reason about tradeoffs without real alternatives].
-- **Make hidden assumptions explicit.** Treat absolute language, fixed tools, prior decisions, and unexplained constraints as assumptions to surface or test [because implicit assumptions silently remove valid option spaces].
-- **Name the decision factors.** When two or more options exist, compare them on observable axes such as reversibility, blast radius, maintenance cost, time-to-first-value, coupling, stakeholder impact, and uncertainty [because explicit factors let the user match options to actual constraints instead of choosing by vibe].
-- **Introduce perspectives outside the user's frame.** Add blind spots, affected stakeholders, failure modes, non-action options, long-term costs, or cross-domain analogies when the conversation is staying inside one frame [because the agent's value in brainstorming is expanding the option space, not just reorganizing what the user already said].
-- **Scale the session to the topic.** A small open question still gets useful exploration, but the response should be proportionate: a short topic may need one reframing, two options, or one decisive question rather than a full workshop [because skipping exploration loses signal, while over-expanding a small topic creates noise].
+- **Work from the live edge.** Find the ambiguity, tension, constraint, or possibility the user is currently trying to understand. Do not restart the topic as a generic workshop.
+- **Add difference, not volume.** Contribute one reframing, direction, assumption, or connection that materially changes how the topic can be seen. More ideas are not automatically better.
+- **Make assumptions visible through consequences.** Show what changes if an assumption is false, a constraint is removed, or another actor bears the cost. Avoid reciting an assumption checklist.
+- **Think with the user.** Build on their reasoning, preserve their agency, and leave room for them to redirect the exploration. Do not quietly replace their question with your preferred one.
+- **Scale depth to the conversation.** Default to one useful expansion and deepen only when the user engages with it or asks for a broader workshop.
 
-## Constraints
+Choose the single move that would add the most understanding now:
 
-- Ask at most one question per message.
-- If the latest user request is a factual lookup, a direct clarification, or a code/action request with no open decision, do not brainstorm; answer or act on that request.
-- If the approach and interfaces are already decided and the remaining work is execution, do not reopen exploration unless the user asks to revisit the decision.
-- Do not choose a direction on the user's behalf unless the user asks for a recommendation.
-- Do not turn brainstorming into spec writing, implementation planning, sub-project decomposition, library selection, file organization, or syntax discussion before the root problem and options are grounded.
-- Do not continue brainstorming after the user signals convergence with language like "let's go with X", "let's plan this out", or "start implementing".
-- Do not leave the current goal to propose unrelated refactors, adjacent projects, or interesting but non-serving directions.
+- reframe what the problem or opportunity might be;
+- introduce a materially different direction;
+- surface an assumption and its consequence;
+- connect an overlooked perspective or adjacent idea;
+- name a tension or tradeoff shaping the space;
+- identify the next question worth exploring.
 
-## Output Shapes
+These are possible moves, not a sequence or required output structure.
 
-Use only the output shapes that match the current conversation. Do not walk this list as a checklist.
+## Interaction
 
-**Reframed problem statement**
-- Use when: the user's opening statement prescribes a solution ("refactor X", "switch to Y", "add Z") rather than stating a need or constraint.
-- Produce: rewrite the framing with embedded assumptions named and the underlying need stated explicitly.
-- Reason: without reframing, every option that follows may solve the wrong problem.
+- Use a question only when the question itself adds understanding—for example, by exposing a hidden premise, reframing the topic, opening a materially different direction, or requesting context required to continue.
+- Let a question be the primary contribution when its value is already visible before the user answers. Otherwise, make the insight directly.
+- Ask at most one question per message. Do not append one merely to hand the conversation back or ask the user to choose between frames you just introduced.
+- Do not impose a fixed number of options or force every topic into option comparison.
+- Do not choose a direction unless the user asks for a recommendation.
+- Do not force convergence. A clearer map, sharper question, or newly visible assumption can be a complete outcome.
+- Keep exploration proportional. A small question may need only a short paragraph and one opening, not a full facilitation session.
 
-**Distinct options on the table**
-- Use when: the user has named one approach without saying it is fixed, or has described a goal without naming an approach.
-- Produce: two or more approaches that lead to materially different designs, not variants of one idea.
-- Watch for: if all options share the same underlying assumption, keep diverging.
+## Boundaries
 
-**Surfaced assumptions**
-- Use when: the user uses absolute language ("we have to", "we can't", "obviously"), references a system/tool/constraint as fixed without justifying it, or treats a prior decision as non-negotiable.
-- Produce: implicit constraints or beliefs as explicit assumptions the user can confirm, reject, or revise.
-- Reason: assumptions left implicit silently exclude option spaces.
+Use this skill when the user explicitly asks to brainstorm or explore, brings an under-formed idea for collaborative thinking, or is genuinely undecided among possible directions.
 
-**Decision factors**
-- Use when: two or more options are on the table and comparison has begun.
-- Produce: the axes along which options differ, such as reversibility, blast radius, maintenance cost, time-to-first-value, coupling, uncertainty, or stakeholder impact.
-- Reason: explicit factors let the user compare against constraints instead of choosing by gut feel.
+Do not trigger merely because the user names a goal without prescribing the implementation. Requests such as “add CSV export,” “fix this bug,” or “write an implementation plan” should proceed in their own workflow unless the user asks to reopen the idea.
 
-**Open questions**
-- Use when: comparison hits a question neither party can answer in the conversation.
-- Produce: facts to gather, people to ask, experiments to run, or constraints to verify before choosing.
-- Reason: making uncertainty explicit prevents premature commitment.
-
-**Blind spots introduced**
-- Use when: detect signals in `references/blind-spots.md` match the current conversation state.
-- Produce: one relevant failure mode, frame lock, missing perspective, inversion, time horizon, or cross-domain analogy.
-- Reason: without injected perspectives, the conversation may only reorganize what the user already thought.
+Do not use brainstorming for factual lookup, settled execution, specification writing, implementation planning, or research. When the user converges—such as “choose the Slack bot,” “plan this,” or “start implementing”—stop exploring and switch to the requested work.
