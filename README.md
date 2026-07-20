@@ -31,6 +31,7 @@ Each skill describes:
 Some skills also include supporting materials such as:
 
 - `examples/`: examples, edge cases, or contrast cases
+- `evaluations/`: behavior cases for comparing a skill with baselines or previous versions
 - `references/`: supporting guidance and judgment frameworks
 - `templates/`: reusable prompt or document templates
 
@@ -41,7 +42,7 @@ The repository already contains skills covering common engineering workflows, in
 - `brainstorming`: turning early ideas into reviewable designs
 - `implementation-judgment`: applying structural judgment before writing behavior-changing code
 - `systematic-debugging`: finding root causes instead of patching symptoms
-- `systematic-research`: validating external information through source-backed research
+- `systematic-research`: turning external topics and questions into clear, comprehensive, evidence-grounded mental models and reports
 - `technical-communication`: writing technical documents that are clear and actionable
 - `understanding-codebases`: building code-backed understanding before making changes
 - `code-review`: performing structured review of code changes

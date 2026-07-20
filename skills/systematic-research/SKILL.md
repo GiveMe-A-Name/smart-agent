@@ -1,70 +1,113 @@
 ---
 name: systematic-research
-description: "Gather and validate information from outside the local codebase — docs, APIs, library behavior, external systems. TRIGGER when: the task requires external information not already verified in context. DO NOT TRIGGER when: all needed information is in the local codebase or already verified."
+description: "Research external topics and questions into clear, well-scoped, evidence-grounded mental models and explanatory reports. Use when the user asks to investigate, understand, compare, or get up to speed on a technology, concept, ecosystem, practice, or current external subject. Do not use when the source of truth is local code, tests, or logs, or when the task only asks to rewrite material already provided."
 ---
 
 # Systematic Research
 
-Use this skill when the task depends on external information that is not already verified in context. External information includes web search results, official documentation, API references, external repositories, RFCs, research papers, expert analysis, package behavior, and external system state.
+Research succeeds when the reader can explain the topic, see how its important parts relate, and judge what matters. A long source list or a large number of searches is not the outcome.
 
-## Principles
+## Research Shapes
 
-- **Treat internal knowledge as a hypothesis.** Use memory to form questions, not to support conclusions [because training data and recalled facts can be stale, wrong, or mismatched to the user's version].
-- **Decompose before searching.** Turn the user's question into specific sub-questions or hypotheses before issuing searches [because vague searches let the first plausible result define the frame and anchor the rest of the research].
-- **Research load-bearing claims, not background.** A claim is load-bearing when changing it would change the answer, confidence label, option ranking, exclusion reason, or recommended next check [because equal effort on non-decision claims wastes context while important claims remain under-evidenced].
-- **Prefer primary and authoritative sources.** Use official docs, specifications, RFCs, changelogs, library source, peer-reviewed research, project-owned issues/discussions, and official ecosystem comparisons before secondary summaries [because retellings drop caveats, version constraints, and contradictions].
-- **Check independence, not citation count.** Treat sources that trace to the same original as one source [because repetition measures propagation, not correctness].
-- **Actively look for disconfirmation.** For the leading answer, run at least one lookup or source check that could refute it or compare a live alternative [because supporting-only evidence cannot distinguish research from confirmation bias].
-- **Calibrate confidence to evidence.** Report unsupported claims as `Unknown` or `unverified`; do not convert absence of evidence into a fact [because downstream decisions need to know whether a claim is established, weak, conflicted, or unresolved].
-- **Switch methods when documentation cannot answer behavior.** If the question is whether something works in practice and sources remain conflicted or inconclusive, prefer a small prototype or executable check in the target environment [because runtime behavior is better evidence than more ambiguous documentation].
+Adapt the depth and output to the request. Research breadth and report depth are separate decisions: the agent may need a broad internal map to avoid a misleading answer, but the user should see only the detail needed for the requested outcome.
 
-## Constraints
+- **Topic orientation** — The user names a subject such as “Research React Server Components.” Default to a concise orientation that lets a technically literate reader understand the central model and practical significance quickly. Do not interpret the word “research” by itself as a request for a comprehensive report.
+- **Targeted question** — The user asks whether a current version supports a behavior or what an external system does. Answer the exact question with version-appropriate evidence; do not expand it into a topic survey unless the surrounding concepts are necessary to avoid a misleading answer.
+- **Comparison or decision** — The user asks which option to use or how approaches differ. Establish decision criteria from the user’s goal, research the differences that change the choice, and give a recommendation or explain why the evidence does not support one.
+- **Deep research** — Expand the full topic map only when the user explicitly asks for an in-depth, comprehensive, systematic, literature-style, or long-form investigation, or when an agreed deliverable requires that depth. Preserve prioritization even in a deep report; depth is not permission to include every fact found.
 
-- Do not use this skill when all needed information is already available from the local codebase, local tests, local logs, or verified conversation context.
-- Before the first search, the notes or response must contain the specific sub-question, hypothesis, or source target being checked.
-- Before final response, every load-bearing claim must have a source basis or an explicit `Unknown`/`unverified` marker.
-- Before using a secondary source for a load-bearing claim, record the primary/authoritative source it traces to; if none is found, mark the claim `secondary-only`.
-- Before counting sources as independent, record that they do not trace to the same original source.
-- Do not present AI-generated summaries, snippets, or examples as corroborating evidence; use them only as pointers toward sources or behavior to verify.
-- Before assigning `High` confidence, record the authoritative source, independent corroborating source, and any checked conflict status.
-- Stop searching when every scoped sub-question has a sourced answer, explicit `Unknown`, or explicit reason for removal from scope.
-- Before concluding on a version-sensitive, time-sensitive, or behavior-sensitive claim, record the current authoritative source used for that exact version, date, environment, or behavior.
+## Core Method
 
-## Research Decisions
+### 1. Frame the research
 
-Use these rules to decide what evidence is sufficient.
+State the question the report must answer and set a useful boundary. Infer reasonable defaults from the request instead of making the user design the research plan.
 
-**Source basis**: For each load-bearing claim, name the source, source tier, date/version relevance when available, and exact claim supported. "Official docs" is not enough; "React API reference, authoritative, current React 19 docs, supports `useActionState` API existence" is enough.
+For a bare topic, identify:
 
-**Source tiers**:
-- **Authoritative**: official documentation, specifications, RFCs, changelogs, library source code, peer-reviewed research, official package/framework/foundation comparisons, and project-owned issues or discussions when they include maintainer evidence.
-- **Established-community**: maintainer-written posts, accepted/high-score Stack Overflow answers with compatible dates and reproducible evidence, dated technical publications that cite primary sources, and maintained integrations with documented production use.
-- **Secondary**: general blogs, tutorials, AI-generated summaries, aggregator pages, forum discussion without primary evidence, and undated summaries.
+- what a reader should understand or be able to decide afterward;
+- which audience and level of detail are reasonable;
+- which neighboring subjects must be distinguished but not researched in full;
+- which parts are stable concepts and which depend on current versions, products, or ecosystem state.
 
-**Cross-validation**: Treat a main conclusion as established only when at least two independent sources support it and at least one is authoritative or established-community. If only one authoritative source directly answers the question, report `Medium` confidence and mark `not independently corroborated`.
+Unless the user signals otherwise, frame the deliverable as a short, decision-ready orientation rather than a reference document or implementation plan.
 
-**Confidence labels**:
-- `High`: authoritative source plus independent corroboration, no unresolved conflict.
-- `Medium`: one authoritative source marked `not independently corroborated`, or two independent established-community sources with no direct contradiction found.
-- `Low`: secondary-only, dated, version-unclear, incomplete, or conflicted evidence.
-- `Unknown`: no source directly answers the question.
+Ask for clarification only when different interpretations would produce materially different reports. Keep the working frame in research notes; do not make the user approve an internal checklist.
 
-**Conflicts**: When sources conflict, compare recency, authority, specificity to the requested version/environment/scope, and provenance. If the conflict remains unresolved, report the conflict instead of collapsing it into one answer.
+### 2. Map the topic
 
-**Open-ended questions**: For "what solutions exist for X?", include options found through authoritative sources, established-community discussions, official ecosystem comparisons, or repeated independent adoption signals. Exclude options found only in unsupported secondary mentions unless they affect the user's decision; state the exclusion reason for searched-but-omitted options.
+Build an initial knowledge map before collecting details. The map should contain concepts and relationships, not just section names. Refine it as evidence changes the understanding, but do not let the first source define the report outline.
 
-**Specific support questions**: For "does library X support Y?", end with `yes`, `no`, or `unknown`, attach the best source for the exact version, and apply the confidence rules.
+Choose the perspectives that make this topic understandable. Common lenses include:
 
-**Prototype switch**: Stop researching and run or propose an executable check when documentation conflicts, two implementation approaches remain equally supported after source review, or implementation behavior has consumed 30+ minutes of research without resolving the main uncertainty. Stay in research for design direction, architecture, tradeoff evaluation, and high-risk domains such as security, data integrity, and compliance.
+- definition, boundary, and purpose;
+- origin or problem context;
+- core mechanism, participants, lifecycle, or data flow;
+- relationships to adjacent or commonly confused concepts;
+- practical use, ecosystem, adoption, and maturity;
+- benefits, constraints, tradeoffs, and failure modes;
+- appropriate and inappropriate use cases;
+- current disagreements, evolution, and open questions.
 
-For deeper methodology, see `references/epistemic-foundations.md`. For recurring research scenarios, see `references/research-patterns.md`.
+These are prompts for internal coverage, not mandatory report headings. Add topic-specific lenses and omit generic ones that do not improve the reader’s model. Mark the map’s load-bearing nodes: claims or relationships that would change the explanation, comparison, or recommendation if wrong. A broad map protects against omissions; it does not require every branch to appear in the output.
 
-## Examples
+### 3. Investigate the map
 
-**Positive example — external API support question**
+Research to fill important gaps and test the load-bearing parts of the map. In the default mode, stop after the central model and consequential implications are supported; do not deepen peripheral branches merely because they are interesting.
 
-User asks whether library X version 4 supports feature Y. Decompose into: current target version; official documentation or changelog for feature Y; source or issue evidence if docs are incomplete; one disconfirming lookup for removed, experimental, or renamed APIs. A complete answer ends `yes`, `no`, or `unknown`, includes the best source for the exact version, and assigns confidence using the label rules above.
+- Use primary or authoritative sources for definitions, specifications, contracts, versions, and official behavior.
+- Use independent implementation evidence, maintainer discussion, credible practitioner experience, or executable checks for operational limits, adoption, failure modes, and behavior that documentation does not settle.
+- Trace consequential claims in secondary sources to their origin. Search snippets and AI-generated summaries are discovery aids, not evidence.
+- Check dates, versions, environments, and evaluation settings before applying a finding to the requested scope.
+- Seek contrary evidence when a claim is disputed, surprising, recommendation-changing, or supported only by an interested party. Do not perform a ceremonial disconfirmation search for every ordinary fact.
+- When sources conflict, explain whether the difference comes from version, scope, method, or unresolved disagreement. Do not silently choose the convenient source.
+- When documentation cannot settle behavior, prefer a small reproducible test over further ambiguous searching.
 
-**Boundary example — local-codebase question**
+Treat unsupported content as an inference, disputed claim, or unknown. Formal source tiers and confidence labels are optional; use them only when they help the reader judge consequential uncertainty.
 
-User asks where the current project handles client errors. Do not use this skill if the answer can be found by reading local files, call sites, tests, or logs already available in the workspace. External research would add noise because the source of truth is the project code, not web documentation.
+### 4. Synthesize for understanding
+
+Organize the report in the order a reader should learn the topic, not the order in which sources were found.
+
+Lead with the central point: what the subject is, why it exists, and what matters most about it. Then establish the smallest accurate mental model. Use one concrete example, request path, lifecycle, or scenario to explain the main mechanism, and state what the example teaches.
+
+### Default depth
+
+For an ordinary topic request, produce a briefing that can be read in roughly five minutes. Prefer:
+
+- the central conclusion and why the topic matters;
+- the smallest useful model of how it works;
+- only the three to five implications, distinctions, or tradeoffs most important to understanding or judgment;
+- one current caveat or unresolved issue when it materially changes the picture;
+- direct sources for consequential claims.
+
+Do not add a migration plan, production checklist, exhaustive history, full option landscape, capacity test matrix, or catalogue of edge cases unless the user asks for it or its absence would make the conclusion unsafe or misleading.
+
+### Deep-research depth
+
+When deeper research is explicitly requested, expand the parts of the knowledge map that serve that request. A deep report may cover history, mechanisms, ecosystem, competing views, operational concerns, and open questions, but it still needs an executive summary and clear prioritization so the reader can stop after forming the main judgment.
+
+These are output contracts, not fixed tables of contents. Merge, reorder, or omit sections to preserve a clear explanation. Keep evidence subordinate to understanding: cite claims where readers may need to verify them, but do not turn the report into a research log.
+
+## Completion Standard
+
+Before finishing, check the report from the reader’s perspective:
+
+- Can the reader explain what the topic is, why it exists, and how its central mechanism works?
+- Are the important concepts connected rather than presented as an inventory?
+- Are boundaries and commonly confused neighboring concepts clear?
+- Does the coverage include the tradeoffs, constraints, and practical consequences that materially shape understanding?
+- Are current, disputed, behavioral, and recommendation-changing claims supported by appropriate evidence or marked unresolved?
+- Does the opening give a useful overview before detail, and does each later section deepen that model?
+- Did every expanded section earn its place from the user’s requested depth or from a fact that changes the main understanding?
+- Would more searching change the knowledge map or a consequential conclusion? If not, stop.
+
+Do not equate completeness with length. A focused report that creates an accurate, usable mental model is more complete than an exhaustive catalogue that leaves the reader to assemble the topic themselves.
+
+## Boundaries
+
+- Do not use external research to answer questions whose source of truth is the local repository, its tests, logs, or runtime state.
+- Do not present one framework’s implementation as the universal definition of a broader concept.
+- Do not hide a narrow research scope behind broad conclusions.
+- Do not pad the report with history, option lists, benchmark tables, or citations that do not change understanding.
+- Do not turn a default orientation into an implementation guide, operational runbook, or exhaustive reference because additional useful material was found.
+- Do not expose chain-of-thought, raw search notes, or a source-by-source diary unless the user explicitly asks for research provenance.
