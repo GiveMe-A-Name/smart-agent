@@ -41,7 +41,7 @@ The repository already contains skills covering common engineering workflows, in
 
 - `brainstorming`: collaboratively exploring open ideas and problems to make the possibility space clearer
 - `implementation-judgment`: applying structural judgment before writing behavior-changing code
-- `systematic-debugging`: finding root causes instead of patching symptoms
+- `systematic-debugging`: preventing premature fixes and false completion when debugging observed failures
 - `systematic-research`: turning external topics and questions into clear, comprehensive, evidence-grounded mental models and reports
 - `technical-communication`: writing technical documents that are clear and actionable
 - `understanding-codebases`: building code-backed understanding before making changes
