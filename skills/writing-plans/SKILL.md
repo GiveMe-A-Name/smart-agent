@@ -15,6 +15,7 @@ Turn a confirmed implementation target into a right-sized execution plan.
 - **Plan the contract, not the implementation recipe.** Specify system promises, inputs, outputs, errors, ownership, and verification; leave library choice, local code shape, and small refactors to execution unless they are already decided constraints [because over-specified plans block execution-time judgment when code evidence changes]
 - **Make design intent and solution shape visible before decomposition.** If multiple plausible designs could satisfy the same user direction, explain why this approach was chosen and what responsibility shape the code or system should have after the change [because humans need to approve the agent's interpretation of the problem and design direction, not just the final behavior]
 - **Different decisions need different reading surfaces.** Put outcome approval in a concise Decision Brief, design approval in a separate Design Review only when a human choice can materially change the solution, and files, commands, and task order in the Execution Plan [because mixing product alignment, architecture review, and cold-start instructions forces every reader through detail unrelated to their decision]
+- **Human approval surfaces use plain language.** Write the Decision Brief and Design Review for a reader with basic technical knowledge but no knowledge of the repository. Lead with practical effects and use user, product, and domain language; technical precision may supplement that explanation but must not replace it [because humans should approve the actual change and tradeoff, not first translate implementation language]
 - **Each fact has one canonical home.** Outcome and scope belong in the Decision Brief; architecture and alternatives belong in Design Review; files, commands, and task order belong in the Execution Plan [because repeating the same rationale or sequence across surfaces increases reading cost and lets copies drift]
 - **Design detail is conditional on approval risk, not plan size.** Include Design Review when choosing differently would materially change a public contract, safety or data property, ownership boundary, runtime boundary, migration, rollback, or long-term dependency shape [because crossing layers or editing several modules does not by itself create a human design decision]
 - **Detail decays with distance.** Fully detail only tasks whose inputs are known now. Later tasks that depend on findings from earlier tasks stay goal-level with revision triggers [because detailed future steps built on unknown outcomes turn assumptions into instructions]
@@ -73,6 +74,18 @@ Read `references/planning-methodology.md` only when task boundaries, dependency 
 
 Classify each risk response by whether it stays inside the approved surface. Keep plan-internal responses with execution risks; put approval-changing conditions only in Stop Signals. Do not copy the same condition into both sections. When a Primary Risk needs an operational stop condition, reference it briefly and state only the observable trigger rather than repeating its rationale.
 
+## Human Approval Language
+
+Apply these rules to the Decision Brief and any Design Review, not to the agent-facing Execution Plan:
+
+- Assume the reader understands common software concepts such as APIs, databases, configuration, requests, responses, permissions, and compatibility, but does not know this repository.
+- State the practical effect before the precise technical term. Do not use jargon such as idempotency, decoupling, trust boundary, or backward compatibility as a substitute for explaining what changes for users, operators, safety, compatibility, or future maintenance.
+- When a necessary specialist term first appears, explain it immediately in everyday words and state why it matters to the approval decision.
+- Decision Briefs avoid repository-internal module, class, function, and acronym names. Design Reviews may use them when they help identify an approval-relevant responsibility, boundary, or flow; on first use, explain in plain language what the named element does and why it matters. Expand or directly explain internal acronyms.
+- Do not fail an approval surface merely because it contains technical or internal names. Fail it when understanding the proposed change, preserved behavior, decision, or practical consequence depends on repository knowledge or unexplained terminology.
+
+Before handoff, test whether a reader with basic technical knowledge but no repository knowledge can state in their own words: what will change, what will remain unchanged, what needs approval, and what practical cost or risk the choice carries. Rewrite the approval surface if any answer requires interpreting internal names or specialist jargon.
+
 ## Design Review Gate
 
 Add `## Design Review` only when repository evidence or the user's request shows at least one approval-relevant consequence:
@@ -104,6 +117,7 @@ Do not include full production code, line-level edits, file maps, task sequencin
 ## Decision Brief Constraints
 
 - The first substantive section after an optional document title is `## Decision Brief`, containing **Intent**, **Outcome**, and **Scope** in that order.
+- Lead with user-visible or domain consequences and concrete behavior. Common software concepts are allowed, but internal repository names and unexplained specialist terms are not.
 - Intent states the problem or value and desired direction without restating Outcome. Outcome is one concise sentence describing what will be observably true after execution. Scope names affected product/domain areas and any adjacent non-area whose preservation is approval-critical.
 - Add **Visible Changes** only when evidence shows multiple behavior outcomes, a public/developer contract change, compatibility expectation, migration, restored behavior, or multiple valid interpretations. Use the shortest complete form: scenario bullets, Before/After pairs, a contract diff, a behavior matrix, or invariants.
 - Add **Approval Needed** only when a reasonable human could choose differently and that choice changes outcome, compatibility, ownership, dependency, rollout, risk, or scope. Omit the field when no such choice exists.
@@ -116,6 +130,7 @@ Read `references/decision-brief.md` when a visible behavior delta needs a compac
 ## Design Review Constraints
 
 - Design Review appears after the Decision Brief and before Situation Assessment only when the Design Review Gate has observable evidence.
+- Explain what each proposed choice makes easier, safer, harder, or more likely to fail before naming its technical mechanism. Necessary repository-internal names are allowed under Human Approval Language when they make the approval-relevant design more precise.
 - Include only representations that let the reviewer decide the triggered issue; do not populate a fixed field list.
 - Stable architecture anchors, public/internal contract names, compact data shapes, diagrams, and pseudocode are allowed when they expose the approval choice. Exact files, task steps, and private helper details belong in the Execution Plan.
 - If implementation evidence invalidates an approved design decision, stop and request re-approval rather than silently changing the frozen approval surface.

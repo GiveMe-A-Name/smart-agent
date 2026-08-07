@@ -12,6 +12,8 @@ The plan has up to three reading surfaces:
 
 The review identifies concrete failure mechanisms and the smallest correction. It is not a request to rewrite the plan in the reviewer's preferred style.
 
+Treat human-readable approval language as a correctness condition, not a style preference. The Decision Brief and Design Review must be understandable to a reader with basic technical knowledge but no knowledge of the repository. Technical or internal names are not failures by themselves; unexplained dependence on them is.
+
 ## Required Context
 
 Before reviewing:
@@ -42,6 +44,7 @@ Block when:
 - Primary Risk appears for ordinary implementation difficulty, or a direction-changing uncertainty is hidden only in technical tasks
 - task summaries, task ordering, file maps, or technical assessment leak into the brief
 - the same fact is repeated across multiple fields without serving a different approval question
+- a reader must know repository-internal names or unexplained specialist terminology to understand what changes, what stays unchanged, what needs approval, or why the practical effect matters
 
 Do not block because an optional field is absent when its trigger is absent.
 
@@ -62,6 +65,8 @@ Block when:
 - it repeats the same information in a diagram, topology, responsibility list, flow, and boundary list
 - it invents alternatives unsupported by repository evidence or user direction
 - it contains exact file edits, task sequence, production code, or private helper detail
+- it relies on technical labels instead of stating what each choice makes easier, safer, harder, or more likely to fail
+- an approval-relevant internal module, class, function, or acronym appears without a first-use explanation of its responsibility and why it matters; do not report the name merely for appearing
 - tasks contradict the approved contract, boundary, dependency, failure policy, migration, or rollout without a stop signal
 
 Do not require a fixed set of fields. One diagram, behavior matrix, contract diff, pseudocode block, or migration sequence may be sufficient.
@@ -176,6 +181,7 @@ Stop after three review iterations. If blocking issues remain, surface them rath
 - Decision Brief: pass/fail
 - Design Review gate: pass/fail/not applicable
 - Design Review content: pass/fail/not applicable
+- Human approval language: pass/fail
 - Cold-start executability: pass/fail
 - Assessment evidence: pass/fail
 - Decomposition: pass/fail
