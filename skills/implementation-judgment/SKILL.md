@@ -5,41 +5,89 @@ description: "Choose a structurally sound change shape from an evidence-backed w
 
 # Implementation Judgment
 
-Use an evidence-backed working model of the current system to decide how a behavior change should land. The target is not the smallest diff or the cleanest imaginable architecture. Choose a design that fully carries the current requirement without degrading the relevant structure, while keeping unrelated redesign out of scope.
+Use the current-system working model as evidence for deciding how a behavior change should land. Do not optimize for either the smallest diff or an idealized architecture. Choose the narrowest coherent intervention that carries the requirement without degrading the structure it exercises.
 
-## Principles
+## Decide Whether to Apply
 
-- **Separate current-system evidence from future design.** Treat the working model as evidence of how the system is designed, how it behaves, and why it may have evolved that way; use it as input rather than assuming the current behavior owner must remain the future owner.
-- **Keep quality above the floor and scope below the ceiling.** The change must not buy a small diff with misplaced responsibility, duplicated policy, caller-specific branches, hidden contract changes, or wrong-way dependencies. Stop once the requirement has a coherent owner and the structural pressure introduced or exposed by this change is resolved [because adjacent redesign adds risk without helping the current outcome].
-- **Put responsibility where the complete decision can be made.** Parsing belongs at an input boundary, domain policy with domain context, persistence invariants with the state owner, and recovery with the caller that can choose retry, rollback, user response, or alerting [because splitting one concern across partial owners produces inconsistent behavior].
-- **Preserve observed contracts deliberately.** Return values, errors, side effects, persistence, events, ordering, timing, caching, and identity are contracts when callers can observe them. Preserve them, change them explicitly, or provide a staged compatibility path.
-- **Abstract shared knowledge, not surface similarity.** Create a shared abstraction when current consumers must obey the same rule and change for the same reason. Keep similar-looking code separate when its policy, lifecycle, security boundary, or owner differs; a single-use helper may name or decompose behavior without pretending to be a reusable extension point.
-- **Use preparatory refactoring when the current structure obstructs a clean change.** Make a bounded behavior-preserving structural move that creates the needed seam or owner, verify it, then add the behavior. Use a focused structural change when no such preparation can prevent the feature from deepening a known boundary problem.
-- **Treat verification as design evidence.** Tests support the chosen shape only when they still assert caller-observable behavior; do not weaken tests, snapshots, types, lint rules, or verification scope to make an unsuitable design pass.
+Apply the rest of this skill when the working model leaves a meaningful choice about the behavior owner, observable contract, abstraction boundary, dependency direction, state or failure ownership, migration, or whether a local patch is structurally complete.
 
-## Decision Constraints
+Otherwise, stop here and proceed with the established local change. Do not run the full judgment checks when one owner clearly contains the change, observable contracts are preserved, and no new abstraction, cross-boundary dependency, persistent-state transition, or migration is introduced. Judge this gate by structural uncertainty, not task size or line count.
 
-Before choosing an intervention, establish the requested behavior, caller-visible behavior that must be preserved, and available acceptance evidence. If materially different outcomes would all satisfy the wording, or no observable result distinguishes success, clarify the requirement before designing the change. Treat user-stated non-goals as scope constraints.
+## Establish the Decision
 
-Before writing behavior-changing code, choose and be able to justify one intervention:
+Before designing the change, establish:
 
-- **Local change** only when the behavior fits the existing owner and does not add split responsibility, duplicated policy, a caller-specific switch, a wrong-way dependency, or an unacknowledged contract change.
-- **Preparatory refactoring** when a specific existing structure blocks the clean behavior change and a bounded, behavior-preserving move can remove that obstruction.
-- **Focused structural change** when every local option would violate an ownership, abstraction, contract, dependency, or state boundary. Limit it to the boundary the current requirement actually exercises.
-- **Staged change** when compatibility, persisted data, deployment order, or rollback requires old and new shapes to coexist.
-- **Pause** when the working model cannot establish the relevant owner, caller contract, state source, or migration order. Name the missing evidence that could change the design decision; do not restart a broad repository investigation.
+- the requested observable result and acceptance evidence;
+- the current behavior owner and the context it has;
+- caller-visible behavior that must be preserved, intentionally changed, or migrated; and
+- explicit non-goals and adjacent behavior that remains out of scope.
 
-When a change adds or alters an external entry point, identity or permission flow, sensitive-data path, secret handling, or dependency across a trust boundary, identify who authenticates the actor, where authorization is enforced, what data crosses the boundary, and which side validates it. Do not choose a design that relies on client-side checks, caller-supplied identity, implicit trust, or broader data or dependency access than the requirement needs.
+Clarify the requirement when materially different outcomes satisfy its wording or no observable result distinguishes success. Pause when missing evidence about the owner, contract, state source, or migration order could change the design; name that evidence instead of restarting a broad investigation.
 
-Do not generalize from a hypothetical future consumer, extract an abstraction only to remove visual duplication, or expand the change to repair unrelated debt. When the chosen design materially affects the implementation, state the owner, contract treatment, structural intervention, and excluded adjacent work.
+## Choose One Intervention
 
-Read `references/judgment-dimensions.md` when the change presents a concrete ownership conflict, strained abstraction, shared contract change, trust-boundary or sensitive-data change, cross-boundary dependency, persistent state transition, or migration.
-Read `references/performance-dimensions.md` when the proposed shape adds I/O, work inside a growing loop, persistent resources, database access, caching, or concurrency.
+- **Local change:** the behavior fits the existing owner and preserves its boundaries.
+- **Preparatory refactoring:** a bounded, behavior-preserving move can create the seam or owner needed by the behavior change. Verify the preparation against the old contract before adding new behavior.
+- **Focused structural change:** every local patch would deepen a demonstrated ownership, abstraction, contract, dependency, or state problem. Limit the correction to the boundary exercised by the requirement.
+- **Staged change:** old and new contracts, data shapes, deployments, or rollback paths must coexist during migration.
+- **Pause:** the evidence needed to choose safely is unresolved.
 
-Example index:
+Judge scope by coherence, not line count. A multi-file change can be the narrowest valid intervention; a one-line conditional can be structurally incomplete.
 
-| Example | Read when |
-|---|---|
-| `examples/wrong-abstraction.md` | Similar code may represent shared knowledge or independent policies. |
-| `examples/complexity-misplacement.md` | One validation, transformation, or recovery concern is split across layers. |
-| `examples/implicit-contract-break.md` | A signature-safe refactor may change caller-observable behavior. |
+## Check the Change Shape
+
+Use this as a required checking skeleton, not a formula with predetermined answers. Spend detail only on dimensions the change actually exercises.
+
+### Ownership and complexity
+
+Put a complete concern where the full decision can be made. Keep transport parsing at the transport boundary, domain policy with domain context, persistence invariants with the state owner, and recovery with the caller that can choose retry, rollback, user response, or alerting.
+
+Crossing layers is valid when each layer enforces a distinct boundary-owned rule. It is split ownership when several layers each implement fragments of one rule. For example, in `route -> service -> storage`, keep request parsing in the route, the complete domain validation rule in the service, and storage invariants in storage.
+
+### Abstraction
+
+Share code when consumers represent the same knowledge or invariant, change for the same reason, and can use one contract without caller-specific branches. Keep similar code separate when owners, policies, lifecycles, or change drivers differ. If policies differ but share a mechanism, extract only the stable primitive.
+
+Do not infer an abstraction from duplication count. A helper whose flags or branches map to caller identities is usually combining independent policies; duplicated authoritative knowledge that must change together usually needs one owner.
+
+### Observable contracts
+
+Treat any caller-observable return, error, side effect, persistence result, event, ordering, timing, caching behavior, or reference identity as part of the contract. Mark each affected behavior as `preserve`, `intentionally change`, or `migrate`.
+
+Signature compatibility alone is insufficient. For example, changing a cached API from sync to async can alter error propagation, first-load concurrency, ordering, and object identity even after every caller adds `await`. Prefer an additive contract or staged migration when consumers cannot move atomically.
+
+### Trust boundaries
+
+When changing an entry point, authentication or authorization flow, tenant boundary, secret, sensitive field, upload, redirect, deserialization path, or privileged dependency:
+
+- identify the untrusted input, authenticated actor, protected resource, and trusted enforcement point;
+- enforce authorization on the trusted side against the requested action and resource;
+- follow untrusted data to its sensitive sink using repository-established validation and escaping; and
+- minimize returned fields, logged values, error detail, credentials, and filesystem or network reach.
+
+Pause if the enforcement point, actor-to-resource rule, or data sensitivity is unknown.
+
+### Dependencies, state, and failure
+
+Keep dependency direction explicit: specific policy may depend on a stable primitive; a general primitive should not import volatile feature policy. Keep one authoritative owner for mutable state, and define precedence and repair when state is copied or cached.
+
+For multi-step persistent work, identify the state after each failure point. Use atomicity, idempotency, compensation, or an explicit recoverable state where partial progress would otherwise be ambiguous. If local and remote state can advance independently, account for replay and reconciliation. Use an additive or staged transition when deployment order, schema compatibility, or rollback affects safety.
+
+### Scope and verification
+
+Include structural work only when the current requirement needs it for a coherent owner, contract, dependency direction, or state transition. Leave adjacent debt alone when the change neither exercises nor worsens it.
+
+Verify caller-observable behavior at the responsible boundary. Do not weaken tests, snapshots, types, lint rules, or checks to make the design pass. Stop expanding when the requirement has one explainable owner, shared knowledge is neither duplicated nor forced together, contracts and state transitions are explicit, and the remaining improvements do not affect the requested behavior.
+
+## Communicate the Judgment
+
+Complete the checks internally. Report only what helps the user evaluate the change:
+
+- the selected intervention and behavior owner;
+- how affected observable contracts are preserved, changed, or migrated;
+- material structural or failure risks and their verification; and
+- excluded adjacent work when the boundary could otherwise be mistaken for an omission.
+
+Explain rejected alternatives only when they are genuinely plausible. Do not turn the checking skeleton into a verbose, dimension-by-dimension report.
+
+Read `references/performance-dimensions.md` only when the proposed shape adds I/O, work that grows with input or state, persistent resources, database access, caching, or concurrency.
