@@ -1,6 +1,6 @@
 # Independent Plan Review Guidance
 
-Use this guidance when a plan requires independent review. Review whether a fresh human can approve the right decision and a fresh agent can execute safely; do not reward section count or template completeness.
+Use this guidance only when the caller explicitly requests independent review. This guidance does not decide whether a plan needs review: the calling `writing-plans` skill invokes it only on that explicit request. Review whether a fresh human can approve the right decision and a fresh agent can execute safely; do not reward section count or template completeness.
 
 ## Review Contract
 
@@ -150,8 +150,6 @@ Blocking threshold:
 
 - Large: fix Critical and Important issues before handoff
 - Medium: fix Critical issues; surface Important issues to the human reviewer
-
-For Medium plans, independent review is required by default. It may be skipped only when the plan affects one domain without changing a public contract or service/process/persistence/trust/external-dependency/cross-team boundary, has no unresolved risk capable of changing approved outcome/scope/design, needs fewer than two contingencies, and names a repository-verified existing pattern. If any condition is false or unknown, review is required.
 
 Stop after three review iterations. If blocking issues remain, surface them rather than polishing the document indefinitely.
 

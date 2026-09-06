@@ -141,21 +141,9 @@ Read `references/design-review.md` only after the Design Review Gate triggers an
 
 ## Independent Review
 
-Use independent review only when the plan has evidence of coordination risk. The review exists to catch gaps the planner is least likely to notice: unverified assumptions on the critical path, cross-boundary contract mismatches, and plans that look complete but cannot be executed cold.
+Independent review is opt-in. Do not launch a reviewer, perform a separate reviewer pass, or delay handoff for independent-review findings unless the caller explicitly asks for an independent review. Do not infer that request from plan size, coordination risk, architectural boundaries, or unresolved uncertainty.
 
-**Large — review required.** Large plans affect multiple components or architectural boundaries, so a single planner is likely to overweight the path they just designed and miss downstream coupling.
-
-**Medium — review required by default.** Skip independent review only when all evidence below is present:
-- the plan affects one domain and does not introduce or change a public contract, service, process, persistence, trust, external-dependency, or cross-team boundary
-- no unresolved risk can change the approved outcome, scope, or design
-- fewer than 2 contingencies are needed
-- the assessment names an existing codebase pattern already verified in repository evidence
-
-If any skip condition is false or cannot be established from the plan and repository evidence, review is required [because an incomplete skip case is evidence that the planner's assumptions or coordination surface need a fresh check].
-
-**Tiny/Small — review skipped.** The review overhead exceeds value when the plan changes one known behavior path, uses exact files, and has a single verification command.
-
-When review is required, launch a fresh sub-agent reviewer when the environment supports sub-agents. Give it a bounded review packet, not the whole planning conversation: the plan document, the original user-visible intent, non-negotiable user constraints, the frozen Decision Brief and Design Review if one exists, repository instructions or architecture docs named by the plan, and the exact files the plan cites as evidence or modification targets. Ask the reviewer to follow `plan-document-reviewer-prompt.md` and to flag missing context instead of inferring it [because independence catches planner rationalization, while a bounded packet prevents a context-poor reviewer from inventing priorities outside the user's intent].
+When the caller explicitly requests independent review, launch a fresh sub-agent reviewer when the environment supports sub-agents. Give it a bounded review packet, not the whole planning conversation: the plan document, the original user-visible intent, non-negotiable user constraints, the frozen Decision Brief and Design Review if one exists, repository instructions or architecture docs named by the plan, and the exact files the plan cites as evidence or modification targets. Ask the reviewer to follow `plan-document-reviewer-prompt.md` and to flag missing context instead of inferring it [because independence catches planner rationalization, while a bounded packet prevents a context-poor reviewer from inventing priorities outside the user's intent].
 
 The planner remains responsible for adjudication. For every Critical or Important reviewer issue, classify it before editing the plan:
 - **Accept:** the issue cites plan text, user intent, repository evidence, or a missing context/file condition that can break execution; update the plan.
