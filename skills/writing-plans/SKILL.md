@@ -68,7 +68,7 @@ Medium/Large plan body:
 - file map: exact existing files for planned modifications; directories/modules for new files when names are not yet certain
 - ordered tasks with purpose line, dependencies, concrete changes, verification, and commit point
 - Final Verification with the complete final command set and expected output
-- `## Execution Log` placeholder described in Execution Handoff
+- execution-log section described in Execution Handoff
 
 Read `references/planning-methodology.md` only when task boundaries, dependency order, contingencies, or stop signals need more guidance than the constraints above; do not load it based on plan size alone. Read `references/estimation.md` only when the user asks for effort, duration, staffing, or scheduling estimates, or repository convention requires them.
 
@@ -160,13 +160,9 @@ Approved Decision Brief and Design Review sections are read-only; any semantic c
 
 Save Medium/Large plans to `docs/plans/YYYY-MM-DD-<name>.md`. Save Tiny/Small plans only when the user asked for a persistent plan or the repo convention requires it. The plan settles scope and targets; execution still requires judgment about how each change lands.
 
-Include an `## Execution Log` section at the bottom of saved plans with exactly this placeholder line:
+Include an execution-log section at the bottom of saved plans. The executor may use a different skill and read only the plan, so place the short, labeled instruction bullets from `references/execution-handoff.md` in that section. Render the heading and instructions in the plan's language (for example, `## 执行日志` in a Chinese plan); preserve exact code names and commands. The bullets structure the guidance, while log entries remain free-form.
 
-```
-*(append entries here as each task completes - format: `[YYYY-MM-DD] Task N: what was done and why; key decisions; any failures and how they were fixed`)*
-```
-
-For log entry format, read-only constraints, failed-task recording, and revision mechanics, see `references/execution-handoff.md` before executing or revising a saved plan.
+Read `references/execution-handoff.md` when writing this instruction and before executing or revising a saved plan. It defines log guidance, final reconciliation, read-only constraints, and revision mechanics.
 
 ## Design Review Examples
 

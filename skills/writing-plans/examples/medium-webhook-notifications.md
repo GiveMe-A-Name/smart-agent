@@ -89,4 +89,8 @@ Files: `notifications/webhook.py`; new `notifications/retry.py`; `tests/notifica
 
 ## Execution Log
 
-*(append entries here as each task completes - format: `[YYYY-MM-DD] Task N: what was done and why; key decisions; any failures and how they were fixed`)*
+- **Language:** Write in the same language as this plan.
+- **When to update:** After each task, before starting the next, append a dated entry identifying the task. Before handing off incomplete work, record progress and remaining work. Update this document, not only the chat.
+- **What to write:** Explain in plain language what now happens under which conditions, or what the investigation established, and give actual verification results. Avoid abstract summaries such as "completed integration."
+- **Final reconciliation:** Before final delivery, check the log against the tasks, promised behavior, and final checks. State unmet requirements and checks that failed or were not run.
+- **Change boundaries:** Preserve approved decisions, designs, and started or completed task specifications. If the approved scope or design must change, propose the replacement and obtain confirmation.
