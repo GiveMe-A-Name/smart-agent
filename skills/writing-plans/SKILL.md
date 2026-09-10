@@ -158,7 +158,7 @@ Approved Decision Brief and Design Review sections are read-only; any semantic c
 
 ## Execution Handoff
 
-Save Medium/Large plans to `docs/plans/YYYY-MM-DD-<name>.md`, then offer to execute. Save Tiny/Small plans only when the user asked for a persistent plan or the repo convention requires it. The plan settles scope and targets; execution still requires judgment about how each change lands.
+Save Medium/Large plans to `docs/plans/YYYY-MM-DD-<name>.md`. Save Tiny/Small plans only when the user asked for a persistent plan or the repo convention requires it. The plan settles scope and targets; execution still requires judgment about how each change lands.
 
 Include an `## Execution Log` section at the bottom of saved plans with exactly this placeholder line:
 
