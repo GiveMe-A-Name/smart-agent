@@ -3,6 +3,7 @@
 ## Change Model
 
 - **Intent:** [Observable behavior the change is meant to produce and the evidence source.]
+- **Operating context:** [Actual deployment, supported usage, and relevant assumptions or limits.]
 - **Semantic center(s):** [Decision, state transition, boundary, contract, or orchestration point that makes each material behavior delta happen.]
 - **Behavior/contract delta:** [What becomes observably different.]
 - **Affected boundaries:** [Relevant callers, consumers, state, side effects, deployment, or operational surfaces inspected.]
@@ -10,7 +11,7 @@
 
 ## Design Assessment
 
-[State whether responsibility placement and affected boundaries are sound. Cite the code, contract, convention, or history that supports the conclusion.]
+[State whether responsibility placement, affected boundaries, and added complexity fit actual use. Cite the code, contract, convention, or history that supports the conclusion.]
 
 ## Findings
 
@@ -19,8 +20,8 @@
 ### [Finding title]
 
 - **File:** `path/to/file:line`
-- **Failure:** [Changed decision and what is wrong.]
-- **Trigger:** [Reachable input, state, caller, consumer, or operational condition.]
+- **Issue:** [Changed decision and what is wrong.]
+- **Condition or burden:** [Reachable failure condition, or the unsupported scope or redundant protection and its concrete maintenance burden.]
 - **Consequence:** [Observable correctness, security, data, compatibility, operability, or maintainability impact.]
 - **Direction:** [Supported fix direction, when clear.]
 

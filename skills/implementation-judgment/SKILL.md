@@ -5,7 +5,7 @@ description: "Choose a structurally sound change shape from an evidence-backed w
 
 # Implementation Judgment
 
-Use the current-system working model as evidence for deciding how a behavior change should land. Do not optimize for either the smallest diff or an idealized architecture. Choose the narrowest coherent intervention that carries the requirement without degrading the structure it exercises.
+Use the current-system working model as evidence for deciding how a behavior change should land. Judge necessity against actual operating conditions and supported use. Do not optimize for either the smallest diff or an idealized architecture. Choose the narrowest coherent intervention that carries the requirement without degrading the structure it exercises.
 
 ## Decide Whether to Apply
 
@@ -18,11 +18,12 @@ Otherwise, stop here and proceed with the established local change. Do not run t
 Before designing the change, establish:
 
 - the requested observable result and acceptance evidence;
+- the actual deployment, users, operation flow, data access, and supported usage relevant to the decision;
 - the current behavior owner and the context it has;
 - caller-visible behavior that must be preserved, intentionally changed, or migrated; and
 - explicit non-goals and adjacent behavior that remains out of scope.
 
-Clarify the requirement when materially different outcomes satisfy its wording or no observable result distinguishes success. Pause when missing evidence about the owner, contract, state source, or migration order could change the design; name that evidence instead of restarting a broad investigation.
+Clarify the requirement when materially different outcomes satisfy its wording or no observable result distinguishes success. Resolve missing context only when it could materially change the current design; name that evidence instead of restarting a broad investigation. Missing information is not evidence for the most demanding deployment or failure scenario.
 
 ## Choose One Intervention
 
@@ -37,6 +38,14 @@ Judge scope by coherence, not line count. A multi-file change can be the narrowe
 ## Check the Change Shape
 
 Use this as a required checking skeleton, not a formula with predetermined answers. Spend detail only on dimensions the change actually exercises.
+
+### Operating context and defensive scope
+
+Ground assumptions in the request, callers, configuration, and actual deployment. Database or network access alone does not imply a public service, multiple tenants, competing writers, or distributed deployment. Do not build mechanisms for a hypothetical future environment.
+
+Cover supported workflows and reasonable everyday mistakes. An imaginable operation does not automatically become a supported use case: unusual unsupported operations may fail clearly or require the user to rerun the task. Before adding recovery, coordination, fallback, or compatibility machinery, establish why that outcome is inadequate for current use and why the benefit warrants the implementation and maintenance cost. Do not invent frequency estimates to justify either adding or removing a defense.
+
+Keep inexpensive checks when they provide a concrete benefit, such as a clearer error, without adding disproportionate complexity or hiding a defect. Low frequency alone is not a reason to remove a useful check. For example, a local read-only reporting tool need not acquire service-style coordination merely because a user could move its working directory while it runs.
 
 ### Ownership and complexity
 
@@ -58,14 +67,14 @@ Signature compatibility alone is insufficient. For example, changing a cached AP
 
 ### Trust boundaries
 
-When changing an entry point, authentication or authorization flow, tenant boundary, secret, sensitive field, upload, redirect, deserialization path, or privileged dependency:
+Apply these checks to trust boundaries actually exercised by the change, such as authentication, authorization, tenant isolation, untrusted input, sensitive data, or privileged operations:
 
 - identify the untrusted input, authenticated actor, protected resource, and trusted enforcement point;
 - enforce authorization on the trusted side against the requested action and resource;
 - follow untrusted data to its sensitive sink using repository-established validation and escaping; and
 - minimize returned fields, logged values, error detail, credentials, and filesystem or network reach.
 
-Pause if the enforcement point, actor-to-resource rule, or data sensitivity is unknown.
+Resolve an unknown enforcement point, actor-to-resource rule, or data sensitivity when it could change the handling of that actual boundary. Do not invent an online threat model for a local workflow.
 
 ### Dependencies, state, and failure
 
@@ -77,7 +86,11 @@ For multi-step persistent work, identify the state after each failure point. Use
 
 Include structural work only when the current requirement needs it for a coherent owner, contract, dependency direction, or state transition. Leave adjacent debt alone when the change neither exercises nor worsens it.
 
-Verify caller-observable behavior at the responsible boundary. Do not weaken tests, snapshots, types, lint rules, or checks to make the design pass. Stop expanding when the requirement has one explainable owner, shared knowledge is neither duplicated nor forced together, contracts and state transitions are explicit, and the remaining improvements do not affect the requested behavior.
+Verify caller-observable behavior at the responsible boundary. Add tests when they protect a meaningful scenario or regression risk that existing verification does not adequately cover. New functions or branches do not each require a test; avoid assertions tied to private implementation choices unless those choices enforce a required contract. Existing tests plus direct verification can be sufficient without new automated tests; follow repository requirements.
+
+Preserve valid behavioral protection and required checks. Remove or revise redundant tests with the unnecessary mechanism they protect; a test for newly invented behavior does not establish a requirement to keep that behavior. Do not weaken a valid contract, type, lint rule, or test merely to make the implementation pass.
+
+Stop expanding when the requirement has one explainable owner, shared knowledge is neither duplicated nor forced together, contracts and state transitions are explicit, and the remaining improvements do not affect the requested behavior.
 
 ## Communicate the Judgment
 
