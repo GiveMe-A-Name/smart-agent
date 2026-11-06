@@ -41,13 +41,24 @@ Build an evidence-backed model of the change before producing findings. A review
 - If the change alters a public interface, exported symbol, API, event, schema, config, error behavior, side effect, ordering, identity, or persistent state, search for repository-visible callers and consumers, inspect those that can observe the delta, and state external or uninspected consumers as coverage limits before approval.
 - If a design flaw would replace or invalidate substantial implementation work, report it before lower-impact findings.
 
+### Test Judgment
+
+When tests are added or modified, review them by the behavior they check, in this order. Keep the comparison scoped to the affected behavior; a separate review round, reviewer, or per-test report is not required.
+
+1. **Is the behavior worth protecting?** Connect it to a current requirement, supported workflow, reasonable everyday mistake, or relevant observed failure. Identify what would matter to a user or caller if it broke. A constructible scenario or an existing code branch does not establish that the behavior deserves support.
+2. **Is automated testing worth the cost?** Judge the expected value against setup, execution, and ongoing maintenance, including mocks and coupling to implementation details. Existing checks or direct verification may be sufficient; follow repository requirements. A test can be unique and still not worth adding.
+3. **Does the test actually verify that behavior?** Inspect its setup and assertions to identify which meaningful error would make it fail. Testing generated source text may verify a code-generation contract, but does not by itself prove the generated code's runtime behavior. User-oriented goals may be verified at a unit or integration boundary; they do not require end-to-end tests by default.
+4. **Does existing verification already do the job?** Inspect relevant existing tests and compare what errors they can detect. Explain the added protection or other concrete benefit, such as easier failure diagnosis, before retaining overlapping tests. Sharing a code path does not alone make tests redundant; different inputs may protect different caller contracts.
+
+Review a mechanism and its tests together: testing invented behavior does not justify that behavior. Recommend removing or revising tests when their value does not warrant their cost, while preserving required behavior. Apply the same reasoning before requesting a missing test; code changes alone do not justify one.
+
+Before finishing a review with changed tests, give a brief evidence-backed judgment in Verification and Coverage, naming the relevant behavior and tests. If necessity, effectiveness, or comparison with existing checks was not assessed, mark that part as not evaluated. Passing tests do not complete this assessment, and finding no unnecessary tests is a valid result.
+
 ### Risk Gate
 
 - Every finding must identify the changed decision, concrete consequence, and supporting file/line or check. For behavioral defects, show the reachable condition under which they fail. For unnecessary implementation or tests, show the unsupported scope or redundant protection and the specific maintenance activity, dependency, or state burden it introduces; do not invent a runtime failure to justify it. Omit claims whose consequence cannot be grounded.
 - Do not report unrelated defects outside the diff unless the change directly exercises them or violates their contract.
 - If the repository exposes tests or merge gates for the touched behavior, inspect their status. Report each executed check as passed or failed and touched-area checks not executed as not run; never imply verification that did not occur.
-- Review tests for meaningful scenario or contract protection, additional regression detection, and maintenance cost. Private call sequences or duplicated implementation logic need a contract-based reason to be asserted. Review a mechanism and its tests together: testing invented behavior does not justify that behavior. Recommend removing redundant tests when their protection is unnecessary or adequately retained elsewhere.
-- Do not demand a new test merely because code was added or changed. Existing coverage and direct verification may be sufficient; follow repository requirements and identify a concrete unprotected behavior before reporting missing tests. User-oriented test goals can be verified at a unit or integration boundary; they do not require end-to-end tests by default.
 - State coverage limits when changed files, consumers, runtime behavior, or checks were not inspected. A coverage limit is uncertainty, not evidence that a defect exists.
 - Do not implement fixes during a review unless the user also asks for changes.
 
@@ -60,7 +71,7 @@ Minimum content:
 - **Change Model:** intent, operating context, supported usage, semantic center, behavior or contract delta, affected boundaries, and material unknowns.
 - **Design Assessment:** whether the change shape and added complexity fit actual use, and the evidence supporting that judgment.
 - **Findings:** concrete issues ordered by merge risk, or an explicit statement that none were found.
-- **Verification and Coverage:** checks passed, failed, or not run, plus material inspection limits.
+- **Verification and Coverage:** checks passed, failed, or not run; when tests change, their necessity, effectiveness, and overlap with existing verification; plus material inspection limits.
 - **Verdict:** include `Ready to merge`, `Ready with fixes`, or `Not ready` when the user asks for an approval or merge decision.
 
 For each finding include the file/line, what is wrong, the triggering path or concrete maintenance burden, why it matters, and a fix direction when the evidence supports one. Omit optional polish unless the user requests it or it materially affects future defect risk or maintenance cost.
@@ -72,3 +83,4 @@ For each finding include the file/line, what is wrong, the triggering path or co
 - **Failure:** A reviewer comments on names and duplicated lines before noticing that authorization moved from a server boundary into a caller-controlled branch. The review must be revised because it evaluated local polish before the behavior owner and trust boundary.
 - **Unnecessary scope:** A local read-only reporting change introduces a coordinator for hypothetical competing service instances. Trace the actual entry point and deployment before judging the premise; if unsupported, identify the added lifecycle or state burden and the simpler reporting path. Passing tests do not settle that design judgment.
 - **Test boundary:** A small error-message improvement has adequate existing coverage and direct verification. Do not require another test merely for the changed branch. A cheap check that improves the error is not overengineering solely because the input is uncommon.
+- **Unique but unnecessary:** A local tool gains an automated recovery test for users manually changing its internal files during execution. No other test covers it, but that does not establish a supported use case or justify the recovery machinery and test maintenance. Establish the behavior's value before checking for duplication.

@@ -28,6 +28,7 @@
 ## Verification and Coverage
 
 - [Check]: [Passed / Failed / Not run]
+- **Test judgment (when tests change):** [Briefly explain whether the tested behavior and automation are worth maintaining, whether assertions verify that behavior, and how relevant existing checks compare. Name the behavior and tests supporting the conclusion; mark any unassessed part as `Not evaluated`. Passing tests alone is not this judgment.]
 - **Coverage limits:** [Uninspected files, consumers, runtime behavior, or checks.]
 
 ## Verdict
