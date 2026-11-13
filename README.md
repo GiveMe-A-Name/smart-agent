@@ -44,6 +44,7 @@ The repository already contains skills covering common engineering workflows, in
 - `systematic-debugging`: preventing premature fixes and false completion when debugging observed failures
 - `systematic-research`: turning external topics and questions into clear, comprehensive, evidence-grounded mental models and reports
 - `technical-communication`: writing technical documents that are clear and actionable
+- `explaining-clearly`: explaining concepts, mechanisms, and changes through the connections the reader needs to understand
 - `understanding-codebases`: building code-backed understanding before making changes
 - `explain-pr`: explaining a PR's background, solution, and observable changes in a standalone, collapsible HTML page
 - `code-review`: performing structured review of code changes
