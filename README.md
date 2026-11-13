@@ -46,7 +46,7 @@ The repository already contains skills covering common engineering workflows, in
 - `technical-communication`: writing technical documents that are clear and actionable
 - `explaining-clearly`: explaining concepts, mechanisms, and changes through the connections the reader needs to understand
 - `understanding-codebases`: building code-backed understanding before making changes
-- `explain-pr`: explaining a PR's background, solution, and observable changes in a standalone, collapsible HTML page
+- `explain-pr`: briefly explaining a PR's problem, approach, and resulting changes in conversation, grounded in the actual diff
 - `code-review`: performing structured review of code changes
 - `receiving-code-review`: evaluating reviewer feedback before accepting or pushing back
 - `writing-good-skills`: designing compact, reusable skill instructions
