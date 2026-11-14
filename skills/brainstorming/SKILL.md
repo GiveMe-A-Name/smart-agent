@@ -42,4 +42,8 @@ Use this skill when the user explicitly asks to brainstorm or explore, brings an
 
 Do not trigger merely because the user names a goal without prescribing the implementation. Requests such as “add CSV export,” “fix this bug,” or “write an implementation plan” should proceed in their own workflow unless the user asks to reopen the idea.
 
-Do not use brainstorming for factual lookup, settled execution, specification writing, implementation planning, or research. When the user converges—such as “choose the Slack bot,” “plan this,” or “start implementing”—stop exploring and switch to the requested work.
+Do not use brainstorming for factual lookup, settled execution, specification writing, implementation planning, or research.
+
+Read follow-up messages in the context of the conversation. When the user has asked to discuss before acting, added requirements, filenames, or agreement with a design detail do not by themselves authorize implementation. Continue the discussion and any relevant read-only investigation.
+
+When the user asks for a plan, switch to planning and keep the work within that request. When the user asks to implement, switch to execution and proceed within the existing authorization without asking for confirmation again.

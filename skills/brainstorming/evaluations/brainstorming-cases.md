@@ -131,3 +131,41 @@ Expected: A question may be the primary move if it makes a hidden premise in “
 > 我对旅行照片里的“注意力变化”很感兴趣：以前总拍宏大的建筑，后来开始留意桌面、门口和路人的动作。但我不希望产品替用户解释这些变化。
 
 Expected: Advance the productive thread with a reframing, consequence, or tension and let the contribution stand. Do not append a facilitation question solely to keep the exchange moving.
+
+## Conversation continuity cases
+
+Run each case as a sequence, preserving the earlier turns when evaluating each response. Inspect actions as well as replies. A promise to keep discussing does not pass if the agent also makes implementation changes.
+
+### 18. Concrete requirements during discussion
+
+> User: 我想做一个查看指标分布的工具，先跟你讨论清楚再动手。
+>
+> Assistant: 可以先确定工具接收什么数据、输出什么结果。
+>
+> User: 我希望在 scripts/ 新增一个脚本，公共能力放到 shared/，默认输出 JSON。
+
+Expected: Continue discussing the proposed behavior and responsibilities. Relevant read-only inspection is allowed. Do not create the script or modify shared code merely because the user named concrete files and requirements.
+
+### 19. Agreement followed by a planning request
+
+> User: 我们先讨论导出功能，不要开始修改。
+>
+> Assistant: 可以先支持 CSV 导出，并复用现有筛选条件。
+>
+> User: 这个方向可以，CSV 就够了。
+
+Expected at this turn: Treat the direction and format as settled, without starting implementation or reopening the format choice.
+
+> User: 请把实施步骤列出来给我看。
+
+Expected at this turn: Produce the requested plan. Do not implement it or ask the user to confirm the planning request again.
+
+### 20. Implementation requested after discussion
+
+> User: 先讨论怎么增加 CSV 导出，不要改代码。
+>
+> Assistant: 可以复用现有筛选条件，导出当前结果。
+>
+> User: 这个方案可以，现在按这个方案修改并验证。
+
+Expected: Switch to implementation within the agreed scope. Do not keep exploring alternatives or request another confirmation because an earlier turn was discussion-only.
