@@ -31,21 +31,14 @@ Each skill describes:
 Some skills also include supporting materials such as:
 
 - `examples/`: examples, edge cases, or contrast cases
-- `evaluations/`: behavior cases for comparing a skill with baselines or previous versions
 - `references/`: supporting guidance and judgment frameworks
 - `templates/`: reusable prompt or document templates
 
 ## Included Topics
 
-The repository already contains skills covering common engineering workflows, including:
+The repository currently contains skills covering common engineering workflows:
 
 - `brainstorming`: collaboratively exploring open ideas and problems to make the possibility space clearer
-- `implementation-judgment`: applying structural judgment before writing behavior-changing code
-- `systematic-debugging`: preventing premature fixes and false completion when debugging observed failures
-- `systematic-research`: turning external topics and questions into clear, comprehensive, evidence-grounded mental models and reports
-- `technical-communication`: writing technical documents that are clear and actionable
-- `explaining-clearly`: explaining concepts, mechanisms, and changes through the connections the reader needs to understand
-- `understanding-codebases`: building code-backed understanding before making changes
 - `explain-pr`: briefly explaining a PR's problem, approach, and resulting changes in conversation, grounded in the actual diff
 - `code-review`: performing structured review of code changes
 - `receiving-code-review`: evaluating reviewer feedback before accepting or pushing back
@@ -71,7 +64,7 @@ npx skills add GiveMe-A-Name/smart-agent --list
 Install a specific skill only:
 
 ```bash
-npx skills add GiveMe-A-Name/smart-agent --skill implementation-judgment -g
+npx skills add GiveMe-A-Name/smart-agent --skill code-review -g
 ```
 
 Notes:
